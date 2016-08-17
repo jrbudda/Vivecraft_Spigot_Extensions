@@ -3,9 +3,7 @@ package org.vivecraft.listeners;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.List;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -63,7 +61,8 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			break;
 		case VERSION:
 			vse.vivePlayers.put(sender.getUniqueId(), new VivePlayer());
-			sendVersion(sender);
+			sender.sendPluginMessage(vse, vse.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getName()));		
+			sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});
 			break;
 		case WORLDSCALE:
 			break;
@@ -72,11 +71,6 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		}
 	}
 
-	
-	public void sendVersion(Player player){
-		player.sendPluginMessage(vse, vse.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getName()));		
-	}
-	
 	public static byte[] StringToPayload(PacketDiscriminators version, String input){
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		byte[] bytes = input.getBytes(Charsets.UTF_8);
