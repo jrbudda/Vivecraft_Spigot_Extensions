@@ -15,6 +15,10 @@ import com.google.common.base.Charsets;
 public class VivecraftNetworkListener implements PluginMessageListener {
 	public VSE vse;
 		
+	public VivecraftNetworkListener(VSE vse){
+		this.vse = vse;
+	}
+	
 	public enum PacketDiscriminators {
 		VERSION,
 		REQUESTDATA,
