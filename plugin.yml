@@ -3,5 +3,6 @@ version: '1.10.2 r1'
 main: org.vivecraft.VSE
 dev-url: http://www.vivecraft.org/
 commands:
-  vive:
-    description: 'Vivecraft Spigot Extensions"
+   Vive:
+      description: BLANK
+      usage: /<command>
