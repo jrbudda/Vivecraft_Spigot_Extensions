@@ -1,14 +1,98 @@
 package org.vivecraft.listeners;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
+
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.vivecraft.VSE;
+import org.vivecraft.VivePlayer;
+
+import com.google.common.base.Charsets;
 
 public class VivecraftNetworkListener implements PluginMessageListener {
-
-	@Override
-	public void onPluginMessageReceived(String arg0, Player arg1, byte[] arg2) {
-
+	public VSE vse;
 		
+	public enum PacketDiscriminators {
+		VERSION,
+		REQUESTDATA,
+		HEADDATA,
+		CONTROLLER0DATA,
+		CONTROLLER1DATA,
+		WORLDSCALE,
+		DRAW,
+		MOVEMODE
+	}
+	
+	@Override
+	public void onPluginMessageReceived(String channel, Player sender, byte[] payload) {
+		if(!channel.equalsIgnoreCase(vse.CHANNEL)) return;
+		if(payload.length==0) return;
+		
+		VivePlayer vp = vse.vivePlayers.get(sender.getUniqueId());
+		
+		PacketDiscriminators disc = PacketDiscriminators.values()[payload[0]];
+		
+		if(vp == null && disc.ordinal() > 0) {
+			//how?
+			return;
+		}
+		
+		byte[] data = Arrays.copyOfRange(payload, 1, payload.length);
+		
+		switch (disc){
+		case CONTROLLER0DATA:
+			vp.controller0data = data;
+			break;
+		case CONTROLLER1DATA:
+			vp.controller1data = data;
+			break;
+		case DRAW:
+			break;
+		case HEADDATA:
+			vp.hmdData = data;
+			break;
+		case MOVEMODE:
+			break;
+		case REQUESTDATA:
+			//only we can use that word.
+			break;
+		case VERSION:
+			vse.vivePlayers.put(sender.getUniqueId(), new VivePlayer());
+			sendVersion(sender);
+			break;
+		case WORLDSCALE:
+			break;
+		default:
+			break;
+		}
 	}
 
+	
+	public void sendVersion(Player player){
+		player.sendPluginMessage(vse, vse.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getName()));		
+	}
+	
+	public static byte[] StringToPayload(PacketDiscriminators version, String input){
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		byte[] bytes = input.getBytes(Charsets.UTF_8);
+		int len = bytes.length;
+		try {
+			output.write((byte)version.ordinal());
+			output.write(ByteBuffer.allocate(4).putInt(len).array());
+			//TODO: check endianness.
+			output.write(bytes);
+		} catch (IOException e) {
+		}
+
+		return output.toByteArray();
+		
+	}
+	
+	
 }
+
