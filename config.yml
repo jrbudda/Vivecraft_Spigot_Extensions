@@ -1,15 +1,7 @@
-<<<<<<< HEAD
-vive-only: true
-vive-only.kickmessage: U need to have the Vive Mod installed to join this server!
-vive-only.waittime: 20
-permissions.vivegroup: vive.vivegroup
+vive-only: false
+vive-only.kickmessage: This server is configured for Vivecraft players only.
+vive-only.waittime: 60
+permissions.vivegroup: 'vive.vivegroup'
 permissions.non-vivegroup: 'vive.non-vivegroup'
 permissions.freemovegroup: 'vive.freemovegroup'
-=======
-vive-only: true
-vive-only.kickmessage: U need to have the Vive Mod installed to join this server!
-vive-only.waittime: 20
-permissions.vivegroup: vive.vivegroup
-permissions.non-vivegroup: 'vive.non-vivegroup'
-permissions.freemovegroup: 'vive.freemovegroup'
->>>>>>> debf51d6decf44d25831ee97bdbbe2ceea92fd7b
+
