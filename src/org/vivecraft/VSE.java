@@ -41,16 +41,18 @@ public class VSE extends JavaPlugin implements Listener{
 
     @EventHandler
     public void onPlayerConnect(PlayerJoinEvent event) {
-        final Player p = event.getPlayer();
+    	final Player p = event.getPlayer();
 
-        getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-            @Override
-            public void run() {
-                if (p.isOnline() && vivePlayers.containsKey(p.getUniqueId())) {
-                    p.kickPlayer(getConfig().getString("vive-only.kickmessage"));
-                }
-            }
-        }, getConfig().getInt("vive-only.waittime"));
+    	if(getConfig().getBoolean("vive-only.enabled")){
+    		getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+    			@Override
+    			public void run() {
+    				if (p.isOnline() && vivePlayers.containsKey(p.getUniqueId())) {
+    					p.kickPlayer(getConfig().getString("vive-only.kickmessage"));
+    				}
+    			}
+    		}, getConfig().getInt("vive-only.waittime"));
+    	}
     }
 
     
@@ -68,7 +70,7 @@ public class VSE extends JavaPlugin implements Listener{
             groups.put(g_classic, !isvive);
 
         if (isvive) {
-            String g_freemove = getConfig().getString("permissions.freemovegrounp");
+            String g_freemove = getConfig().getString("permissions.freemovegroup");
             if (g_freemove != null)
                 groups.put(g_freemove, !vivePlayers.get(p.getUniqueId()).isTeleportMode);
         }
