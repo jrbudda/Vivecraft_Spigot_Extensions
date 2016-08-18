@@ -66,7 +66,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			break;
 		case VERSION:
 			vse.vivePlayers.put(sender.getUniqueId(), new VivePlayer(sender));
-			sender.sendPluginMessage(vse, vse.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getName()));		
+			sender.sendPluginMessage(vse, vse.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getDescription().getFullName()));		
 			sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});
 			break;
 		case WORLDSCALE:

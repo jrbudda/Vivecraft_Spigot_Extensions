@@ -1,7 +1,9 @@
 name: Vivecraft Spigot Extensions
 version: '1.10.2 r1'
 main: org.vivecraft.VSE
-dev-url: http://www.vivecraft.org/
+website: http://www.vivecraft.org/
+author: jrbudda
+prefix: Vivecraft
 commands:
    Vive:
       description: BLANK

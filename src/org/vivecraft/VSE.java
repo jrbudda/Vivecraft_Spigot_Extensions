@@ -27,6 +27,7 @@ public class VSE extends JavaPlugin implements Listener {
 
 	int task = 0;
 	
+	
 	@Override
 	public void onEnable() {
 		super.onEnable();
@@ -42,10 +43,9 @@ public class VSE extends JavaPlugin implements Listener {
 		getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, new VivecraftNetworkListener(this));
 		getServer().getMessenger().registerOutgoingPluginChannel(this, CHANNEL);
 
-		SpigotConfig.movedWronglyThreshold = 10; //Maybe 20 would be better for some reasons U will get kicked fast
+		//TODO: config.yml entries?
+		SpigotConfig.movedWronglyThreshold = 30;
 		SpigotConfig.movedTooQuicklyMultiplier = 64; 
-		SpigotConfig.outdatedClientMessage = "Please update";
-		SpigotConfig.outdatedServerMessage = "Please Update";
 		
 		task = getServer().getScheduler().scheduleSyncRepeatingTask(this, new  Runnable(){
 			public void run(){
