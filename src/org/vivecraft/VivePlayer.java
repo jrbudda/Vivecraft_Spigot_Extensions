@@ -1,6 +1,11 @@
 package org.vivecraft;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.vivecraft.listeners.VivecraftNetworkListener;
 
 public class VivePlayer {
 
@@ -12,6 +17,12 @@ public class VivePlayer {
 	boolean isSeated;
 	boolean worldScale;
 
+	public Player player;
+	
+	public VivePlayer(Player player){
+		this.player = player;
+	}
+	
 	// TODO: implement
 	public Vector getHmdPos() {
 		Vector out = new Vector();
@@ -20,5 +31,22 @@ public class VivePlayer {
 	}
 
 	// etc
+	
+	public byte[] getUberPacket(){
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		try {
+			output.write((byte) VivecraftNetworkListener.PacketDiscriminators.UBERPACKET.ordinal()); 		
+			output.write(java.nio.ByteBuffer.allocate(8).putLong(player.getUniqueId().getMostSignificantBits()).array());
+			output.write(java.nio.ByteBuffer.allocate(8).putLong(player.getUniqueId().getLeastSignificantBits()).array());
+			output.write(hmdData);
+			output.write(controller0data);
+			output.write(controller1data);
+		} catch (IOException e) {
 
+		}
+		
+		return output.toByteArray();
+	
+	}
+	
 }

@@ -27,7 +27,8 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		CONTROLLER1DATA,
 		WORLDSCALE,
 		DRAW,
-		MOVEMODE
+		MOVEMODE,
+		UBERPACKET
 	}
 	
 	@Override
@@ -64,7 +65,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			//only we can use that word.
 			break;
 		case VERSION:
-			vse.vivePlayers.put(sender.getUniqueId(), new VivePlayer());
+			vse.vivePlayers.put(sender.getUniqueId(), new VivePlayer(sender));
 			sender.sendPluginMessage(vse, vse.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getName()));		
 			sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});
 			break;

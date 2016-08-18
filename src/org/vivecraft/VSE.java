@@ -25,6 +25,8 @@ public class VSE extends JavaPlugin implements Listener {
 
 	public Map<UUID, VivePlayer> vivePlayers = new HashMap<UUID, VivePlayer>();
 
+	int task = 0;
+	
 	@Override
 	public void onEnable() {
 		super.onEnable();
@@ -45,13 +47,40 @@ public class VSE extends JavaPlugin implements Listener {
 		SpigotConfig.outdatedClientMessage = "Please update";
 		SpigotConfig.outdatedServerMessage = "Please Update";
 		
+		task = getServer().getScheduler().scheduleSyncRepeatingTask(this, new  Runnable(){
+			public void run(){
+				sendPosData();
+			}}, 20, 1);
 		
 	}
+		
+	public void sendPosData(){
+
+		for (VivePlayer sendTo: vivePlayers.values()){
+
+			if(sendTo == null || sendTo.player == null || !sendTo.player.isOnline()) continue; //dunno y but just in case.
+
+			for (VivePlayer v: vivePlayers.values()){	
+
+				if(v == sendTo || v == null || v.player == null || !v.player.isOnline()) continue; 
+
+				double d = sendTo.player.getLocation().distanceSquared(v.player.getLocation());
+
+				if(d < 256*256){
+					//TODO: optional distance value?
+					sendTo.player.sendPluginMessage(this,CHANNEL, v.getUberPacket());
+				}	
+			}
+		}
+	}
+		
+		
+		
 	//Config Save
 	@Override
 	public void onDisable() {
 		saveConfig();
-		
+		getServer().getScheduler().cancelTask(task);
 		super.onDisable();
 	}
 	
