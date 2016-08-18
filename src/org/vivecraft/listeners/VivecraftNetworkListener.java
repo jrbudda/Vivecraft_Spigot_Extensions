@@ -39,14 +39,12 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		VivePlayer vp = vse.vivePlayers.get(sender.getUniqueId());
 		
 		PacketDiscriminators disc = PacketDiscriminators.values()[payload[0]];
-		vse.getLogger().info("[ViveCraft]debug: bsPacketRecived: " + disc);
 		if(vp == null && disc.ordinal() > 0) {
 			//how?
 			return;
 		}
 		
 		byte[] data = Arrays.copyOfRange(payload, 1, payload.length);
-		vse.getLogger().info("[ViveCraft]debug: PacketRecived: " + disc);
 		switch (disc){
 		case CONTROLLER0DATA:
 			vp.controller0data = data;
@@ -95,4 +93,3 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 	
 	
 }
-

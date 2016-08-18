@@ -1,6 +1,5 @@
 package org.vivecraft;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -20,7 +19,7 @@ import org.vivecraft.listeners.VivecraftNetworkListener;
 
 public class VSE extends JavaPlugin implements Listener {
 	FileConfiguration config = getConfig();
-	
+
 	public final String CHANNEL = "Vivecraft";
 
 	public Map<UUID, VivePlayer> vivePlayers = new HashMap<UUID, VivePlayer>();
@@ -31,11 +30,11 @@ public class VSE extends JavaPlugin implements Listener {
 	public void onEnable() {
 		super.onEnable();
 
-		//Config Part
-	    config.options().copyDefaults(true);
-	    saveDefaultConfig();
-	    saveConfig();
-	    //end Config part
+		// Config Part
+		config.options().copyDefaults(true);
+		saveDefaultConfig();
+		saveConfig();
+		// end Config part
 
 		this.getCommand("vive").setExecutor(new ViveCommand(this));
 		getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, new VivecraftNetworkListener(this));
