@@ -5,6 +5,9 @@ website: http://www.vivecraft.org/
 author: jrbudda
 prefix: Vivecraft
 commands:
-   Vive:
-      description: BLANK
+   vive:
+      description: Vive
+      usage: /<command>
+   viveinfo:
+      description: Get info about the VivePlugin Version
       usage: /<command>
