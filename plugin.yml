@@ -6,5 +6,5 @@ author: jrbudda
 prefix: Vivecraft
 commands:
    Vive:
-      description: BLANK
-      usage: /<command>
+      description: Vivecraft Spigot Extensions
+      usage: /vive <command>
