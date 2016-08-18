@@ -5,14 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerChannelEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRegisterChannelEvent;
-
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,7 +19,8 @@ import org.vivecraft.command.ViveCommand;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 
 public class VSE extends JavaPlugin implements Listener {
-
+	FileConfiguration config = getConfig();
+	
 	public final String CHANNEL = "Vivecraft";
 
 	public Map<UUID, VivePlayer> vivePlayers = new HashMap<UUID, VivePlayer>();
@@ -32,7 +31,12 @@ public class VSE extends JavaPlugin implements Listener {
 	public void onEnable() {
 		super.onEnable();
 
-		createConfig();
+		//Config Part
+	    config.options().copyDefaults(true);
+	    saveDefaultConfig();
+	    saveConfig();
+	    //end Config part
+
 		this.getCommand("vive").setExecutor(new ViveCommand(this));
 		getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, new VivecraftNetworkListener(this));
 		getServer().getMessenger().registerOutgoingPluginChannel(this, CHANNEL);
@@ -137,32 +141,4 @@ public class VSE extends JavaPlugin implements Listener {
 			}
 		}
 	}
-
-	private void createConfig() {
-		try {
-			if (!getDataFolder().exists()) {
-				getDataFolder().mkdirs();
-			}
-			File file = new File(getDataFolder(), "config.yml");
-			if (!file.exists()) {
-				getLogger().info("ViveCraft Config not found, creating!");
-				saveDefaultConfig();
-				this.getConfig().set("vive-only.enabled", true);
-				this.getConfig().set("vive-only.kickmessage",
-						"You need to have the Vive Mod installed to join this server!");
-				this.getConfig().set("vive-only.waittime", 20);
-				this.getConfig().set("permissions.vivegroup", "vive.vivegroup");
-				this.getConfig().set("permissions.non-vivegroup", "vive.non-vivegroup");
-				this.getConfig().set("permissions.freemovegroup", "vive.freemovegroup");
-				saveConfig();
-			} else {
-				getLogger().info("ViveCraft Config found, loading!");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-
-		}
-
-	}
-
 }
