@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="E:/Vivecraft/Vivecraft_Spigot_Extensions/lib/spigot-1.10.2-R0.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="E:/Vivecraft/Vivecraft_Spigot_Extensions/lib/spigot-api-1.10.2-R0.1-SNAPSHOT-shaded.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="E:/Vivecraft/Vivecraft_Spigot_Extensions/lib/Vault.jar"/>
-	<classpathentry kind="output" path="bin"/>
-</classpath>
