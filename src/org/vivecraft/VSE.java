@@ -19,6 +19,8 @@ import org.vivecraft.listeners.VivecraftNetworkListener;
 import net.milkbowl.vault.permission.Permission;
 
 public class VSE extends JavaPlugin implements Listener {
+  
+    
     FileConfiguration config = getConfig();
     public final String CHANNEL = "Vivecraft";
 
