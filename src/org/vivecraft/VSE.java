@@ -15,6 +15,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.spigotmc.SpigotConfig;
 import org.vivecraft.command.ViveCommand;
+import org.vivecraft.command.ViveInfoCommand;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 
 import net.milkbowl.vault.permission.Permission;
@@ -39,6 +40,8 @@ public class VSE extends JavaPlugin implements Listener {
 	    
 	   //Command Part
 	    this.getCommand("vive").setExecutor(new ViveCommand());
+	    this.getCommand("viveinfo").setExecutor(new ViveInfoCommand());
+	    
 	    //end Command Part
 		getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, new VivecraftNetworkListener(this));
 		getServer().getMessenger().registerOutgoingPluginChannel(this, CHANNEL);

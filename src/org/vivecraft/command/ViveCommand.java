@@ -11,8 +11,8 @@ public class ViveCommand extends JavaPlugin  implements CommandExecutor{
 	@Override 
 	public void onEnable(){
 
-		this.getLogger().info("The Vive Commands Have been Enabled!");
-
+		this.getLogger().info("The Vive Command Have been Enabled!");
+		
 	}
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
