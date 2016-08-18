@@ -1,13 +1,8 @@
-#Set to true to only allow Vivecraft players to play.
-vive-only: false
-#The message to show kicked non-vive players.
-vive-only.kickmessage: This server is configured for Vivecraft players only.
-#Ticks to wait before kicking a player. The player's client must send a Vivecraft VERSION info in that time.
-vive-only.waittime: 60
-#Permission group for Vive users
-permissions.vivegroup: vive.vivegroup
-#Permission group for non-Vive users
-permissions.non-vivegroup: vive.non-vivegroup
-#Permission group for vive users in free move mode.
-permissions.freemovegroup: vive.freemovegroup
-
+vive-only:
+  enabled: true
+  kickmessage: You need to have the Vive Mod installed to join this server!
+  waittime: 20
+permissions:
+  vivegroup: vive.vivegroup
+  non-vivegroup: vive.non-vivegroup
+  freemovegroup: vive.freemovegroup

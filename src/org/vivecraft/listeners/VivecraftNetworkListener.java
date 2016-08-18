@@ -27,8 +27,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		CONTROLLER1DATA,
 		WORLDSCALE,
 		DRAW,
-		MOVEMODE,
-		UBERPACKET
+		MOVEMODE
 	}
 	
 	@Override
@@ -39,14 +38,14 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		VivePlayer vp = vse.vivePlayers.get(sender.getUniqueId());
 		
 		PacketDiscriminators disc = PacketDiscriminators.values()[payload[0]];
-		
+		vse.getLogger().info("[ViveCraft]debug: bsPacketRecived: " + disc);
 		if(vp == null && disc.ordinal() > 0) {
 			//how?
 			return;
 		}
 		
 		byte[] data = Arrays.copyOfRange(payload, 1, payload.length);
-		
+		vse.getLogger().info("[ViveCraft]debug: PacketRecived: " + disc);
 		switch (disc){
 		case CONTROLLER0DATA:
 			vp.controller0data = data;
@@ -65,8 +64,12 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			//only we can use that word.
 			break;
 		case VERSION:
-			vse.vivePlayers.put(sender.getUniqueId(), new VivePlayer(sender));
-			sender.sendPluginMessage(vse, vse.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getDescription().getFullName()));		
+			vse.vivePlayers.put(sender.getUniqueId(), new VivePlayer());
+			sender.sendMessage("[ViveCraft] Welcome Vive user!");
+			//sender.sendRawMessage("Vivecraft");
+			vse.getLogger().info("[ViveCraft]debug: payload: " + StringToPayload(PacketDiscriminators.VERSION, vse.getName()) + " : " + new String(StringToPayload(PacketDiscriminators.VERSION, vse.getName())));
+			vse.getLogger().info("[ViveCraft]debug: payload2: " + new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()} + " : " + new String(new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()}));
+			sender.sendPluginMessage(vse, vse.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getName()));		
 			sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});
 			break;
 		case WORLDSCALE:
@@ -94,5 +97,4 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 	
 	
 }
-
 
