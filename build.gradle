@@ -37,13 +37,28 @@ jar {
 	from file('config.yml')
 }
 
-task setup(dependsOn: 'setupRun') {
-	def spigotJar = new File('lib/spigot.jar')
-	if (spigotJar.exists()) spigotJar.delete();
-	else spigotJar.getParentFile().mkdirs();
-	copy {
-		from 'setup/spigot-' + mcversion + '.jar'
-		into 'lib'
+clean {
+	delete fileTree(dir: 'lib', include: 'spigot-*.jar')
+}
+
+task setup(dependsOn: 'setupDownload') {
+	def spigotJar = new File('lib/spigot-' + mcversion + '.jar')
+	if (!spigotJar.exists()) {
+		spigotJar.getParentFile().mkdirs();
+		doFirst {
+			javaexec {
+				workingDir 'setup'
+				classpath 'setup/BuildTools.jar'
+				main 'org.spigotmc.builder.Builder'
+				args '--rev', mcversion
+			}
+		}
+		doLast {
+			copy {
+				from 'setup/spigot-' + mcversion + '.jar'
+				into 'lib'
+			}
+		}
 	}
 }
 
@@ -56,9 +71,4 @@ task setupDownload {
 	}
 }
 
-task setupRun(dependsOn: 'setupDownload', type: JavaExec) {
-	workingDir 'setup'
-	classpath 'setup/BuildTools.jar'
-	main 'org.spigotmc.builder.Builder'
-	args '--rev', mcversion
-}
+build.dependsOn setup
