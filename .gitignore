@@ -3,8 +3,7 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
-*.jar
+# Package Files
 *.war
 *.ear
 
@@ -33,3 +32,4 @@ local.properties
 # Misc project things
 setup/
 lib/
+build/
