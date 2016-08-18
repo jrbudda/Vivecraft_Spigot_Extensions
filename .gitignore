@@ -1,11 +1,5 @@
-*.class
-
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
-
-# Package Files
-*.war
-*.ear
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
@@ -25,11 +19,16 @@ local.properties
 .settings/
 .loadpath
 
+# IntelliJ
+out/
+.idea/
+generated/
+
 # Gradle
-.gradle
-.m2
+.gradle/
+.m2/
+build/
 
 # Misc project things
 setup/
 lib/
-build/
