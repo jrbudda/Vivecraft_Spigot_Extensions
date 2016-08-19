@@ -99,6 +99,7 @@ public class VivePlayer {
 					java.nio.ByteBuffer.allocate(8).putLong(player.getUniqueId().getMostSignificantBits()).array());
 			output.write(
 					java.nio.ByteBuffer.allocate(8).putLong(player.getUniqueId().getLeastSignificantBits()).array());
+			if(hmdData.length < 29) output.write(0);
 			output.write(hmdData);
 			output.write(controller0data);
 			output.write(controller1data);
