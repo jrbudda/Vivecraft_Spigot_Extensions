@@ -36,7 +36,11 @@ public class VivecraftCombatListener implements Listener{
 		   //TODO: check for seated mode.
 		   
 		   proj.teleport(vp.getControllerPos(hand));
-
+		   
+		   //this only works if the incoming speed is at max (based! on draw time)
+		   //TODO: properly scale in all cases.
+		   proj.setVelocity(proj.getVelocity().multiply(vp.getDraw())); 
+		   
 	   }
 	
 	   @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)

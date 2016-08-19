@@ -54,6 +54,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			vp.controller1data = data;
 			break;
 		case DRAW:
+			vp.draw = data;
 			break;
 		case HEADDATA:
 			vp.hmdData = data;

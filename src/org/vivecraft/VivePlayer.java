@@ -16,6 +16,7 @@ public class VivePlayer {
 	public byte[] hmdData;
 	public byte[] controller0data;
 	public byte[] controller1data;
+	public byte[] draw;
 	boolean isTeleportMode;
 	boolean isReverseHands;
 	boolean isSeated;
@@ -27,6 +28,24 @@ public class VivePlayer {
 		this.player = player;
 	}
 
+	public float getDraw(){
+		try {
+		
+			ByteArrayInputStream byin = new ByteArrayInputStream(draw);
+			DataInputStream da = new DataInputStream(byin);
+	
+			float draw= da.readFloat();
+			
+			da.close(); //needed?
+			return draw;
+				
+		} catch (IOException e) {
+
+		}
+	 
+		return 0;
+	}
+	
 	// TODO: implement
 	public Location getControllerPos(int c) {
 		try {
