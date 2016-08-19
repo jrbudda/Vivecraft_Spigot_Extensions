@@ -4,7 +4,7 @@ vive-only:
   #The message to show kicked non-vive players.
   kickmessage: This server is configured for Vivecraft players only.
   #Ticks to wait before kicking a player. The player's client must send a Vivecraft VERSION info in that time.
-  waittime: 20
+  waittime: 60
 permissions:
   #Permission group for Vive users
   vivegroup: vive.vivegroup

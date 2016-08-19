@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
+import org.vivecraft.command.ViveCommand;
 
 import com.google.common.base.Charsets;
 
@@ -64,7 +65,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			break;
 		case VERSION:
 			vse.vivePlayers.put(sender.getUniqueId(), new VivePlayer(sender));
-			sender.sendMessage("[ViveCraft] Welcome Vive user!");
+			ViveCommand.sendMessage("Welcome Vive user!",sender);
 			sender.sendPluginMessage(vse, vse.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getDescription().getFullName()));		
 			sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});
 			break;
@@ -91,5 +92,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		
 	}
 	
+	
+
 	
 }
