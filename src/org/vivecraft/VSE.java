@@ -15,6 +15,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.spigotmc.SpigotConfig;
 import org.vivecraft.command.ViveCommand;
+import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 
 public class VSE extends JavaPlugin implements Listener {
@@ -40,6 +41,9 @@ public class VSE extends JavaPlugin implements Listener {
 		getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, new VivecraftNetworkListener(this));
 		getServer().getMessenger().registerOutgoingPluginChannel(this, CHANNEL);
 
+		getServer().getPluginManager().registerEvents(this, this);
+		getServer().getPluginManager().registerEvents(new VivecraftCombatListener(this), this);
+		
 		SpigotConfig.movedWronglyThreshold = 10;
 		SpigotConfig.movedTooQuicklyMultiplier = 64;
 
@@ -102,6 +106,11 @@ public class VSE extends JavaPlugin implements Listener {
 		}
 	}
 
+	public boolean isVive(Player p){
+		if(p == null) return false;
+		return vivePlayers.containsKey(p.getUniqueId());
+	}
+	
 	public void setPermissionsGroup(Player p) {
 
 		Map<String, Boolean> groups = new HashMap<String, Boolean>();
