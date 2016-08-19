@@ -26,6 +26,7 @@ public class VivecraftCombatListener implements Listener{
 	                return;
             
 	            event.setDamage(event.getDamage()*2);
+	            arrow.teleport(vse.vivePlayers.get(arrow.getShooter()).getControllerPos(1));
 	            //TODO: configurable Vive player arrow damage
 	            
 	            

@@ -1,8 +1,12 @@
 package org.vivecraft;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.vivecraft.listeners.VivecraftNetworkListener;
@@ -24,11 +28,29 @@ public class VivePlayer {
 	}
 
 	// TODO: implement
-	public Vector getHmdPos() {
-		Vector out = new Vector();
-		// TODO : use nms Vec3D?
-		return out;
+	public Location getControllerPos(int c) {
+		ByteArrayInputStream byin = new ByteArrayInputStream(c==0?controller0data:controller1data);
+		DataInputStream da = new DataInputStream(byin);
+		
+		try {
+			boolean rev = da.readBoolean();
+			float x = da.readFloat();
+			float y = da.readFloat();
+			float z = da.readFloat();
+			
+			return new Location(player.getWorld(), x, y, z);
+				
+		} catch (IOException e) {
+
+		}
+	 
+		
+		return player.getLocation(); //why
+		
+		
 	}
+	
+
 
 	// etc
 
