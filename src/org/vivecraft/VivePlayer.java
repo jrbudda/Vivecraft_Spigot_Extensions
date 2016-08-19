@@ -29,28 +29,46 @@ public class VivePlayer {
 
 	// TODO: implement
 	public Location getControllerPos(int c) {
-		ByteArrayInputStream byin = new ByteArrayInputStream(c==0?controller0data:controller1data);
-		DataInputStream da = new DataInputStream(byin);
-		
 		try {
+			
+			ByteArrayInputStream byin = new ByteArrayInputStream(c==0?controller0data:controller1data);
+			DataInputStream da = new DataInputStream(byin);
+	
 			boolean rev = da.readBoolean();
 			float x = da.readFloat();
 			float y = da.readFloat();
 			float z = da.readFloat();
 			
+			da.close(); //needed?
 			return new Location(player.getWorld(), x, y, z);
 				
 		} catch (IOException e) {
 
 		}
 	 
-		
 		return player.getLocation(); //why
-		
-		
+
 	}
 	
+	
+	public boolean isSeated(){
+		try {
+			if(hmdData.length <29) return false;//old client.
+			
+			ByteArrayInputStream byin = new ByteArrayInputStream(hmdData);
+			DataInputStream da = new DataInputStream(byin);
+	
+			boolean seated= da.readBoolean();
+			
+			da.close(); //needed?
+			return seated;
+				
+		} catch (IOException e) {
 
+		}
+	 
+		return false;
+	}
 
 	// etc
 

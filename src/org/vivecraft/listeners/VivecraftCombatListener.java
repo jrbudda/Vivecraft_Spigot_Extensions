@@ -3,11 +3,14 @@ package org.vivecraft.listeners;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.vivecraft.VSE;
+import org.vivecraft.VivePlayer;
 
 
 public class VivecraftCombatListener implements Listener{
@@ -19,14 +22,35 @@ public class VivecraftCombatListener implements Listener{
 	}
 	
 	   @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+	   public void onProjectileLaunch(ProjectileLaunchEvent event) {
+		   //position all projectiles correctly.
+		   
+		   final Projectile proj = event.getEntity();
+		   if (!(proj.getShooter() instanceof Player) || !vse.isVive((Player) proj.getShooter()))
+			   return;
+
+		   VivePlayer vp = vse.vivePlayers.get(proj.getShooter());
+		   
+		   int hand = 0;
+		   if (proj instanceof Arrow) hand = 1;
+		   //TODO: check for seated mode.
+		   
+		   proj.teleport(vp.getControllerPos(hand));
+
+	   }
+	
+	   @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	    public void onProjectileHit(EntityDamageByEntityEvent event) {
 	        if (event.getDamager() instanceof Arrow && event.getEntity() instanceof LivingEntity) {
 	            final Arrow arrow = (Arrow) event.getDamager();
 	            if (!(arrow.getShooter() instanceof Player) || !vse.isVive((Player) arrow.getShooter()))
 	                return;
-            
-	            event.setDamage(event.getDamage()*2);
-	            arrow.teleport(vse.vivePlayers.get(arrow.getShooter()).getControllerPos(1));
+	            
+	            VivePlayer vp = vse.vivePlayers.get(arrow.getShooter());
+	 			
+	            if(!vp.isSeated())
+	 				event.setDamage(event.getDamage()*2);
+
 	            //TODO: configurable Vive player arrow damage
 	            
 	            
