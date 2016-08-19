@@ -71,6 +71,8 @@ public class ViveCommand implements CommandExecutor {
 				} else {
 					sendMessage("Unknown command", player);
 				}
+			}else{
+				sendMessage("Download Vivecraft at http://www.vivecraft.org/",player);
 			}
 		} else if (!(sender instanceof Player))
 			plugin.getLogger().info("Only players can run this command!");
