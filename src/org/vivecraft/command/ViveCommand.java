@@ -1,6 +1,8 @@
 package org.vivecraft.command;
 
 import java.util.ArrayList;
+
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -80,7 +82,7 @@ public class ViveCommand implements CommandExecutor {
 	}
 
 	public static void sendMessage(String message, Player p) {
-		p.sendMessage("[Vivecraft] " + message);
+		p.sendMessage(ChatColor.BLUE + "[" + ChatColor.GRAY + "Vivecraft" + ChatColor.BLUE + "] " + ChatColor.WHITE + message);
 	}
 
 }

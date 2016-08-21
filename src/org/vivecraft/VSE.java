@@ -40,10 +40,10 @@ public class VSE extends JavaPlugin implements Listener {
 		this.getCommand("vive").setExecutor(new ViveCommand(this));
 		getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, new VivecraftNetworkListener(this));
 		getServer().getMessenger().registerOutgoingPluginChannel(this, CHANNEL);
-
+		
 		getServer().getPluginManager().registerEvents(this, this);
 		getServer().getPluginManager().registerEvents(new VivecraftCombatListener(this), this);
-		
+
 		SpigotConfig.movedWronglyThreshold = 10;
 		SpigotConfig.movedTooQuicklyMultiplier = 64;
 
@@ -76,7 +76,7 @@ public class VSE extends JavaPlugin implements Listener {
 			}
 		}
 	}
-
+	
 	@Override
 	public void onDisable() {
 		saveConfig();
@@ -93,29 +93,35 @@ public class VSE extends JavaPlugin implements Listener {
 	public void onPlayerConnect(PlayerJoinEvent event) {
 		final Player p = event.getPlayer();
 
+		if (getConfig().getBoolean("debug.enabled")) {
+			getLogger().info(p.getName() + " Has joined the server");
+		}
 		if (getConfig().getBoolean("vive-only.enabled")) {
 			getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 				@Override
 				public void run() {
-					if (p.isOnline() && vivePlayers.containsKey(p.getUniqueId())) {
-						p.kickPlayer(getConfig().getString("vive-only.kickmessage"));
-						getLogger().info(p.getName() + " " + "got kicked for not using the Vive Mod");
+					if (VSE.this.getConfig().getBoolean("debug.enabled")) {
+						VSE.this.getLogger().info("Checking player for ViveCraft");
+					}
+					if ((p.isOnline()) && (!isVive(p))) {
+						VSE.this.getLogger().info(p.getName() + " " + "got kicked for not using the Vive Mod");
+						p.kickPlayer(VSE.this.getConfig().getString("vive-only.kickmessage"));
 					}
 				}
 			}, getConfig().getInt("vive-only.waittime"));
 		}
 	}
-
+	
 	public boolean isVive(Player p){
 		if(p == null) return false;
 		return vivePlayers.containsKey(p.getUniqueId());
 	}
-	
+
 	public void setPermissionsGroup(Player p) {
 
 		Map<String, Boolean> groups = new HashMap<String, Boolean>();
 
-		boolean isvive = vivePlayers.containsKey(p.getUniqueId());
+		boolean isvive = isVive(p);
 
 		String g_vive = getConfig().getString("permissions.vivegroup");
 		String g_classic = getConfig().getString("permissions.non-vivegroup");

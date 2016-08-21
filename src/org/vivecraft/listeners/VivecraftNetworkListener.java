@@ -48,9 +48,11 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		byte[] data = Arrays.copyOfRange(payload, 1, payload.length);
 		switch (disc){
 		case CONTROLLER0DATA:
+			//vse.getLogger().info("CONTROLLER0 listen");
 			vp.controller0data = data;
 			break;
 		case CONTROLLER1DATA:
+			//vse.getLogger().info("CONTROLLER1 listen");
 			vp.controller1data = data;
 			break;
 		case DRAW:
