@@ -63,15 +63,15 @@ public class VSE extends JavaPlugin implements Listener {
 				continue; // dunno y but just in case.
 
 			for (VivePlayer v : vivePlayers.values()) {
-
-				if (v == sendTo || v == null || v.player == null || !v.player.isOnline())
-					continue;
-
-				double d = sendTo.player.getLocation().distanceSquared(v.player.getLocation());
-
-				if (d < 256 * 256) {
-					// TODO: optional distance value?
-					sendTo.player.sendPluginMessage(this, CHANNEL, v.getUberPacket());
+			
+					if (v == sendTo || v == null || v.player == null || !v.player.isOnline() || v.hmdData == null || v.controller0data == null || v.controller1data == null)
+						continue;
+					
+					double d = sendTo.player.getLocation().distanceSquared(v.player.getLocation());
+	
+					if (d < 256 * 256) {
+						// TODO: optional distance value?
+						sendTo.player.sendPluginMessage(this, CHANNEL, v.getUberPacket());
 				}
 			}
 		}
