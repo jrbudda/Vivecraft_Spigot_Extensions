@@ -30,15 +30,16 @@ public class VivePlayer {
 
 	public float getDraw(){
 		try {
+			if(draw != null){
+				ByteArrayInputStream byin = new ByteArrayInputStream(draw);
+				DataInputStream da = new DataInputStream(byin);
 		
-			ByteArrayInputStream byin = new ByteArrayInputStream(draw);
-			DataInputStream da = new DataInputStream(byin);
-	
-			float draw= da.readFloat();
-			
-			da.close(); //needed?
-			return draw;
+				float draw= da.readFloat();
 				
+				da.close(); //needed?
+				return draw;	
+			}else{
+			}
 		} catch (IOException e) {
 
 		}
@@ -49,18 +50,20 @@ public class VivePlayer {
 	// TODO: implement
 	public Location getControllerPos(int c) {
 		try {
-			
-			ByteArrayInputStream byin = new ByteArrayInputStream(c==0?controller0data:controller1data);
-			DataInputStream da = new DataInputStream(byin);
-	
-			boolean rev = da.readBoolean();
-			float x = da.readFloat();
-			float y = da.readFloat();
-			float z = da.readFloat();
-			
-			da.close(); //needed?
-			return new Location(player.getWorld(), x, y, z);
+			if(controller0data != null && controller0data != null){
 				
+				ByteArrayInputStream byin = new ByteArrayInputStream(c==0?controller0data:controller1data);
+				DataInputStream da = new DataInputStream(byin);
+		
+				boolean rev = da.readBoolean();
+				float x = da.readFloat();
+				float y = da.readFloat();
+				float z = da.readFloat();
+				
+				da.close(); //needed?
+				return new Location(player.getWorld(), x, y, z);
+			}else{
+			}
 		} catch (IOException e) {
 
 		}
@@ -99,10 +102,10 @@ public class VivePlayer {
 					java.nio.ByteBuffer.allocate(8).putLong(player.getUniqueId().getMostSignificantBits()).array());
 			output.write(
 					java.nio.ByteBuffer.allocate(8).putLong(player.getUniqueId().getLeastSignificantBits()).array());
-			if(hmdData.length < 29) output.write(0);
-			output.write(hmdData);
-			output.write(controller0data);
-			output.write(controller1data);
+				if(hmdData.length < 29) output.write(0);
+				output.write(hmdData);
+				output.write(controller0data);
+				output.write(controller1data);
 		} catch (IOException e) {
 
 		}

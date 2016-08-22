@@ -40,10 +40,10 @@ public class VSE extends JavaPlugin implements Listener {
 		this.getCommand("vive").setExecutor(new ViveCommand(this));
 		getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, new VivecraftNetworkListener(this));
 		getServer().getMessenger().registerOutgoingPluginChannel(this, CHANNEL);
-
+		
 		getServer().getPluginManager().registerEvents(this, this);
 		getServer().getPluginManager().registerEvents(new VivecraftCombatListener(this), this);
-		
+
 		SpigotConfig.movedWronglyThreshold = 10;
 		SpigotConfig.movedTooQuicklyMultiplier = 64;
 
@@ -63,20 +63,20 @@ public class VSE extends JavaPlugin implements Listener {
 				continue; // dunno y but just in case.
 
 			for (VivePlayer v : vivePlayers.values()) {
-
-				if (v == sendTo || v == null || v.player == null || !v.player.isOnline())
-					continue;
-
-				double d = sendTo.player.getLocation().distanceSquared(v.player.getLocation());
-
-				if (d < 256 * 256) {
-					// TODO: optional distance value?
-					sendTo.player.sendPluginMessage(this, CHANNEL, v.getUberPacket());
+			
+					if (v == sendTo || v == null || v.player == null || !v.player.isOnline() || v.hmdData == null || v.controller0data == null || v.controller1data == null)
+						continue;
+					
+					double d = sendTo.player.getLocation().distanceSquared(v.player.getLocation());
+	
+					if (d < 256 * 256) {
+						// TODO: optional distance value?
+						sendTo.player.sendPluginMessage(this, CHANNEL, v.getUberPacket());
 				}
 			}
 		}
 	}
-
+	
 	@Override
 	public void onDisable() {
 		saveConfig();
@@ -93,29 +93,35 @@ public class VSE extends JavaPlugin implements Listener {
 	public void onPlayerConnect(PlayerJoinEvent event) {
 		final Player p = event.getPlayer();
 
+		if (getConfig().getBoolean("debug.enabled")) {
+			getLogger().info(p.getName() + " Has joined the server");
+		}
 		if (getConfig().getBoolean("vive-only.enabled")) {
 			getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 				@Override
 				public void run() {
-					if (p.isOnline() && vivePlayers.containsKey(p.getUniqueId())) {
-						p.kickPlayer(getConfig().getString("vive-only.kickmessage"));
-						getLogger().info(p.getName() + " " + "got kicked for not using the Vive Mod");
+					if (VSE.this.getConfig().getBoolean("debug.enabled")) {
+						VSE.this.getLogger().info("Checking player for ViveCraft");
+					}
+					if ((p.isOnline()) && (!isVive(p))) {
+						VSE.this.getLogger().info(p.getName() + " " + "got kicked for not using the Vive Mod");
+						p.kickPlayer(VSE.this.getConfig().getString("vive-only.kickmessage"));
 					}
 				}
 			}, getConfig().getInt("vive-only.waittime"));
 		}
 	}
-
+	
 	public boolean isVive(Player p){
 		if(p == null) return false;
 		return vivePlayers.containsKey(p.getUniqueId());
 	}
-	
+
 	public void setPermissionsGroup(Player p) {
 
 		Map<String, Boolean> groups = new HashMap<String, Boolean>();
 
-		boolean isvive = vivePlayers.containsKey(p.getUniqueId());
+		boolean isvive = isVive(p);
 
 		String g_vive = getConfig().getString("permissions.vivegroup");
 		String g_classic = getConfig().getString("permissions.non-vivegroup");

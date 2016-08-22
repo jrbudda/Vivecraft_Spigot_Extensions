@@ -29,17 +29,24 @@ public class VivecraftCombatListener implements Listener{
 		   if (!(proj.getShooter() instanceof Player) || !vse.isVive((Player) proj.getShooter()))
 			   return;
 
-		   VivePlayer vp = vse.vivePlayers.get(proj.getShooter());
+		    Player pl = (Player)proj.getShooter();
+		    VivePlayer vp = (VivePlayer)this.vse.vivePlayers.get(pl.getUniqueId());
 		   
 		   int hand = 0;
 		   if (proj instanceof Arrow) hand = 1;
 		   //TODO: check for seated mode.
 		   
-		   proj.teleport(vp.getControllerPos(hand));
+		   if ((vp == null) && (this.vse.getConfig().getBoolean("debug.enabled"))) {
+			   vse.getLogger().warning(" Error on projectile launch!");
+		   }
 		   
 		   //this only works if the incoming speed is at max (based! on draw time)
 		   //TODO: properly scale in all cases.
-		   proj.setVelocity(proj.getVelocity().multiply(vp.getDraw())); 
+		   if(vp.getDraw() != 0){
+			   vse.getLogger().info("Setting Projectile");
+			   proj.teleport(vp.getControllerPos(hand));
+			   proj.setVelocity(proj.getVelocity().multiply(vp.getDraw())); 
+		   }
 		   
 	   }
 	
@@ -50,7 +57,8 @@ public class VivecraftCombatListener implements Listener{
 	            if (!(arrow.getShooter() instanceof Player) || !vse.isVive((Player) arrow.getShooter()))
 	                return;
 	            
-	            VivePlayer vp = vse.vivePlayers.get(arrow.getShooter());
+			    Player pl = (Player)arrow.getShooter();
+			    VivePlayer vp = (VivePlayer)this.vse.vivePlayers.get(pl.getUniqueId());
 	 			
 	            if(!vp.isSeated())
 	 				event.setDamage(event.getDamage()*2);
