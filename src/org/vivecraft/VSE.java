@@ -44,8 +44,13 @@ public class VSE extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(this, this);
 		getServer().getPluginManager().registerEvents(new VivecraftCombatListener(this), this);
 
-		SpigotConfig.movedWronglyThreshold = 10;
-		SpigotConfig.movedTooQuicklyMultiplier = 64;
+		try {
+			SpigotConfig.movedWronglyThreshold = 10;
+			SpigotConfig.movedTooQuicklyMultiplier = 64;
+		} catch (NoSuchFieldError e) {
+			getLogger().warning("You are running this on an older version of spigot/bukkit Please set the value of movedWronglyThreshold to 10 and set the value of movedTooQuicklyMultiplier to 64");
+			//.printStackTrace();
+		}
 
 		task = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
