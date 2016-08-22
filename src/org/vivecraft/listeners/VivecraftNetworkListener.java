@@ -83,9 +83,10 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		byte[] bytes = input.getBytes(Charsets.UTF_8);
 		int len = bytes.length;
+		if( len > 255) return output.toByteArray();
 		try {
 			output.write((byte)version.ordinal());
-			output.write(ByteBuffer.allocate(4).putInt(len).array());
+			output.write((byte) len);
 			//TODO: check endianness.
 			output.write(bytes);
 		} catch (IOException e) {
