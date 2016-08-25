@@ -5,6 +5,13 @@ vive-only:
   kickmessage: This server is configured for Vivecraft players only.
   #Ticks to wait before kicking a player. The player's client must send a Vivecraft VERSION info in that time.
   waittime: 60
+SendPlayerData:
+  #Send player data to all clients with Vivecraft
+  enabled: true
+CreeperRadius:
+  #Distance from a Vivecraft player before creeper starts to swell up
+  enabled: true
+  radius: 1.75
 debug:
   enabled: false
 permissions:

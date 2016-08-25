@@ -4,11 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 
 public class VivePlayer {
@@ -55,6 +52,7 @@ public class VivePlayer {
 				ByteArrayInputStream byin = new ByteArrayInputStream(c==0?controller0data:controller1data);
 				DataInputStream da = new DataInputStream(byin);
 		
+				@SuppressWarnings("unused")
 				boolean rev = da.readBoolean();
 				float x = da.readFloat();
 				float y = da.readFloat();
@@ -98,14 +96,12 @@ public class VivePlayer {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		try {
 			output.write((byte) VivecraftNetworkListener.PacketDiscriminators.UBERPACKET.ordinal());
-			output.write(
-					java.nio.ByteBuffer.allocate(8).putLong(player.getUniqueId().getMostSignificantBits()).array());
-			output.write(
-					java.nio.ByteBuffer.allocate(8).putLong(player.getUniqueId().getLeastSignificantBits()).array());
-				if(hmdData.length < 29) output.write(0);
-				output.write(hmdData);
-				output.write(controller0data);
-				output.write(controller1data);
+			output.write(java.nio.ByteBuffer.allocate(8).putLong(player.getUniqueId().getMostSignificantBits()).array());
+			output.write(java.nio.ByteBuffer.allocate(8).putLong(player.getUniqueId().getLeastSignificantBits()).array());
+			if(hmdData.length < 29) output.write(0);
+			output.write(hmdData);
+			output.write(controller0data);
+			output.write(controller1data);
 		} catch (IOException e) {
 
 		}

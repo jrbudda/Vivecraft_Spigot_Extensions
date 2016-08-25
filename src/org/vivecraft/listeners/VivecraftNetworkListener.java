@@ -2,9 +2,7 @@ package org.vivecraft.listeners;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
-
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.vivecraft.VSE;
@@ -37,7 +35,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		if(!channel.equalsIgnoreCase(vse.CHANNEL)) return;
 		if(payload.length==0) return;
 		
-		VivePlayer vp = vse.vivePlayers.get(sender.getUniqueId());
+		VivePlayer vp = VSE.vivePlayers.get(sender.getUniqueId());
 		
 		PacketDiscriminators disc = PacketDiscriminators.values()[payload[0]];
 		if(vp == null && disc.ordinal() > 0) {
@@ -48,11 +46,9 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		byte[] data = Arrays.copyOfRange(payload, 1, payload.length);
 		switch (disc){
 		case CONTROLLER0DATA:
-			//vse.getLogger().info("CONTROLLER0 listen");
 			vp.controller0data = data;
 			break;
 		case CONTROLLER1DATA:
-			//vse.getLogger().info("CONTROLLER1 listen");
 			vp.controller1data = data;
 			break;
 		case DRAW:
@@ -67,9 +63,10 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			//only we can use that word.
 			break;
 		case VERSION:
-			vse.vivePlayers.put(sender.getUniqueId(), new VivePlayer(sender));
+			VSE.vivePlayers.put(sender.getUniqueId(), new VivePlayer(sender));
 			ViveCommand.sendMessage("Welcome Vive user!",sender);
-			sender.sendPluginMessage(vse, vse.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getDescription().getFullName()));		
+			sender.sendPluginMessage(vse, vse.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getDescription().getFullName()));
+			if(vse.getConfig().getBoolean("SendPlayerData.enabled") == true)
 			sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});
 			break;
 		case WORLDSCALE:

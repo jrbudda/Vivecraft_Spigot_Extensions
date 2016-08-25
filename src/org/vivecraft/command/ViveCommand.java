@@ -18,14 +18,15 @@ public class ViveCommand implements CommandExecutor {
 	public ViveCommand(VSE vse) {
 		plugin = vse;
 		commands.add(new Cmd("vive-only", "Set to true to only allow Vivecraft players to play."));
-		commands.add(new Cmd("waittime",
-				"Ticks to wait before kicking a player. The player's client must send a Vivecraft VERSION info in that time."));
+		commands.add(new Cmd("waittime","Ticks to wait before kicking a player. The player's client must send a Vivecraft VERSION info in that time."));
 		commands.add(new Cmd("version", "returns the version of the plugin."));
+		commands.add(new Cmd("sendplayerdata", "set to false to disable sending player to data to clients"));
+		commands.add(new Cmd("creeperradius", "type false to disable or type a number to change the radius. Default: 1.75"));
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (sender instanceof Player){// || sender.hasPermission("SpigotVive.vive")) {
+		if (sender instanceof Player){
 			Player player = (Player) sender;
 			if (args.length >= 1) {
 				String command = args[0].toLowerCase();
@@ -45,6 +46,41 @@ public class ViveCommand implements CommandExecutor {
 					}
 					plugin.saveConfig();
 				} else
+			    //
+				if(command.equals("sendplayerdata") && sender.isOp()){
+					if(args.length >= 2){
+						if(args[1].toLowerCase().equals("true")){
+							plugin.getConfig().set("SendPlayerData.enabled", true);
+							sendMessage("SendPlayerData has been enabled.", player);
+						}else if (args[1].toLowerCase().equals("false")) {
+							plugin.getConfig().set("SendPlayerData.enabled", false);
+							sendMessage("SendPlayerData has been disabled.", player);
+						}
+					}else{
+						sendMessage("SendPlayerData: " + plugin.getConfig().get("SendPlayerData.enabled"),player);
+					}
+				}else
+				//
+				if(command.equals("creeperradius") && sender.isOp()){
+					if(args.length >= 2){
+						if(args[1].toLowerCase().equals("true")){
+							plugin.getConfig().set("CreeperRadius.enabled", true);
+							sendMessage("Creeper Radius has been enabled.", player);
+						}else if (args[1].toLowerCase().equals("false")) {
+							plugin.getConfig().set("CreeperRadius.enabled", false);
+							sendMessage("Creeper Radius has been disabled.", player);
+						}else{
+							try {
+								plugin.getConfig().set("CreeperRadius.radius", Double.parseDouble(args[1]));
+								sendMessage("Creeper Radius set to " + Double.parseDouble(args[1]), player);
+							} catch (NumberFormatException e) {
+								sendMessage("Must use numbers ex: 1.75", player);
+							}
+						}
+					}else{
+						sendMessage("Creeper Radius: " + plugin.getConfig().get("CreeperRadius.enabled") + " Radius set to: " + plugin.getConfig().getDouble("CreeperRadius.radius"),player);
+					}
+				}else
 				//
 				if (command.equals("waittime") && sender.isOp()) {
 					if (args.length >= 2) {
