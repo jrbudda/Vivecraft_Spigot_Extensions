@@ -1,6 +1,6 @@
 vive-only:
   #Set to true to only allow Vivecraft players to play.
-  enabled: true
+  enabled: false
   #The message to show kicked non-vive players.
   kickmessage: This server is configured for Vivecraft players only.
   #Ticks to wait before kicking a player. The player's client must send a Vivecraft VERSION info in that time.
@@ -13,7 +13,7 @@ CreeperRadius:
   enabled: true
   radius: 1.75
 debug:
-  enabled: true
+  enabled: false
 permissions:
   #Permission group for Vive users
   vivegroup: vive.vivegroup
