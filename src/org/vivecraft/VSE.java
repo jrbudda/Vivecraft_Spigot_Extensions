@@ -1,20 +1,30 @@
 package org.vivecraft;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftCreeper;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import net.milkbowl.vault.permission.Permission;
+import net.minecraft.server.v1_10_R1.EntityCreeper;
+import net.minecraft.server.v1_10_R1.PathfinderGoalSelector;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.spigotmc.SpigotConfig;
 import org.vivecraft.command.ViveCommand;
+import org.vivecraft.entities.CustomGoalSwell;
 import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 
@@ -23,7 +33,7 @@ public class VSE extends JavaPlugin implements Listener {
 
 	public final String CHANNEL = "Vivecraft";
 
-	public Map<UUID, VivePlayer> vivePlayers = new HashMap<UUID, VivePlayer>();
+	public static Map<UUID, VivePlayer> vivePlayers = new HashMap<UUID, VivePlayer>();
 
 	int task = 0;
 
@@ -52,7 +62,63 @@ public class VSE extends JavaPlugin implements Listener {
 				sendPosData();
 			}
 		}, 20, 1);
+		
+		CheckForCreeper();
 
+	}
+		
+	public static Object getPrivateField(String fieldName, Class<PathfinderGoalSelector> clazz, Object object)
+	{
+	Field field;
+	Object o = null;
+	try
+	{
+		field = clazz.getDeclaredField(fieldName);
+		field.setAccessible(true);
+		o = field.get(object);
+	}
+	catch(NoSuchFieldException e)
+	{
+		e.printStackTrace();
+	}
+	catch(IllegalAccessException e)
+	{
+		e.printStackTrace();
+	}
+	return o;
+	}
+	  
+	@EventHandler
+    public void onEvent(CreatureSpawnEvent event) {
+		EditCreeper(event.getEntity());
+	}
+	
+	public void CheckForCreeper(){
+		List<World> wrl = this.getServer().getWorlds();
+		for(World world: wrl){
+			for(Entity e: world.getLivingEntities()){
+				if(e.getType() == EntityType.CREEPER){
+					EditCreeper(e);
+				}
+			}
+		}
+	}
+	
+	public void EditCreeper(Entity entity){
+		if(entity.getType() == EntityType.CREEPER){	
+			EntityCreeper e = ((CraftCreeper) entity).getHandle();
+			@SuppressWarnings("rawtypes")
+			LinkedHashSet goalB = (LinkedHashSet )getPrivateField("b", PathfinderGoalSelector.class, e.goalSelector);
+			int x = 0;
+			for(Object b: goalB){
+				if(x==1){
+					goalB.remove(b);
+					break;
+				}
+				x+=1;
+			}
+		    e.goalSelector.a(2, new CustomGoalSwell(e));
+		}
 	}
 
 	public void sendPosData() {
@@ -64,8 +130,9 @@ public class VSE extends JavaPlugin implements Listener {
 
 			for (VivePlayer v : vivePlayers.values()) {
 			
-					if (v == sendTo || v == null || v.player == null || !v.player.isOnline() || v.hmdData == null || v.controller0data == null || v.controller1data == null)
+					if (v == sendTo || v == null || v.player == null || !v.player.isOnline() || v.hmdData == null || v.controller0data == null || v.controller1data == null){
 						continue;
+					}
 					
 					double d = sendTo.player.getLocation().distanceSquared(v.player.getLocation());
 	

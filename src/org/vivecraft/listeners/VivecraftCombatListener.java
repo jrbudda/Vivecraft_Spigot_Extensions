@@ -30,7 +30,7 @@ public class VivecraftCombatListener implements Listener{
 			   return;
 
 		    Player pl = (Player)proj.getShooter();
-		    VivePlayer vp = (VivePlayer)this.vse.vivePlayers.get(pl.getUniqueId());
+		    VivePlayer vp = (VivePlayer)VSE.vivePlayers.get(pl.getUniqueId());
 		   
 		   int hand = 0;
 		   if (proj instanceof Arrow) hand = 1;
@@ -58,7 +58,7 @@ public class VivecraftCombatListener implements Listener{
 	                return;
 	            
 			    Player pl = (Player)arrow.getShooter();
-			    VivePlayer vp = (VivePlayer)this.vse.vivePlayers.get(pl.getUniqueId());
+			    VivePlayer vp = (VivePlayer)VSE.vivePlayers.get(pl.getUniqueId());
 	 			
 	            if(!vp.isSeated())
 	 				event.setDamage(event.getDamage()*2);
