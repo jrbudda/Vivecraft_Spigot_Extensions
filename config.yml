@@ -14,6 +14,8 @@ CreeperRadius:
   radius: 1.75
 debug:
   enabled: false
+bow:
+  multiplier: 2
 permissions:
   #Permission group for Vive users
   vivegroup: vive.vivegroup

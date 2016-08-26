@@ -17,11 +17,12 @@ public class ViveCommand implements CommandExecutor {
 
 	public ViveCommand(VSE vse) {
 		plugin = vse;
-		commands.add(new Cmd("vive-only", "Set to true to only allow Vivecraft players to play."));
-		commands.add(new Cmd("waittime","Ticks to wait before kicking a player. The player's client must send a Vivecraft VERSION info in that time."));
+		commands.add(new Cmd("vive-only", "Set to true to only allow Vivecraft players to play. Default: false"));
+		commands.add(new Cmd("waittime","Ticks to wait before kicking a player. The player's client must send a Vivecraft VERSION info in that time. Default: 60"));
 		commands.add(new Cmd("version", "returns the version of the plugin."));
-		commands.add(new Cmd("sendplayerdata", "set to false to disable sending player to data to clients"));
+		commands.add(new Cmd("sendplayerdata", "set to false to disable sending player to data to clients. Default: true"));
 		commands.add(new Cmd("creeperradius", "type false to disable or type a number to change the radius. Default: 1.75"));
+		commands.add(new Cmd("bow", "Sets the multiplier for bow damage of vive users. Default: 2"));
 	}
 
 	@Override
@@ -92,6 +93,19 @@ public class ViveCommand implements CommandExecutor {
 						}
 					} else {
 						sendMessage("waittime: " + plugin.getConfig().get("vive-only.waittime"), player);
+					}
+					plugin.saveConfig();
+				} else
+				if (command.equals("bow") && sender.isOp()) {
+					if (args.length >= 2) {
+						try {
+							plugin.getConfig().set("bow.multiplier", Integer.parseInt(args[1]));
+							sendMessage("Multiplier set to " + Integer.parseInt(args[1]), player);
+						} catch (NumberFormatException e) {
+							sendMessage("Must use numbers", player);
+						}
+					} else {
+						sendMessage("Multiplier: " + plugin.getConfig().get("bow.multiplier"), player);
 					}
 					plugin.saveConfig();
 				} else

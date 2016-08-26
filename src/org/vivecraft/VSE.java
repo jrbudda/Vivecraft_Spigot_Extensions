@@ -26,6 +26,7 @@ import org.spigotmc.SpigotConfig;
 import org.vivecraft.command.ViveCommand;
 import org.vivecraft.entities.CustomGoalSwell;
 import org.vivecraft.listeners.VivecraftCombatListener;
+import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 
 public class VSE extends JavaPlugin implements Listener {
@@ -53,7 +54,8 @@ public class VSE extends JavaPlugin implements Listener {
 		
 		getServer().getPluginManager().registerEvents(this, this);
 		getServer().getPluginManager().registerEvents(new VivecraftCombatListener(this), this);
-
+		getServer().getPluginManager().registerEvents(new VivecraftItemListener(), this);
+		
 		SpigotConfig.movedWronglyThreshold = 10;
 		SpigotConfig.movedTooQuicklyMultiplier = 64;
 
@@ -179,7 +181,7 @@ public class VSE extends JavaPlugin implements Listener {
 		}
 	}
 	
-	public boolean isVive(Player p){
+	public static boolean isVive(Player p){
 		if(p == null) return false;
 		return vivePlayers.containsKey(p.getUniqueId());
 	}
