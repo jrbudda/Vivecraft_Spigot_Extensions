@@ -26,7 +26,7 @@ public class VivecraftCombatListener implements Listener{
 		   //position all projectiles correctly.
 		   
 		   final Projectile proj = event.getEntity();
-		   if (!(proj.getShooter() instanceof Player) || !vse.isVive((Player) proj.getShooter()))
+		   if (!(proj.getShooter() instanceof Player) || !VSE.isVive((Player) proj.getShooter()))
 			   return;
 
 		    Player pl = (Player)proj.getShooter();
@@ -42,9 +42,9 @@ public class VivecraftCombatListener implements Listener{
 		   
 		   //this only works if the incoming speed is at max (based! on draw time)
 		   //TODO: properly scale in all cases.
+		   
+		   proj.teleport(vp.getControllerPos(hand));
 		   if(vp.getDraw() != 0){
-			   vse.getLogger().info("Setting Projectile");
-			   proj.teleport(vp.getControllerPos(hand));
 			   proj.setVelocity(proj.getVelocity().multiply(vp.getDraw())); 
 		   }
 		   
@@ -54,14 +54,14 @@ public class VivecraftCombatListener implements Listener{
 	    public void onProjectileHit(EntityDamageByEntityEvent event) {
 	        if (event.getDamager() instanceof Arrow && event.getEntity() instanceof LivingEntity) {
 	            final Arrow arrow = (Arrow) event.getDamager();
-	            if (!(arrow.getShooter() instanceof Player) || !vse.isVive((Player) arrow.getShooter()))
+	            if (!(arrow.getShooter() instanceof Player) || !VSE.isVive((Player) arrow.getShooter()))
 	                return;
 	            
 			    Player pl = (Player)arrow.getShooter();
 			    VivePlayer vp = (VivePlayer)VSE.vivePlayers.get(pl.getUniqueId());
 	 			
 	            if(!vp.isSeated())
-	 				event.setDamage(event.getDamage()*2);
+	 				event.setDamage(event.getDamage()*vse.getConfig().getDouble("bow.multiplier"));
 
 	            //TODO: configurable Vive player arrow damage
 	            
