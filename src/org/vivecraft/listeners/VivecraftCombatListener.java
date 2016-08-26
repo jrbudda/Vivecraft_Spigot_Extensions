@@ -1,6 +1,8 @@
 package org.vivecraft.listeners;
 
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftArrow;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -33,7 +35,7 @@ public class VivecraftCombatListener implements Listener{
 		    VivePlayer vp = (VivePlayer)VSE.vivePlayers.get(pl.getUniqueId());
 		   
 		   int hand = 0;
-		   if (proj instanceof Arrow) hand = 1;
+		   if (proj instanceof CraftArrow) hand = 1;
 		   //TODO: check for seated mode.
 		   
 		   if ((vp == null) && (this.vse.getConfig().getBoolean("debug.enabled"))) {
@@ -43,9 +45,10 @@ public class VivecraftCombatListener implements Listener{
 		   //this only works if the incoming speed is at max (based! on draw time)
 		   //TODO: properly scale in all cases.
 		   
+		   
 		   proj.teleport(vp.getControllerPos(hand));
-		   if(vp.getDraw() != 0){
-			   proj.setVelocity(proj.getVelocity().multiply(vp.getDraw())); 
+		   if(proj.getType() == EntityType.ARROW && vp.getDraw() != 0) {
+			   proj.setVelocity(proj.getVelocity().multiply(vp.getDraw()));  
 		   }
 		   
 	   }

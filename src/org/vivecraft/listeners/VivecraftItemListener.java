@@ -1,5 +1,6 @@
 package org.vivecraft.listeners;
 
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -28,14 +29,16 @@ public class VivecraftItemListener implements Listener{
 		 
 		 float f2 = 0.3F;
 		 
-		 Vector v = new Vector();
-		 float yaw = player.getLocation().getYaw();
-		 float pitch = -player.getLocation().getPitch();
-		 v.setX((double)(-MathHelper.sin(yaw * 0.017453292F) * MathHelper.cos(player.getLocation().getPitch() * 0.017453292F) * f2));
-		 v.setZ((double)(MathHelper.cos(yaw * 0.017453292F) * MathHelper.cos(player.getLocation().getPitch() * 0.017453292F) * f2));
-		 v.setY((double)(MathHelper.sin(pitch * 0.017453292F) * f2 + 0.1F));
-		 
-		 event.getItemDrop().teleport(vp.getControllerPos(0));
-		 event.getItemDrop().setVelocity(v);
+		 if(event.getItemDrop().getType() == EntityType.DROPPED_ITEM){
+		 	 Vector v = new Vector();
+			 float yaw = player.getLocation().getYaw();
+			 float pitch = -player.getLocation().getPitch();
+			 v.setX((double)(-MathHelper.sin(yaw * 0.017453292F) * MathHelper.cos(player.getLocation().getPitch() * 0.017453292F) * f2));
+			 v.setZ((double)(MathHelper.cos(yaw * 0.017453292F) * MathHelper.cos(player.getLocation().getPitch() * 0.017453292F) * f2));
+			 v.setY((double)(MathHelper.sin(pitch * 0.017453292F) * f2 + 0.1F));
+			 
+			 event.getItemDrop().teleport(vp.getControllerPos(0));
+			 event.getItemDrop().setVelocity(v);
+		 }
 	 }
 }
