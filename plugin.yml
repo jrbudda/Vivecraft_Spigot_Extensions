@@ -1,8 +1,8 @@
 name: Vivecraft-Spigot-Extensions
-version: '1.10.2-r1'
+version: '1.11-r2'
 main: org.vivecraft.VSE
 website: http://www.vivecraft.org/
-author: jrbudda
+author: jrbudda, jaron780
 prefix: Vivecraft
 commands:
    Vive:

@@ -9,12 +9,13 @@ SendPlayerData:
   #Send player data to all clients with Vivecraft
   enabled: true
 CreeperRadius:
-  #Distance from a Vivecraft player before creeper starts to swell up
+  #Distance from a Vivecraft player before creeper starts to swell up (vanilla is 3)
   enabled: true
   radius: 1.75
 debug:
   enabled: false
 bow:
+  #Archery damage multiplier for Vivecraft (standing) users.
   multiplier: 2
 permissions:
   #Permission group for Vive users
