@@ -49,6 +49,7 @@ public class VSE extends JavaPlugin implements Listener {
 		// end Config part
 
 		this.getCommand("vive").setExecutor(new ViveCommand(this));
+		this.getCommand("vse").setExecutor(new ViveCommand(this));
 		getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, new VivecraftNetworkListener(this));
 		getServer().getMessenger().registerOutgoingPluginChannel(this, CHANNEL);
 		
