@@ -8,3 +8,6 @@ commands:
    Vive:
       description: Vivecraft Spigot Extensions
       usage: /vive <command>
+   vse:
+      description: Vivecraft Spigot Extensions
+      usage: /vse <command>
