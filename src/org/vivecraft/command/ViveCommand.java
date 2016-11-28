@@ -121,10 +121,13 @@ public class ViveCommand implements CommandExecutor {
 						sendMessage(cm.getCommand() + " - " + cm.getDescription(), player);
 					}
 				} else {
+					if(!sender.isOp()){
+						sendMessage("You must be OP to use these commands", player);
+					}else
 					sendMessage("Unknown command", player);
 				}
 			}else{
-				sendMessage("Download Vivecraft at http://www.vivecraft.org/",player);
+				sendMessage("Download Vivecraft at http://www.vivecraft.org/ type '/vive help' to list options",player);
 			}
 		} else if (!(sender instanceof Player))
 			plugin.getLogger().info("Only players can run this command!");

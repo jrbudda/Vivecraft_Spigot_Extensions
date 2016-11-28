@@ -10,7 +10,7 @@ import org.bukkit.util.Vector;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 
-import net.minecraft.server.v1_10_R1.MathHelper;
+import net.minecraft.server.v1_11_R1.MathHelper;
 
 public class VivecraftItemListener implements Listener{
 	

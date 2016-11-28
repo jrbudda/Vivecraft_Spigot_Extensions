@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftCreeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -18,8 +18,8 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.v1_10_R1.EntityCreeper;
-import net.minecraft.server.v1_10_R1.PathfinderGoalSelector;
+import net.minecraft.server.v1_11_R1.EntityCreeper;
+import net.minecraft.server.v1_11_R1.PathfinderGoalSelector;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.spigotmc.SpigotConfig;
@@ -49,6 +49,7 @@ public class VSE extends JavaPlugin implements Listener {
 		// end Config part
 
 		this.getCommand("vive").setExecutor(new ViveCommand(this));
+		this.getCommand("vse").setExecutor(new ViveCommand(this));
 		getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, new VivecraftNetworkListener(this));
 		getServer().getMessenger().registerOutgoingPluginChannel(this, CHANNEL);
 		
