@@ -13,4 +13,6 @@ Option to limit server to Vivecraft players only.
 See the config.yml for all available configuration options.
 
 #Installation
-Install as you would any other Spigot/Bukkit plugin by placing the jar in the /plugins folder. Please ensure you download the correct version of the plugin as they are not backwards compatible.
+Download from the [Releases](https://github.com/jrbudda/Vivecraft_Spigot_Extensions/releases) page. Please ensure you download the correct version of the plugin as they are not backwards compatible.
+
+Install as you would any other Spigot/Bukkit plugin by placing the jar in the /plugins folder. 
