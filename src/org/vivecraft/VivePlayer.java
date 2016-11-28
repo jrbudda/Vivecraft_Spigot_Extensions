@@ -22,7 +22,7 @@ public class VivePlayer {
 	public Player player;
 
 	public VivePlayer(Player player) {
-		this.player = player;
+		this.player = player;	
 	}
 
 	public float getDraw(){

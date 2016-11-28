@@ -1,13 +1,15 @@
 name: Vivecraft-Spigot-Extensions
-version: '1.11-r2'
+version: '1.11-r1'
 main: org.vivecraft.VSE
 website: http://www.vivecraft.org/
 author: jrbudda, jaron780
 prefix: Vivecraft
 commands:
-   Vive:
+   vive:
       description: Vivecraft Spigot Extensions
       usage: /vive <command>
    vse:
       description: Vivecraft Spigot Extensions
       usage: /vse <command>
+=======
+
