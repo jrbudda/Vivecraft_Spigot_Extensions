@@ -3,12 +3,12 @@ VSE is a companion plugin for [Vivecraft](www.vivecraft.org), the VR mod for Jav
 VSE is for [Spigot](https://www.spigotmc.org/) servers and adds several enchancements for VR players.
 
 # Features
-Vivecraft players will see other Vivecraft players head and arm movements.
-Support for Vivecraft 2-handed archery.
-Assign permission groups for VR players.
-Fixes projectiles and dropped items from VR players.
-Shrinks Creeper explosion radius for VR players from 3 to 1.75m (Configurable)
-Option to limit server to Vivecraft players only.
+ - Vivecraft players will see other Vivecraft players head and arm movements.
+ - Support for Vivecraft 2-handed archery.
+ - Assign permission groups for VR players.
+ - Fixes projectiles and dropped items from VR players.
+ - Shrinks Creeper explosion radius for VR players from 3 to 1.75m (Configurable)
+ - Option to limit server to Vivecraft players only.
 
 See the config.yml for all available configuration options.
 
