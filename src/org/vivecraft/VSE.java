@@ -1,6 +1,10 @@
 package org.vivecraft;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -20,8 +24,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import net.milkbowl.vault.permission.Permission;
 import net.minecraft.server.v1_11_R1.EntityCreeper;
 import net.minecraft.server.v1_11_R1.PathfinderGoalSelector;
+
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.mcstats.Metrics;
 import org.spigotmc.SpigotConfig;
 import org.vivecraft.command.ViveCommand;
 import org.vivecraft.entities.CustomGoalSwell;
@@ -37,11 +44,19 @@ public class VSE extends JavaPlugin implements Listener {
 	public static Map<UUID, VivePlayer> vivePlayers = new HashMap<UUID, VivePlayer>();
 
 	int task = 0;
-
+	private String readurl = "https://raw.githubusercontent.com/jaron780/Vivecraft_Spigot_Extensions/master/version.txt";
+	
 	@Override
 	public void onEnable() {
 		super.onEnable();
 
+		try {
+	        Metrics metrics = new Metrics(this);
+	        metrics.start();
+	    } catch (IOException e) {
+	        // Failed to submit the stats :-(
+	    }
+		
 		// Config Part
 		config.options().copyDefaults(true);
 		saveDefaultConfig();
@@ -66,8 +81,13 @@ public class VSE extends JavaPlugin implements Listener {
 			}
 		}, 20, 1);
 		
+		//check for any creepers and modify the fuse radius
 		CheckForCreeper();
-
+		
+		//Easter egg
+		if(getConfig().getBoolean("printmoney.enabled")){
+			getLogger().warning("\r\n||====================================================================||\r\n||//$\\\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\//$\\\\||\r\n||(100)==================| FEDERAL RESERVE NOTE |================(100)||\r\n||\\\\$//        ~         '------========--------'                \\\\$//||\r\n||<< /        /$\\              // ____ \\\\                         \\ >>||\r\n||>>|  12    //L\\\\            // ///..) \\\\         L38036133B   12 |<<||\r\n||<<|        \\\\ //           || <||  >\\  ||                        |>>||\r\n||>>|         \\$/            ||  $$ --/  ||        One Hundred     |<<||\r\n||<<|      L38036133B        *\\\\  |\\_/  //* series                 |>>||\r\n||>>|  12                     *\\\\/___\\_//*   1989                  |<<||\r\n||<<\\      Treasurer     ______/Franklin\\________     Secretary 12 />>||\r\n||//$\\                 ~|UNITED STATES OF AMERICA|~               /$\\\\||\r\n||(100)===================  ONE HUNDRED DOLLARS =================(100)||\r\n||\\\\$//\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\\\$//||\r\n||====================================================================||");
+		}
 	}
 		
 	public static Object getPrivateField(String fieldName, Class<PathfinderGoalSelector> clazz, Object object)
@@ -140,7 +160,6 @@ public class VSE extends JavaPlugin implements Listener {
 					double d = sendTo.player.getLocation().distanceSquared(v.player.getLocation());
 	
 					if (d < 256 * 256) {
-						// TODO: optional distance value?
 						sendTo.player.sendPluginMessage(this, CHANNEL, v.getUberPacket());
 				}
 			}
@@ -162,7 +181,7 @@ public class VSE extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onPlayerConnect(PlayerJoinEvent event) {
 		final Player p = event.getPlayer();
-
+		
 		if (getConfig().getBoolean("debug.enabled")) {
 			getLogger().info(p.getName() + " Has joined the server");
 		}
@@ -179,6 +198,34 @@ public class VSE extends JavaPlugin implements Listener {
 					}
 				}
 			}, getConfig().getInt("vive-only.waittime"));
+		}
+		if(p.isOp())
+		startUpdateCheck(p);
+	}
+	
+	public void startUpdateCheck(Player p) {
+		PluginDescriptionFile pdf = getDescription();
+		String version = pdf.getVersion();
+		System.out.println("Version: " + version);
+		if (getConfig().getBoolean("checkforupdate.enabled")) {
+			try {
+				getLogger().info("Checking for a update...");
+				URL url = new URL(readurl);
+				BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+				String str;
+				while ((str = br.readLine()) != null) {
+					String line = str;
+//					if (line.charAt(0) == 'R' && line.charAt(1) == '2') {
+					if(line.toLowerCase().startsWith(version.toLowerCase())){
+						String updatemsg = line.substring(version.length() + 2);
+						getLogger().info(updatemsg);
+						ViveCommand.sendMessage(updatemsg, p);
+					}
+				}
+				br.close();
+			} catch (IOException e) {
+			getLogger().severe("The update URL is invalid! Please message Jaron780 on discord!");
+			}
 		}
 	}
 	
