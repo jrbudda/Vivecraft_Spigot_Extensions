@@ -5,8 +5,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.lwjgl.util.vector.Vector3f;
 import org.vivecraft.listeners.VivecraftNetworkListener;
+import org.vivecraft.utils.Quaternion;
+import org.vivecraft.utils.Vector3;
+
+import net.minecraft.server.v1_11_R1.Vec3D;
 
 public class VivePlayer {
 
@@ -42,6 +48,37 @@ public class VivePlayer {
 		}
 	 
 		return 0;
+	}
+	
+	public Vec3D getHMDDir(){
+		try {
+			if(hmdData != null){
+				
+				ByteArrayInputStream byin = new ByteArrayInputStream(hmdData);
+				DataInputStream da = new DataInputStream(byin);
+		
+				@SuppressWarnings("unused")
+				float lx = da.readFloat();
+				float ly = da.readFloat();
+				float lz = da.readFloat();
+				
+				float w = da.readFloat();
+				float x = da.readFloat();
+				float y = da.readFloat();
+				float z = da.readFloat();
+			    Vector3 forward = new Vector3(0,0,-1);
+				Quaternion q = new Quaternion(w, x, y, z);
+				Vector3 out = q.multiply(forward);
+				
+				da.close(); //needed?
+				return new Vec3D(out.getX(), out.getY(), out.getZ());
+			}else{
+			}
+		} catch (IOException e) {
+
+		}
+	 
+		return ((CraftPlayer)player).getHandle().f(1.0f);
 	}
 	
 	// TODO: implement

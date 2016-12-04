@@ -13,7 +13,7 @@ repositories {
 	maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
-ext.mcversion = '1.10.2'
+ext.mcversion = '1.11'
 version = '0.1'
 
 // In this section you declare the dependencies for your production and test code
