@@ -12,11 +12,13 @@ import java.util.Map;
 import java.util.UUID;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftCreeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -32,6 +34,7 @@ import org.mcstats.Metrics;
 import org.spigotmc.SpigotConfig;
 import org.vivecraft.command.ViveCommand;
 import org.vivecraft.entities.CustomGoalSwell;
+import org.vivecraft.entities.EntityEndermanCustom;
 import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
@@ -82,7 +85,7 @@ public class VSE extends JavaPlugin implements Listener {
 		}, 20, 1);
 		
 		//check for any creepers and modify the fuse radius
-		CheckForCreeper();
+		CheckAllEntities();
 		
 		//Easter egg
 		if(getConfig().getBoolean("printmoney.enabled")){
@@ -111,23 +114,25 @@ public class VSE extends JavaPlugin implements Listener {
 	return o;
 	}
 	  
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onEvent(CreatureSpawnEvent event) {
-		EditCreeper(event.getEntity());
+		if(!event.isCancelled()){
+			EditEntity(event.getEntity());
+		}
 	}
 	
-	public void CheckForCreeper(){
+	public void CheckAllEntities(){
 		List<World> wrl = this.getServer().getWorlds();
 		for(World world: wrl){
 			for(Entity e: world.getLivingEntities()){
 				if(e.getType() == EntityType.CREEPER){
-					EditCreeper(e);
+					EditEntity(e);
 				}
 			}
 		}
 	}
 	
-	public void EditCreeper(Entity entity){
+	public void EditEntity(Entity entity){
 		if(entity.getType() == EntityType.CREEPER){	
 			EntityCreeper e = ((CraftCreeper) entity).getHandle();
 			@SuppressWarnings("rawtypes")
@@ -140,7 +145,15 @@ public class VSE extends JavaPlugin implements Listener {
 				}
 				x+=1;
 			}
-		    e.goalSelector.a(2, new CustomGoalSwell(e));
+			e.goalSelector.a(2, new CustomGoalSwell(e));
+		}
+		else if(entity.getType() == EntityType.ENDERMAN){	
+			net.minecraft.server.v1_11_R1.World nmsWorld = ((CraftWorld) entity.getWorld()).getHandle();
+			EntityEndermanCustom e = new EntityEndermanCustom(nmsWorld);
+			e.setLocation(entity.getLocation().getX(), entity.getLocation().getY(), entity.getLocation().getZ(), entity.getLocation().getPitch(), entity.getLocation().getYaw());
+			if (nmsWorld.addEntity(e)){
+				entity.remove();
+			}
 		}
 	}
 
