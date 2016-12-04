@@ -18,6 +18,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -113,9 +114,11 @@ public class VSE extends JavaPlugin implements Listener {
 	return o;
 	}
 	  
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onEvent(CreatureSpawnEvent event) {
-		EditEntity(event.getEntity());
+		if(!event.isCancelled()){
+			EditEntity(event.getEntity());
+		}
 	}
 	
 	public void CheckAllEntities(){
