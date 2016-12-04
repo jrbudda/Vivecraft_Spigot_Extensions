@@ -5,11 +5,9 @@ website: http://www.vivecraft.org/
 author: jrbudda, jaron780
 prefix: Vivecraft
 commands:
-   vive:
+   Vive:
       description: Vivecraft Spigot Extensions
       usage: /vive <command>
    vse:
       description: Vivecraft Spigot Extensions
       usage: /vse <command>
-=======
-
