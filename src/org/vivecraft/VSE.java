@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -14,6 +15,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -25,6 +27,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import net.milkbowl.vault.permission.Permission;
 import net.minecraft.server.v1_11_R1.EntityCreeper;
+import net.minecraft.server.v1_11_R1.EntityEnderman;
 import net.minecraft.server.v1_11_R1.PathfinderGoalSelector;
 
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -34,7 +37,6 @@ import org.mcstats.Metrics;
 import org.spigotmc.SpigotConfig;
 import org.vivecraft.command.ViveCommand;
 import org.vivecraft.entities.CustomGoalSwell;
-import org.vivecraft.entities.EntityEndermanCustom;
 import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
@@ -95,25 +97,40 @@ public class VSE extends JavaPlugin implements Listener {
 		
 	public static Object getPrivateField(String fieldName, Class<PathfinderGoalSelector> clazz, Object object)
 	{
-	Field field;
-	Object o = null;
-	try
-	{
-		field = clazz.getDeclaredField(fieldName);
-		field.setAccessible(true);
-		o = field.get(object);
-	}
-	catch(NoSuchFieldException e)
-	{
-		e.printStackTrace();
-	}
-	catch(IllegalAccessException e)
-	{
-		e.printStackTrace();
-	}
-	return o;
+		Field field;
+		Object o = null;
+		try
+		{
+			field = clazz.getDeclaredField(fieldName);
+			field.setAccessible(true);
+			o = field.get(object);
+		}
+		catch(NoSuchFieldException e)
+		{
+			e.printStackTrace();
+		}
+		catch(IllegalAccessException e)
+		{
+			e.printStackTrace();
+		}
+		return o;
 	}
 	  
+	public static Method getPrivateMethod(String methodName, Class clazz)
+	{
+		Method m = null;
+		try
+		{
+			m = clazz.getDeclaredMethod(methodName);
+			m.setAccessible(true);
+		}
+		catch(NoSuchMethodException e)
+		{
+			e.printStackTrace();
+		}
+		return m;
+	}
+	
 	@EventHandler(priority = EventPriority.MONITOR)
     public void onEvent(CreatureSpawnEvent event) {
 		if(!event.isCancelled()){
@@ -147,13 +164,8 @@ public class VSE extends JavaPlugin implements Listener {
 			}
 			e.goalSelector.a(2, new CustomGoalSwell(e));
 		}
-		else if(entity.getType() == EntityType.ENDERMAN){	
-			net.minecraft.server.v1_11_R1.World nmsWorld = ((CraftWorld) entity.getWorld()).getHandle();
-			EntityEndermanCustom e = new EntityEndermanCustom(nmsWorld);
-			e.setLocation(entity.getLocation().getX(), entity.getLocation().getY(), entity.getLocation().getZ(), entity.getLocation().getPitch(), entity.getLocation().getYaw());
-			if (nmsWorld.addEntity(e)){
-				entity.remove();
-			}
+		else if(entity.getType() == EntityType.ENDERMAN && ((CraftEntity)entity).getHandle() instanceof EntityEnderman){			
+
 		}
 	}
 
