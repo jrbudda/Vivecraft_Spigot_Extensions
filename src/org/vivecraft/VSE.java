@@ -15,6 +15,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEnderman;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -37,6 +38,7 @@ import org.mcstats.Metrics;
 import org.spigotmc.SpigotConfig;
 import org.vivecraft.command.ViveCommand;
 import org.vivecraft.entities.CustomGoalSwell;
+import org.vivecraft.entities.CustomPathFinderGoalPlayerWhoLookedAtTarget;
 import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
@@ -165,7 +167,18 @@ public class VSE extends JavaPlugin implements Listener {
 			e.goalSelector.a(2, new CustomGoalSwell(e));
 		}
 		else if(entity.getType() == EntityType.ENDERMAN && ((CraftEntity)entity).getHandle() instanceof EntityEnderman){			
-
+			EntityEnderman e = ((CraftEnderman) entity).getHandle();
+			@SuppressWarnings("rawtypes")
+			LinkedHashSet goalB = (LinkedHashSet )getPrivateField("b", PathfinderGoalSelector.class, e.targetSelector);
+			int x = 0;
+			for(Object b: goalB){
+				if(x==0){
+					goalB.remove(b);
+					break;
+				}
+				x+=1;
+			}
+			e.goalSelector.a(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e));
 		}
 	}
 
