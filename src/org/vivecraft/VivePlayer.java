@@ -7,7 +7,6 @@ import java.io.IOException;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.lwjgl.util.vector.Vector3f;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 import org.vivecraft.utils.Quaternion;
 import org.vivecraft.utils.Vector3;
@@ -50,6 +49,7 @@ public class VivePlayer {
 		return 0;
 	}
 	
+	@SuppressWarnings("unused")
 	public Vec3D getHMDDir(){
 		try {
 			if(hmdData != null){
@@ -57,7 +57,7 @@ public class VivePlayer {
 				ByteArrayInputStream byin = new ByteArrayInputStream(hmdData);
 				DataInputStream da = new DataInputStream(byin);
 		
-				@SuppressWarnings("unused")
+				boolean seated = da.readBoolean();
 				float lx = da.readFloat();
 				float ly = da.readFloat();
 				float lz = da.readFloat();
@@ -70,6 +70,8 @@ public class VivePlayer {
 				Quaternion q = new Quaternion(w, x, y, z);
 				Vector3 out = q.multiply(forward);
 				
+				
+				//System.out.println("("+out.getX()+","+out.getY()+","+out.getZ()+")" + " : W:" + w + " X: "+x + " Y:" + y+ " Z:" + z);
 				da.close(); //needed?
 				return new Vec3D(out.getX(), out.getY(), out.getZ());
 			}else{
