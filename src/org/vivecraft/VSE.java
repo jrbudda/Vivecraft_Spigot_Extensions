@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.UUID;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftCreeper;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEnderman;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEntity;
@@ -117,7 +116,8 @@ public class VSE extends JavaPlugin implements Listener {
 		}
 		return o;
 	}
-	  
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static Method getPrivateMethod(String methodName, Class clazz)
 	{
 		Method m = null;
@@ -178,7 +178,7 @@ public class VSE extends JavaPlugin implements Listener {
 				}
 				x+=1;
 			}
-			e.goalSelector.a(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e));
+			e.targetSelector.a(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e));
 		}
 	}
 

@@ -75,7 +75,8 @@ public class EntityEndermanCustom
     a(PathType.WATER, -1.0F);
   }
   
-  protected void r()
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+protected void r()
   {
     this.goalSelector.a(0, new PathfinderGoalFloat(this));
     this.goalSelector.a(2, new PathfinderGoalMeleeAttack(this, 1.0D, false));
@@ -181,7 +182,8 @@ public class EntityEndermanCustom
     }
   }
   
-  public void a(NBTTagCompound nbttagcompound)
+  @SuppressWarnings("deprecation")
+public void a(NBTTagCompound nbttagcompound)
   {
     super.a(nbttagcompound);
     IBlockData iblockdata;
@@ -326,7 +328,8 @@ public class EntityEndermanCustom
     this.datawatcher.set(bw, Optional.fromNullable(iblockdata));
   }
   
-  @Nullable
+  @SuppressWarnings("rawtypes")
+@Nullable
   public IBlockData getCarried()
   {
     return (IBlockData)((Optional)this.datawatcher.get(bw)).orNull();
@@ -469,7 +472,8 @@ public class EntityEndermanCustom
       this.i = entityenderman;
     }
     
-    public boolean a()
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public boolean a()
     {
       double d0 = i();
       
