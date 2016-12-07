@@ -144,9 +144,7 @@ public class VSE extends JavaPlugin implements Listener {
 		List<World> wrl = this.getServer().getWorlds();
 		for(World world: wrl){
 			for(Entity e: world.getLivingEntities()){
-				if(e.getType() == EntityType.CREEPER){
 					EditEntity(e);
-				}
 			}
 		}
 	}
