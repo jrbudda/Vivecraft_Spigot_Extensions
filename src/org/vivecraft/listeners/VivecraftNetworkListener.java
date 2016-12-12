@@ -1,7 +1,11 @@
 package org.vivecraft.listeners;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -63,8 +67,32 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			//only we can use that word.
 			break;
 		case VERSION:
+			ByteArrayInputStream byin = new ByteArrayInputStream(data);
+			DataInputStream da = new DataInputStream(byin);
+			InputStreamReader is = new InputStreamReader(da);
+			BufferedReader br = new BufferedReader(is);
 			VSE.vivePlayers.put(sender.getUniqueId(), new VivePlayer(sender));
-			ViveCommand.sendMessage("Welcome Vive user!",sender);
+
+			VivePlayer vivepl = VSE.vivePlayers.get(sender.getUniqueId());
+			try {
+				String version = br.readLine();
+				
+				if(version.contains("NONVR")){
+					vivepl.setVR(false);
+					
+					if(vse.getConfig().getBoolean("welcomemsg.enabled"))
+					ViveCommand.sendMessage("Welcome user!",sender);
+				}else{
+					vivepl.setVR(true);
+					
+					if(vse.getConfig().getBoolean("welcomemsg.enabled"))
+					ViveCommand.sendMessage("Welcome VR user!",sender);
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			sender.sendPluginMessage(vse, vse.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getDescription().getFullName()));
 			if(vse.getConfig().getBoolean("SendPlayerData.enabled") == true)
 			sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});

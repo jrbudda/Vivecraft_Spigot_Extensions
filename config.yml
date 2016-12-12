@@ -29,3 +29,5 @@ permissions:
   non-vivegroup: vive.non-vivegroup
   #Permission group for vive users in free move mode.
   freemovegroup: vive.freemovegroup
+welcomemsg:
+  enabled: true

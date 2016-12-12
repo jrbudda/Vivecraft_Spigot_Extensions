@@ -23,6 +23,7 @@ public class VivePlayer {
 	boolean isReverseHands;
 	boolean isSeated;
 	boolean worldScale;
+	boolean isVR;
 
 	public Player player;
 
@@ -108,7 +109,14 @@ public class VivePlayer {
 		return player.getLocation(); //why
 
 	}
+
+	public boolean isVR(){
+		return this.isVR;
+	}
 	
+	public void setVR(boolean vr){
+		this.isVR = vr;
+	}
 	
 	public boolean isSeated(){
 		try {
