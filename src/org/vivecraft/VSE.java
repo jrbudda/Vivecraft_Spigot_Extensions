@@ -267,7 +267,10 @@ public class VSE extends JavaPlugin implements Listener {
 	
 	public static boolean isVive(Player p){
 		if(p == null) return false;
-		return vivePlayers.containsKey(p.getUniqueId());
+			if(vivePlayers.containsKey(p.getUniqueId())){
+				return vivePlayers.get(p.getUniqueId()).isVR();
+			}
+		return false;
 	}
 
 	public void setPermissionsGroup(Player p) {
