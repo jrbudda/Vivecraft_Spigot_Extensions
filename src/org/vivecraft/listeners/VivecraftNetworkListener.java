@@ -73,6 +73,8 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			BufferedReader br = new BufferedReader(is);
 			VSE.vivePlayers.put(sender.getUniqueId(), new VivePlayer(sender));
 
+			sender.sendPluginMessage(vse, vse.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getDescription().getFullName()));
+			
 			VivePlayer vivepl = VSE.vivePlayers.get(sender.getUniqueId());
 			try {
 				String version = br.readLine();
@@ -87,15 +89,17 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 					
 					if(vse.getConfig().getBoolean("welcomemsg.enabled"))
 					ViveCommand.sendMessage(vse.getConfig().getString("welcomemsg.welcomeVR"),sender);
+					
+					if(vse.getConfig().getBoolean("SendPlayerData.enabled") == true)
+						sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
-			sender.sendPluginMessage(vse, vse.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getDescription().getFullName()));
-			if(vse.getConfig().getBoolean("SendPlayerData.enabled") == true)
-			sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});
+			
+			
 			break;
 		case WORLDSCALE:
 			break;
