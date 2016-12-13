@@ -32,4 +32,4 @@ permissions:
 welcomemsg:
   enabled: true
   welcomeVR: Welcome VR user!
-  welcomenonVR: Welcome user!
+  welcomenonVR: Welcome, Muggle!
