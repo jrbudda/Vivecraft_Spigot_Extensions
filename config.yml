@@ -31,3 +31,5 @@ permissions:
   freemovegroup: vive.freemovegroup
 welcomemsg:
   enabled: true
+  welcomeVR: Welcome, VR user!
+  welcomenonVR: Welcome, user!
