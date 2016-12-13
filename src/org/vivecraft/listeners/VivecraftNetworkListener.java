@@ -81,12 +81,12 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 					vivepl.setVR(false);
 					
 					if(vse.getConfig().getBoolean("welcomemsg.enabled"))
-					ViveCommand.sendMessage("Welcome user!",sender);
+					ViveCommand.sendMessage(vse.getConfig().getString("welcomemsg.welcomenonVR"),sender);
 				}else{
 					vivepl.setVR(true);
 					
 					if(vse.getConfig().getBoolean("welcomemsg.enabled"))
-					ViveCommand.sendMessage("Welcome VR user!",sender);
+					ViveCommand.sendMessage(vse.getConfig().getString("welcomemsg.welcomeVR"),sender);
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
