@@ -13,7 +13,7 @@ import org.vivecraft.VSE;
 public class ViveCommand implements CommandExecutor {
 
 	private VSE plugin;
-	private ArrayList<Cmd> commands = new ArrayList<Cmd>();
+	private static ArrayList<Cmd> commands = new ArrayList<Cmd>();
 
 	public ViveCommand(VSE vse) {
 		plugin = vse;
@@ -23,6 +23,11 @@ public class ViveCommand implements CommandExecutor {
 		commands.add(new Cmd("sendplayerdata", "set to false to disable sending player to data to clients. Default: true"));
 		commands.add(new Cmd("creeperradius", "type false to disable or type a number to change the radius. Default: 1.75"));
 		commands.add(new Cmd("bow", "Sets the multiplier for bow damage of vive users. Default: 2"));
+		commands.add(new Cmd("checkforupdate", "Checked for an update every time an OP joins the server"));
+	}
+	
+	public static ArrayList<Cmd> getCommands(){
+		return commands;
 	}
 
 	@Override
@@ -116,6 +121,20 @@ public class ViveCommand implements CommandExecutor {
 					sendMessage("Version: " + version, player);
 				} else
 				//	
+				if(command.equals("checkforupdate")){
+					if(args.length >= 2){
+						if(args[1].toLowerCase().equals("true")){
+							plugin.getConfig().set("checkforupdate.enabled", true);
+							sendMessage("Update checker has been enabled.", player);
+						}else if (args[1].toLowerCase().equals("false")) {
+							plugin.getConfig().set("checkforupdate.enabled", false);
+							sendMessage("Update checker has been disabled.", player);
+						}
+					}else{
+						sendMessage("Check for update: " + plugin.getConfig().get("checkforupdate.enabled"),player);
+					}
+				}else
+				//
 				if (command.equals("help")) {
 					for (Cmd cm : commands) {
 						sendMessage(cm.getCommand() + " - " + cm.getDescription(), player);

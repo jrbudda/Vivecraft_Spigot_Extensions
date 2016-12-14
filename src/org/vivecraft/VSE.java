@@ -35,6 +35,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mcstats.Metrics;
 import org.spigotmc.SpigotConfig;
+import org.vivecraft.command.ConstructTabCompleter;
 import org.vivecraft.command.ViveCommand;
 import org.vivecraft.entities.CustomGoalSwell;
 import org.vivecraft.entities.CustomPathFinderGoalPlayerWhoLookedAtTarget;
@@ -69,8 +70,12 @@ public class VSE extends JavaPlugin implements Listener {
 		saveConfig();
 		// end Config part
 
-		this.getCommand("vive").setExecutor(new ViveCommand(this));
-		this.getCommand("vse").setExecutor(new ViveCommand(this));
+		getCommand("vive").setExecutor(new ViveCommand(this));
+		getCommand("vse").setExecutor(new ViveCommand(this));
+		getCommand("vive").setTabCompleter(new ConstructTabCompleter());
+		getCommand("vse").setTabCompleter(new ConstructTabCompleter());
+
+		
 		getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, new VivecraftNetworkListener(this));
 		getServer().getMessenger().registerOutgoingPluginChannel(this, CHANNEL);
 		
