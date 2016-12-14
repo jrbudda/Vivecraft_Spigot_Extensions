@@ -1,6 +1,6 @@
 # Vivecraft_Spigot_Extensions
-VSE is a companion plugin for [Vivecraft](www.vivecraft.org), the VR mod for Java Minecraft. 
-VSE is for [Spigot](https://www.spigotmc.org/) servers and adds several enchancements for VR players.
+VSE is a companion plugin for [Vivecraft](http://www.vivecraft.org), the VR mod for Java Minecraft. 
+VSE is for [Spigot](https://www.spigotmc.org/) servers and adds several enhancements for VR players.
 
 # Features
  - Vivecraft players will see other Vivecraft players head and arm movements.
