@@ -42,6 +42,7 @@ import org.vivecraft.entities.CustomPathFinderGoalPlayerWhoLookedAtTarget;
 import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
+import org.vivecraft.utils.Headshot;
 
 public class VSE extends JavaPlugin implements Listener {
 	FileConfiguration config = getConfig();
@@ -82,7 +83,9 @@ public class VSE extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(this, this);
 		getServer().getPluginManager().registerEvents(new VivecraftCombatListener(this), this);
 		getServer().getPluginManager().registerEvents(new VivecraftItemListener(), this);
-		
+
+        Headshot.init(this);
+
 		SpigotConfig.movedWronglyThreshold = 10;
 		SpigotConfig.movedTooQuicklyMultiplier = 64;
 
