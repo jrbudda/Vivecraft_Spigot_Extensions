@@ -194,7 +194,7 @@ public class VSE extends JavaPlugin implements Listener {
 
 			for (VivePlayer v : vivePlayers.values()) {
 			
-					if (v == sendTo || v == null || v.player == null || !v.player.isOnline() || v.hmdData == null || v.controller0data == null || v.controller1data == null){
+					if (v == sendTo || v == null || v.player == null || !v.player.isOnline() || v.player.getWorld() != sendTo.player.getWorld() || v.hmdData == null || v.controller0data == null || v.controller1data == null){
 						continue;
 					}
 					
