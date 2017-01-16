@@ -20,8 +20,16 @@ checkforupdate:
 printmoney:
   enabled: false
 bow:
-  #Archery damage multiplier for Vivecraft (standing) users.
-  multiplier: 2
+  #Archery damage multiplier for Vivecraft (standing) users. Set to 1 to disable
+  standingmultiplier: 2
+  #Archery damage multiplier for Vivecraft (seated) users. Set to 1 to disable
+  seatedmultiplier: 1
+  #Headshot damage multiplier for Vivecraft (standing) users. Set to 1 to disable
+  standingheadshotmultiplier: 3
+  #Headshot damage multiplier for Vivecraft (seated) users. Set to 1 to disable
+  seatedheadshotmultiplier: 2
+  #Set if players can headshot mobs (only horizontal mobs)
+  headshotmobs: true
 permissions:
   #Permission group for Vive users
   vivegroup: vive.vivegroup
