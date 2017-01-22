@@ -14,6 +14,20 @@ CreeperRadius:
   radius: 1.75
 debug:
   enabled: false
+setSpigotConfig:
+  enabled: true
+  #Increase these if you get rubber banding when teleporting.
+  movedWronglyThreshold: 15
+  movedTooQuickly: 64
+pvp:
+  #Allows Standing VR players to Attack other Standing VR Players
+  VRvsVR: true 
+  #Allows Standing VR Players to attack Non VR players
+  VRvsNONVR: true
+  #Allows  Seated VR Players to attack normal players.
+  SEATEDVRvsNONVR: true
+  #Allows Standing VR Players to attack Seated VR Players
+  VRvsSEATEDVR: true
 checkforupdate:
   #will check for a newer version and alert any OP when they login to the server
   enabled: true

@@ -1,8 +1,8 @@
 package org.vivecraft.listeners;
 
-import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftArrow;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -82,4 +82,71 @@ public class VivecraftCombatListener implements Listener{
 
         }
     }
+    
+    public boolean usingVR(Player player){
+    	if(VSE.vivePlayers.containsKey(player.getUniqueId())){
+    		if(!VSE.vivePlayers.get(player.getUniqueId()).isVR()){
+    			return false;
+    		}
+    		return true;
+    	}
+    	return false;
+    }
+    
+    public boolean isSeated(Player player){
+    	if(VSE.vivePlayers.containsKey(player.getUniqueId())){
+    		return VSE.vivePlayers.get(player.getUniqueId()).isSeated();
+    	}
+    	return false;
+    }
+    
+    public boolean isStanding(Player player){
+    	if(VSE.vivePlayers.containsKey(player.getUniqueId())){
+    		if(!VSE.vivePlayers.get(player.getUniqueId()).isSeated() && VSE.vivePlayers.get(player.getUniqueId()).isVR()) return true;
+    	}
+    	return false;
+    }
+    
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+	public void onDamage(EntityDamageByEntityEvent e) {
+		final Entity damager = e.getDamager();
+		final Entity damaged = e.getEntity();
+
+		if (damager instanceof Player) {
+			if (damaged instanceof Player) {
+				Player attacker = (Player) damager;
+				Player victim = (Player) damager;
+
+				if (!vse.getConfig().getBoolean("pvp.VRvsVR")) {
+					if (usingVR(attacker) && usingVR(victim)) {
+						if (isStanding(attacker) && isStanding(victim)) {
+							e.setCancelled(true);
+						}
+					}
+				}
+
+				if (!vse.getConfig().getBoolean("pvp.VRvsNONVR")) {
+					if ((usingVR(attacker) && !usingVR(victim)) || (usingVR(victim) && !usingVR(attacker))) {
+						e.setCancelled(true);
+					}
+				}
+				
+				if (!vse.getConfig().getBoolean("pvp.SEATEDVRvsNONVR")) {
+					if(((usingVR(attacker) && isSeated(attacker)) && !usingVR(victim)) || ((usingVR(victim) && isSeated(victim)) && !usingVR(attacker))){
+						e.setCancelled(true);
+					}
+				}
+
+				if (!vse.getConfig().getBoolean("pvp.VRvsSEATEDVR")) {
+					if (usingVR(attacker) && usingVR(victim)) {
+						if ((isSeated(attacker) && isStanding(victim)) || (isSeated(victim) && isStanding(attacker))) {
+							e.setCancelled(true);
+						}
+					}
+				}
+
+			}
+		}
+	}
+    
 }

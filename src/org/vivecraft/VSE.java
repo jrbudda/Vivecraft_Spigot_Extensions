@@ -85,10 +85,12 @@ public class VSE extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new VivecraftItemListener(), this);
 
         Headshot.init(this);
-
-		SpigotConfig.movedWronglyThreshold = 10;
-		SpigotConfig.movedTooQuicklyMultiplier = 64;
-
+        
+        if(getConfig().getBoolean("setSpigotConfig.enabled")){
+        	SpigotConfig.movedWronglyThreshold = getConfig().getDouble("setSpigotConfig.movedWronglyThreshold");
+			SpigotConfig.movedTooQuicklyMultiplier = getConfig().getDouble("setSpigotConfig.movedTooQuickly");
+        }
+        
 		task = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
 				sendPosData();

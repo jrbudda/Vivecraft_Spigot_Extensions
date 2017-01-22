@@ -1,6 +1,8 @@
 package org.vivecraft.command;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -9,6 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.vivecraft.VSE;
+import org.vivecraft.VivePlayer;
 
 public class ViveCommand implements CommandExecutor {
 
@@ -24,12 +27,14 @@ public class ViveCommand implements CommandExecutor {
 		commands.add(new Cmd("creeperradius", "type false to disable or type a number to change the radius. Default: 1.75"));
 		commands.add(new Cmd("bow", "Sets the multiplier for bow damage of vive users. Default: 2"));
 		commands.add(new Cmd("checkforupdate", "Checked for an update every time an OP joins the server"));
+		commands.add(new Cmd("list", "Lists all the users using Vivecraft."));
 	}
 	
 	public static ArrayList<Cmd> getCommands(){
 		return commands;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (sender instanceof Player){
@@ -101,6 +106,7 @@ public class ViveCommand implements CommandExecutor {
 					}
 					plugin.saveConfig();
 				} else
+				//
 				if (command.equals("bow") && sender.isOp()) {
 					if (args.length >= 2) {
 						try {
@@ -114,6 +120,22 @@ public class ViveCommand implements CommandExecutor {
 					}
 					plugin.saveConfig();
 				} else
+				//
+				if(command.equals("list") && sender.isOp()){
+					Iterator it = VSE.vivePlayers.entrySet().iterator();
+					int size = VSE.vivePlayers.size();
+					if(size >= 2){
+						sendMessage("There are "+VSE.vivePlayers.size() + " Vivecraft Players",player);
+					}else{
+						sendMessage("There is "+VSE.vivePlayers.size() + " Vivecraft Player",player);
+					}
+					while (it.hasNext()) {
+						Map.Entry pair = (Map.Entry)it.next();
+						VivePlayer vp = (VivePlayer)pair.getValue();
+						sendMessage((vp.isVR() ? "VR" : "NONVR") + ": "+vp.player.getDisplayName(),player);
+					}
+					
+				}else
 				//
 				if (command.equals("version")) {
 					PluginDescriptionFile pdf = plugin.getDescription();
