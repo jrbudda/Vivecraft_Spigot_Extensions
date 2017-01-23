@@ -144,8 +144,8 @@ public class ViveCommand implements CommandExecutor {
 						sendMessage(vp.player.getDisplayName() + ": " + (vp.isVR() ? "VR " + (vp.isSeated() ? "SEATED" : "STANDING") : "NONVR") ,player);
 					}
 					
-				}else//          0           1          2   3  4 
-				//Example: /vse set vive-only.enabled false a test
+				}else
+				//
 				if(command.equals("set") && sender.isOp()){
 					if (args.length >= 3) {
 						String config = args[1];
@@ -165,7 +165,6 @@ public class ViveCommand implements CommandExecutor {
 										}
 									}
 								}
-								System.out.println("TEST: " + test);
 								plugin.getConfig().set(config, test);
 							}
 							sendMessage(config + " has been set to: " + plugin.getConfig().get(config),player);
@@ -235,8 +234,6 @@ public class ViveCommand implements CommandExecutor {
             return false;
         }
     }
-	
-	
 	
 	public static void sendMessage(String message, Player p) {
 		p.sendMessage(ChatColor.BLUE + "[" + ChatColor.GRAY + "Vivecraft" + ChatColor.BLUE + "] " + ChatColor.WHITE + message);
