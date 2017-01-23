@@ -40,7 +40,7 @@ public class VivecraftCombatListener implements Listener{
 		   if (proj instanceof CraftArrow) hand = 1;
 		   //TODO: check for seated mode.
 		   
-		   if ((vp == null) && (this.vse.getConfig().getBoolean("debug.enabled"))) {
+		   if ((vp == null) && (this.vse.getConfig().getBoolean("general.debug"))) {
 			   vse.getLogger().warning(" Error on projectile launch!");
 		   }
 		   

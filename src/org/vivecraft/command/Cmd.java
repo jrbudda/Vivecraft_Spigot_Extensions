@@ -4,10 +4,12 @@ public class Cmd {
 	
 	private String cmd = "";
 	private String desc = "";
+	private String hovertext = "";
 	
-	public Cmd(String cmd, String desc){
+	public Cmd(String cmd, String desc, String hovertext){
 		this.cmd = cmd;
 		this.desc = desc;
+		this.hovertext = hovertext;
 	}
 	
 	public String getCommand(){
@@ -18,4 +20,7 @@ public class Cmd {
 		return this.desc;
 	}
 
+	public String getHoverText(){
+		return this.hovertext;
+	}
 }

@@ -7,6 +7,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.vivecraft.VSE;
@@ -79,16 +81,36 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			try {
 				String version = br.readLine();
 				
+				if(vivepl.isSeated()){
+					vivepl.setVR(true);
+					if(vse.getConfig().getBoolean("welcomemsg.enabled")){
+						String message = vse.getConfig().getString("welcomemsg.welcomeSeated");
+						String format = message.replace("&player", sender.getDisplayName());
+						for(Player p : Bukkit.getOnlinePlayers()){
+							ViveCommand.sendMessage(format,p);
+						}
+					}
+				}else
 				if(version.contains("NONVR")){
 					vivepl.setVR(false);
 					
-					if(vse.getConfig().getBoolean("welcomemsg.enabled"))
-					ViveCommand.sendMessage(vse.getConfig().getString("welcomemsg.welcomenonVR"),sender);
+					if(vse.getConfig().getBoolean("welcomemsg.enabled")){
+						String message = vse.getConfig().getString("welcomemsg.welcomenonVR");
+						String format = message.replace("&player", sender.getDisplayName());
+						for(Player p : Bukkit.getOnlinePlayers()){
+							ViveCommand.sendMessage(format,p);
+						}
+					}
 				}else{
 					vivepl.setVR(true);
 					
-					if(vse.getConfig().getBoolean("welcomemsg.enabled"))
-					ViveCommand.sendMessage(vse.getConfig().getString("welcomemsg.welcomeVR"),sender);
+					if(vse.getConfig().getBoolean("welcomemsg.enabled")){
+						String message = vse.getConfig().getString("welcomemsg.welcomeVR");
+						String format = message.replace("&player", sender.getDisplayName());
+						for(Player p : Bukkit.getOnlinePlayers()){
+							ViveCommand.sendMessage(format,p);
+						}
+					}
 					
 					if(vse.getConfig().getBoolean("SendPlayerData.enabled") == true)
 						sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});

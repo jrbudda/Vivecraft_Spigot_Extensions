@@ -1,10 +1,14 @@
-vive-only:
+general:
+  debug: false
+  #will check for a newer version and alert any OP when they login to the server
+  checkforupdate: true
   #Set to true to only allow Vivecraft players to play.
-  enabled: false
+  vive-only: false
   #The message to show kicked non-vive players.
-  kickmessage: This server is configured for Vivecraft players only.
+  vive-only-kickmessage: This server is configured for Vivecraft players only.
   #Ticks to wait before kicking a player. The player's client must send a Vivecraft VERSION info in that time.
-  waittime: 60
+  vive-only-kickwaittime: 10
+  printmoney: false
 SendPlayerData:
   #Send player data to all clients with Vivecraft
   enabled: true
@@ -12,8 +16,6 @@ CreeperRadius:
   #Distance from a Vivecraft player before creeper starts to swell up (vanilla is 3)
   enabled: true
   radius: 1.75
-debug:
-  enabled: false
 setSpigotConfig:
   enabled: true
   #Increase these if you get rubber banding when teleporting.
@@ -28,11 +30,6 @@ pvp:
   SEATEDVRvsNONVR: true
   #Allows Standing VR Players to attack Seated VR Players
   VRvsSEATEDVR: true
-checkforupdate:
-  #will check for a newer version and alert any OP when they login to the server
-  enabled: true
-printmoney:
-  enabled: false
 bow:
   #Archery damage multiplier for Vivecraft (standing) users. Set to 1 to disable
   standingmultiplier: 2
@@ -53,5 +50,8 @@ permissions:
   freemovegroup: vive.freemovegroup
 welcomemsg:
   enabled: true
+  #Remove message to not send. ex: leaveMessage:
   welcomeVR: Welcome, VR user!
-  welcomenonVR: Welcome, user!
+  welcomenonVR: Welcome, &player!
+  welcomeSeated: Welcome Seated Player!
+  leaveMessage: &player has left the server!

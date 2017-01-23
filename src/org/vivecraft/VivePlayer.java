@@ -120,6 +120,7 @@ public class VivePlayer {
 	
 	public boolean isSeated(){
 		try {
+			if(hmdData == null) return false;
 			if(hmdData.length <29) return false;//old client.
 			
 			ByteArrayInputStream byin = new ByteArrayInputStream(hmdData);
