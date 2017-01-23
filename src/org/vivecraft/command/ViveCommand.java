@@ -27,6 +27,7 @@ public class ViveCommand implements CommandExecutor {
 		commands.add(new Cmd("creeperradius", "type false to disable or type a number to change the radius. Default: 1.75"));
 		commands.add(new Cmd("bow", "Sets the multiplier for bow damage of vive users. Default: 2"));
 		commands.add(new Cmd("checkforupdate", "Checked for an update every time an OP joins the server"));
+		commands.add(new Cmd("set", "Allows Editing the plugin config ingame. May need to restart server to take effect."));
 		commands.add(new Cmd("list", "Lists all the users using Vivecraft."));
 	}
 	
@@ -127,14 +128,38 @@ public class ViveCommand implements CommandExecutor {
 					if(size >= 2){
 						sendMessage("There are "+VSE.vivePlayers.size() + " Vivecraft Players",player);
 					}else{
-						sendMessage("There is "+VSE.vivePlayers.size() + " Vivecraft Player",player);
+						sendMessage("There is 1 Vivecraft Player",player);
+					}
+					if(size == 0){
+						sendMessage("There are no Vivecraft players",player);
 					}
 					while (it.hasNext()) {
 						Map.Entry pair = (Map.Entry)it.next();
 						VivePlayer vp = (VivePlayer)pair.getValue();
-						sendMessage((vp.isVR() ? "VR" : "NONVR") + ": "+vp.player.getDisplayName(),player);
+						sendMessage(vp.player.getDisplayName() + ": " + (vp.isVR() ? "VR" : "NONVR") + " " + (vp.isSeated() ? "SEATED" : "STANDING") ,player);
 					}
 					
+				}else
+				//Example: /vse set vive-only.enabled false
+				if(command.equals("set") && sender.isOp()){
+					if (args.length >= 3) {
+						String config = args[2];
+						if(plugin.getConfig().contains(config)){
+							if(isBoolean(args[3])){
+								plugin.getConfig().set(config, Boolean.parseBoolean(args[3]));
+							}else
+							if(isDouble(args[3])){
+								plugin.getConfig().set(config, Double.parseDouble(args[3]));
+							}else{
+								plugin.getConfig().set(config, args[3]);
+							}
+							sendMessage(config + " has been set to: " + plugin.getConfig().get(config),player);
+						}else{
+							sendMessage("That config option does not exist.",player);
+						}
+					}else{
+						sendMessage("Missing arguments!",player);
+					}
 				}else
 				//
 				if (command.equals("version")) {
@@ -174,6 +199,19 @@ public class ViveCommand implements CommandExecutor {
 			plugin.getLogger().info("Only players can run this command!");
 		return true;
 	}
+	
+	public boolean isBoolean(String str){
+		return (str.toLowerCase().equals("true") || str.toLowerCase().equals("false"));
+	}
+	
+	boolean isDouble(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 
 	public static void sendMessage(String message, Player p) {
 		p.sendMessage(ChatColor.BLUE + "[" + ChatColor.GRAY + "Vivecraft" + ChatColor.BLUE + "] " + ChatColor.WHITE + message);
