@@ -11,6 +11,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftCreeper;
@@ -85,10 +87,12 @@ public class VSE extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new VivecraftItemListener(), this);
 
         Headshot.init(this);
-
-		SpigotConfig.movedWronglyThreshold = 10;
-		SpigotConfig.movedTooQuicklyMultiplier = 64;
-
+        
+        if(getConfig().getBoolean("setSpigotConfig.enabled")){
+        	SpigotConfig.movedWronglyThreshold = getConfig().getDouble("setSpigotConfig.movedWronglyThreshold");
+			SpigotConfig.movedTooQuicklyMultiplier = getConfig().getDouble("setSpigotConfig.movedTooQuickly");
+        }
+        
 		task = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
 				sendPosData();
@@ -99,7 +103,7 @@ public class VSE extends JavaPlugin implements Listener {
 		CheckAllEntities();
 		
 		//Easter egg
-		if(getConfig().getBoolean("printmoney.enabled")){
+		if(getConfig().getBoolean("general.printmoney")){
 			getLogger().warning("\r\n||====================================================================||\r\n||//$\\\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\//$\\\\||\r\n||(100)==================| FEDERAL RESERVE NOTE |================(100)||\r\n||\\\\$//        ~         '------========--------'                \\\\$//||\r\n||<< /        /$\\              // ____ \\\\                         \\ >>||\r\n||>>|  12    //L\\\\            // ///..) \\\\         L38036133B   12 |<<||\r\n||<<|        \\\\ //           || <||  >\\  ||                        |>>||\r\n||>>|         \\$/            ||  $$ --/  ||        One Hundred     |<<||\r\n||<<|      L38036133B        *\\\\  |\\_/  //* series                 |>>||\r\n||>>|  12                     *\\\\/___\\_//*   1989                  |<<||\r\n||<<\\      Treasurer     ______/Franklin\\________     Secretary 12 />>||\r\n||//$\\                 ~|UNITED STATES OF AMERICA|~               /$\\\\||\r\n||(100)===================  ONE HUNDRED DOLLARS =================(100)||\r\n||\\\\$//\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\\\$//||\r\n||====================================================================||");
 		}
 	}
@@ -220,28 +224,35 @@ public class VSE extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		vivePlayers.remove(event.getPlayer().getUniqueId());
+		if(getConfig().getBoolean("welcomemsg.enabled")){
+			String message = getConfig().getString("welcomemsg.leaveMessage");
+			String format = message.replace("&player", event.getPlayer().getDisplayName());
+			for(Player p : Bukkit.getOnlinePlayers()){
+				ViveCommand.sendMessage(format,p);
+			}
+		}
 	}
 
 	@EventHandler
 	public void onPlayerConnect(PlayerJoinEvent event) {
 		final Player p = event.getPlayer();
 		
-		if (getConfig().getBoolean("debug.enabled")) {
+		if (getConfig().getBoolean("general.debug")) {
 			getLogger().info(p.getName() + " Has joined the server");
 		}
-		if (getConfig().getBoolean("vive-only.enabled")) {
+		if (getConfig().getBoolean("general.vive-only")) {
 			getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 				@Override
 				public void run() {
-					if (VSE.this.getConfig().getBoolean("debug.enabled")) {
+					if (VSE.this.getConfig().getBoolean("general.debug")) {
 						VSE.this.getLogger().info("Checking player for ViveCraft");
 					}
 					if ((p.isOnline()) && (!isVive(p))) {
-						VSE.this.getLogger().info(p.getName() + " " + "got kicked for not using the Vive Mod");
-						p.kickPlayer(VSE.this.getConfig().getString("vive-only.kickmessage"));
+						VSE.this.getLogger().info(p.getName() + " " + "got kicked for not using Vivecraft");
+						p.kickPlayer(VSE.this.getConfig().getString("general.vive-only-kickmessage"));
 					}
 				}
-			}, getConfig().getInt("vive-only.waittime"));
+			}, getConfig().getInt("general.vive-only-kickwaittime"));
 		}
 		if(p.isOp())
 		startUpdateCheck(p);
@@ -251,7 +262,7 @@ public class VSE extends JavaPlugin implements Listener {
 		PluginDescriptionFile pdf = getDescription();
 		String version = pdf.getVersion();
 		System.out.println("Version: " + version);
-		if (getConfig().getBoolean("checkforupdate.enabled")) {
+		if (getConfig().getBoolean("general.checkforupdate")) {
 			try {
 				getLogger().info("Checking for a update...");
 				URL url = new URL(readurl);
