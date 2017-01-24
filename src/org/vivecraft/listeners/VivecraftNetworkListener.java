@@ -103,8 +103,6 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 				e.printStackTrace();
 			}
 
-
-
 			break;
 		case WORLDSCALE:
 			break;
@@ -114,15 +112,12 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			try {
 				float x = d.readFloat();
 				float y = d.readFloat();
-				float z;
-				z = d.readFloat();
+				float z = d.readFloat();
 				EntityPlayer nms = 	((CraftPlayer)sender).getHandle();
 				nms.setLocation(x, y, z, nms.pitch, nms.yaw);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
-			
 			
 			break;
 		default:
