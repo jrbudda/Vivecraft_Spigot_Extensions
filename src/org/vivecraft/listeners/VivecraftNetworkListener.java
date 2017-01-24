@@ -161,7 +161,5 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		
 	}
 	
-	
 
-	
 }
