@@ -7,6 +7,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.vivecraft.VSE;
@@ -14,6 +16,8 @@ import org.vivecraft.VivePlayer;
 import org.vivecraft.command.ViveCommand;
 
 import com.google.common.base.Charsets;
+
+import net.minecraft.server.v1_11_R1.EntityPlayer;
 
 public class VivecraftNetworkListener implements PluginMessageListener {
 	public VSE vse;
@@ -31,7 +35,8 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		WORLDSCALE,
 		DRAW,
 		MOVEMODE,
-		UBERPACKET
+		UBERPACKET,
+		TELEPORT
 	}
 	
 	@Override
@@ -97,11 +102,28 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			
-			
+
+
+
 			break;
 		case WORLDSCALE:
+			break;
+		case TELEPORT:
+			ByteArrayInputStream in = new ByteArrayInputStream(data);
+			DataInputStream d = new DataInputStream(in);
+			try {
+				float x = d.readFloat();
+				float y = d.readFloat();
+				float z;
+				z = d.readFloat();
+				EntityPlayer nms = 	((CraftPlayer)sender).getHandle();
+				nms.setLocation(x, y, z, nms.pitch, nms.yaw);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			
+			
 			break;
 		default:
 			break;
@@ -125,7 +147,5 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		
 	}
 	
-	
 
-	
 }
