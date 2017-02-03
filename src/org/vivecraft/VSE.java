@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftCreeper;
@@ -27,6 +28,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import net.milkbowl.vault.item.Items;
 import net.milkbowl.vault.permission.Permission;
@@ -38,7 +42,6 @@ import net.minecraft.server.v1_11_R1.Item;
 import net.minecraft.server.v1_11_R1.ItemArmor;
 import net.minecraft.server.v1_11_R1.ItemArmor.EnumArmorMaterial;
 import net.minecraft.server.v1_11_R1.ItemShears;
-import net.minecraft.server.v1_11_R1.Material;
 import net.minecraft.server.v1_11_R1.MinecraftKey;
 import net.minecraft.server.v1_11_R1.PathfinderGoalSelector;
 
@@ -71,11 +74,28 @@ public class VSE extends JavaPlugin implements Listener {
 	public void onEnable() {
 		super.onEnable();
 		
-        Item.REGISTRY.a(22000, new MinecraftKey("eatme_cake"), new ItemVivecraft().c("eatme_cake").a(CreativeModeTab.k));      
-        Item.REGISTRY.a(22001, new MinecraftKey("drinkme_bottle"), new ItemVivecraft().c("drinkme_bottle").a(CreativeModeTab.k));   
-        Item.REGISTRY.a(22002, new MinecraftKey("jump_boots"), new ItemArmor(EnumArmorMaterial.LEATHER, 0, EnumItemSlot.FEET).c("jump_boots").a(CreativeModeTab.e));      
-        Item.REGISTRY.a(22003, new MinecraftKey("climb_claws"), new ItemShears().c("climb_claws").a(CreativeModeTab.e));   
-              
+		ItemStack is = new ItemStack(Material.LEATHER_BOOTS);
+		ItemMeta meta = is.getItemMeta();
+		meta.setDisplayName("Jump Boots");
+		meta.setUnbreakable(true);
+		is.setItemMeta(meta);
+		ShapedRecipe recipe = new ShapedRecipe(is);
+		recipe.shape("   ", " B ", " S ");
+		recipe.setIngredient('B', Material.LEATHER_BOOTS);
+		recipe.setIngredient('S', Material.SLIME_BLOCK);
+		Bukkit.addRecipe(recipe);
+		
+		ItemStack is2 = new ItemStack(Material.SHEARS);
+		ItemMeta meta2 = is2.getItemMeta();
+		meta2.setDisplayName("Climb Claws");
+		meta2.setUnbreakable(true);
+		is2.setItemMeta(meta2);
+		ShapedRecipe recipe2 = new ShapedRecipe(is);
+		recipe2.shape("   ", "E E", "S S");
+		recipe2.setIngredient('E', Material.SPIDER_EYE);
+		recipe2.setIngredient('S', Material.SHEARS);
+		Bukkit.addRecipe(recipe2);
+		
 		try {
 	        Metrics metrics = new Metrics(this);
 	        metrics.start();

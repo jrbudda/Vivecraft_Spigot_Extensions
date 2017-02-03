@@ -26,17 +26,6 @@ public class VivecraftItemListener implements Listener{
 		this.vse = vse;
 	}
 	
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
-	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		if (!VSE.isVive(event.getPlayer()))
-			return;
-		if(vse.getConfig().getBoolean("climbey.giveItemsOnSpawn") == true)
-		{
-			((CraftPlayer)event.getPlayer()).getHandle().inventory.pickup(new ItemStack(Item.getById(22002)));
-			((CraftPlayer)event.getPlayer()).getHandle().inventory.pickup(new ItemStack(Item.getById(22003)));
-		}
-	}
-
 	 @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	 public void onPlayerDropItem(PlayerDropItemEvent event) {
 		 final Player player = event.getPlayer();
