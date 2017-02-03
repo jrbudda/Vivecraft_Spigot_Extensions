@@ -37,7 +37,8 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		DRAW,
 		MOVEMODE,
 		UBERPACKET,
-		TELEPORT
+		TELEPORT,
+		CLIMBING
 	}
 	
 	@Override
@@ -118,6 +119,10 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 					
 					if(vse.getConfig().getBoolean("SendPlayerData.enabled") == true)
 						sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});
+					
+					if(vse.getConfig().getBoolean("Climbey.enabled") == true)
+						sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.CLIMBING.ordinal()});
+					
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -139,6 +144,9 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			}
 			
 			break;
+		case CLIMBING:
+			EntityPlayer nms = 	((CraftPlayer)sender).getHandle();
+			nms.fallDistance = 0;
 		default:
 			break;
 		}

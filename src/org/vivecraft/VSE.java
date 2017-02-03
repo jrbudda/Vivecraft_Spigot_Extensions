@@ -75,8 +75,7 @@ public class VSE extends JavaPlugin implements Listener {
         Item.REGISTRY.a(22001, new MinecraftKey("drinkme_bottle"), new ItemVivecraft().c("drinkme_bottle").a(CreativeModeTab.k));   
         Item.REGISTRY.a(22002, new MinecraftKey("jump_boots"), new ItemArmor(EnumArmorMaterial.LEATHER, 0, EnumItemSlot.FEET).c("jump_boots").a(CreativeModeTab.e));      
         Item.REGISTRY.a(22003, new MinecraftKey("climb_claws"), new ItemShears().c("climb_claws").a(CreativeModeTab.e));   
-        
-        
+              
 		try {
 	        Metrics metrics = new Metrics(this);
 	        metrics.start();
@@ -101,7 +100,7 @@ public class VSE extends JavaPlugin implements Listener {
 		
 		getServer().getPluginManager().registerEvents(this, this);
 		getServer().getPluginManager().registerEvents(new VivecraftCombatListener(this), this);
-		getServer().getPluginManager().registerEvents(new VivecraftItemListener(), this);
+		getServer().getPluginManager().registerEvents(new VivecraftItemListener(this), this);
 
         Headshot.init(this);
         

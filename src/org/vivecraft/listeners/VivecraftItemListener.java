@@ -8,31 +8,35 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 import org.bukkit.util.Vector;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 
+import net.minecraft.server.v1_11_R1.EntityPlayer;
 import net.minecraft.server.v1_11_R1.Item;
 import net.minecraft.server.v1_11_R1.ItemStack;
 import net.minecraft.server.v1_11_R1.MathHelper;
 
 public class VivecraftItemListener implements Listener{
-	
-	public VivecraftItemListener(){
+	VSE vse = null;
+	public VivecraftItemListener(VSE vse){
+		this.vse = vse;
 	}
 	
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		if (!VSE.isVive(event.getPlayer()))
 			return;
-		//TODO: Server options.
-		((CraftPlayer)event.getPlayer()).getHandle().inventory.pickup(new ItemStack(Item.getById(22002)));
-		((CraftPlayer)event.getPlayer()).getHandle().inventory.pickup(new ItemStack(Item.getById(22003)));	 
+		if(vse.getConfig().getBoolean("climbey.giveItemsOnSpawn") == true)
+		{
+			((CraftPlayer)event.getPlayer()).getHandle().inventory.pickup(new ItemStack(Item.getById(22002)));
+			((CraftPlayer)event.getPlayer()).getHandle().inventory.pickup(new ItemStack(Item.getById(22003)));
+		}
 	}
 
-	
 	 @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	 public void onPlayerDropItem(PlayerDropItemEvent event) {
 		 final Player player = event.getPlayer();

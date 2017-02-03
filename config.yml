@@ -55,3 +55,8 @@ welcomemsg:
   welcomenonVR: Welcome, &player!
   welcomeSeated: Welcome Seated Player!
   leaveMessage: &player has left the server!
+climbey:
+  #Allows use of jump boot and climb claws.
+  enabled: false
+  #Give players boots and claws on spawn.
+  giveItemsOnSpawn: false
