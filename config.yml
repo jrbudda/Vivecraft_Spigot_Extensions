@@ -56,7 +56,7 @@ welcomemsg:
   welcomeSeated: Welcome Seated Player!
   leaveMessage: &player has left the server!
 climbey:
-  #Allows use of jump boot and climb claws.
+  #Allows use of jump_boots and climb_claws. Provide with /give (player) climb_claws | jump_boots
   enabled: false
-  #Give players boots and claws on spawn.
+  #Give players boots and claws on respawn.
   giveItemsOnSpawn: false

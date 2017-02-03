@@ -123,6 +123,9 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 					if(vse.getConfig().getBoolean("Climbey.enabled") == true)
 						sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.CLIMBING.ordinal()});
 					
+					sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.TELEPORT.ordinal()});
+
+					
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
