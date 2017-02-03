@@ -24,8 +24,7 @@ public class VivecraftCombatListener implements Listener{
 	public VivecraftCombatListener(VSE plugin){
 		this.vse = plugin;
 	}
-	
-	   @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+ 	   @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	   public void onProjectileLaunch(ProjectileLaunchEvent event) {
 		   //position all projectiles correctly.
 		   
@@ -117,7 +116,7 @@ public class VivecraftCombatListener implements Listener{
 				Player attacker = (Player) damager;
 				Player victim = (Player) damager;
 
-				if (!vse.getConfig().getBoolean("pvp.VRvsVR")) {
+				if (!vse.getConfig().getBoolean("pvp.VRvsVR",true)) {
 					if (usingVR(attacker) && usingVR(victim)) {
 						if (isStanding(attacker) && isStanding(victim)) {
 							e.setCancelled(true);
@@ -125,19 +124,19 @@ public class VivecraftCombatListener implements Listener{
 					}
 				}
 
-				if (!vse.getConfig().getBoolean("pvp.VRvsNONVR")) {
+				if (!vse.getConfig().getBoolean("pvp.VRvsNONVR", true)) {
 					if ((usingVR(attacker) && !usingVR(victim)) || (usingVR(victim) && !usingVR(attacker))) {
 						e.setCancelled(true);
 					}
 				}
 				
-				if (!vse.getConfig().getBoolean("pvp.SEATEDVRvsNONVR")) {
+				if (!vse.getConfig().getBoolean("pvp.SEATEDVRvsNONVR", true)) {
 					if(((usingVR(attacker) && isSeated(attacker)) && !usingVR(victim)) || ((usingVR(victim) && isSeated(victim)) && !usingVR(attacker))){
 						e.setCancelled(true);
 					}
 				}
 
-				if (!vse.getConfig().getBoolean("pvp.VRvsSEATEDVR")) {
+				if (!vse.getConfig().getBoolean("pvp.VRvsSEATEDVR", true)) {
 					if (usingVR(attacker) && usingVR(victim)) {
 						if ((isSeated(attacker) && isStanding(victim)) || (isSeated(victim) && isStanding(attacker))) {
 							e.setCancelled(true);

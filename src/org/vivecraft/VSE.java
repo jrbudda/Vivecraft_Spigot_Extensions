@@ -27,9 +27,19 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+
+import net.milkbowl.vault.item.Items;
 import net.milkbowl.vault.permission.Permission;
+import net.minecraft.server.v1_11_R1.CreativeModeTab;
 import net.minecraft.server.v1_11_R1.EntityCreeper;
 import net.minecraft.server.v1_11_R1.EntityEnderman;
+import net.minecraft.server.v1_11_R1.EnumItemSlot;
+import net.minecraft.server.v1_11_R1.Item;
+import net.minecraft.server.v1_11_R1.ItemArmor;
+import net.minecraft.server.v1_11_R1.ItemArmor.EnumArmorMaterial;
+import net.minecraft.server.v1_11_R1.ItemShears;
+import net.minecraft.server.v1_11_R1.Material;
+import net.minecraft.server.v1_11_R1.MinecraftKey;
 import net.minecraft.server.v1_11_R1.PathfinderGoalSelector;
 
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -45,6 +55,7 @@ import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 import org.vivecraft.utils.Headshot;
+import org.vivecraft.utils.ItemVivecraft;
 
 public class VSE extends JavaPlugin implements Listener {
 	FileConfiguration config = getConfig();
@@ -59,7 +70,13 @@ public class VSE extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		super.onEnable();
-
+		
+        Item.REGISTRY.a(22000, new MinecraftKey("eatme_cake"), new ItemVivecraft().c("eatme_cake").a(CreativeModeTab.k));      
+        Item.REGISTRY.a(22001, new MinecraftKey("drinkme_bottle"), new ItemVivecraft().c("drinkme_bottle").a(CreativeModeTab.k));   
+        Item.REGISTRY.a(22002, new MinecraftKey("jump_boots"), new ItemArmor(EnumArmorMaterial.LEATHER, 0, EnumItemSlot.FEET).c("jump_boots").a(CreativeModeTab.e));      
+        Item.REGISTRY.a(22003, new MinecraftKey("climb_claws"), new ItemShears().c("climb_claws").a(CreativeModeTab.e));   
+        
+        
 		try {
 	        Metrics metrics = new Metrics(this);
 	        metrics.start();
@@ -262,7 +279,7 @@ public class VSE extends JavaPlugin implements Listener {
 		PluginDescriptionFile pdf = getDescription();
 		String version = pdf.getVersion();
 		System.out.println("Version: " + version);
-		if (getConfig().getBoolean("general.checkforupdate")) {
+		if (getConfig().getBoolean("general.checkforupdate", true)) {
 			try {
 				getLogger().info("Checking for a update...");
 				URL url = new URL(readurl);

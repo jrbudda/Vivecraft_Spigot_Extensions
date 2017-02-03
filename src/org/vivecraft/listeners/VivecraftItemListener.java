@@ -1,21 +1,37 @@
 package org.vivecraft.listeners;
 
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+
 import org.bukkit.util.Vector;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 
+import net.minecraft.server.v1_11_R1.Item;
+import net.minecraft.server.v1_11_R1.ItemStack;
 import net.minecraft.server.v1_11_R1.MathHelper;
 
 public class VivecraftItemListener implements Listener{
 	
 	public VivecraftItemListener(){
 	}
+	
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+	public void onPlayerRespawn(PlayerRespawnEvent event) {
+		if (!VSE.isVive(event.getPlayer()))
+			return;
+		//TODO: Server options.
+		((CraftPlayer)event.getPlayer()).getHandle().inventory.pickup(new ItemStack(Item.getById(22002)));
+		((CraftPlayer)event.getPlayer()).getHandle().inventory.pickup(new ItemStack(Item.getById(22003)));	 
+	}
+
 	
 	 @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	 public void onPlayerDropItem(PlayerDropItemEvent event) {
