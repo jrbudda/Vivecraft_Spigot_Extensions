@@ -90,7 +90,7 @@ public class VSE extends JavaPlugin implements Listener {
 		meta2.setDisplayName("Climb Claws");
 		meta2.setUnbreakable(true);
 		is2.setItemMeta(meta2);
-		ShapedRecipe recipe2 = new ShapedRecipe(is);
+		ShapedRecipe recipe2 = new ShapedRecipe(is2);
 		recipe2.shape("   ", "E E", "S S");
 		recipe2.setIngredient('E', Material.SPIDER_EYE);
 		recipe2.setIngredient('S', Material.SHEARS);
