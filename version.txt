@@ -2,4 +2,4 @@
 1.11-r3: VSE has a new update download at https://github.com/jrbudda/Vivecraft_Spigot_Extensions/releases
 1.11-r4: NEW VERSION IS AVAILABLE! Fixed Player animations and more! Download at https://github.com/jrbudda/Vivecraft_Spigot_Extensions/releases
 1.11-r5: VSE has a new update download at https://github.com/jrbudda/Vivecraft_Spigot_Extensions/releases
-1.11-r6b: VSE is up to date!
+1.11-r6: VSE is up to date!
