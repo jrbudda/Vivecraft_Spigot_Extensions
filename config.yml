@@ -48,6 +48,8 @@ permissions:
   non-vivegroup: vive.non-vivegroup
   #Permission group for vive users in free move mode.
   freemovegroup: vive.freemovegroup
+  #Permission to override climb limitations.
+  climbgroup: vive.climbanywhere
 welcomemsg:
   enabled: true
   #Remove message to not send. ex: leaveMessage:
@@ -58,3 +60,9 @@ welcomemsg:
 climbey:
   #Allows use of jump_boots and climb_claws. Provide with /give (player) climb_claws | jump_boots
   enabled: false
+  #Sets which blocks are climb-able. Options are 'None': List ignored. All blocks are climbable. 'Include': Only blocks on the list are climbable. 'Exclude': All blocks are climbable except those on the list
+  blockmode: None
+  #The list of blocks for use with include/exclude block mode. use name or id. Specify data with :data. i.e. red wool is 'wool:14' or '35:14'
+  blocklist:
+  	 - wool:0
+  	 - dirt

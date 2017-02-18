@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftCreeper;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEnderman;
@@ -70,6 +72,8 @@ public class VSE extends JavaPlugin implements Listener {
 	int task = 0;
 	private String readurl = "https://raw.githubusercontent.com/jaron780/Vivecraft_Spigot_Extensions/master/version.txt";
 	
+	public List<String> blocklist = new ArrayList<>();
+	
 	@Override
 	public void onEnable() {
 		super.onEnable();
@@ -107,8 +111,52 @@ public class VSE extends JavaPlugin implements Listener {
 		config.options().copyDefaults(true);
 		saveDefaultConfig();
 		saveConfig();
+		ConfigurationSection sec = config.getConfigurationSection("climbey");
+		
+		if(sec!=null){
+			List<String> temp = sec.getStringList("blocklist");
+			//make an attempt to validate these on the server for debugging.
+			if(temp != null){
+				for (String string : temp) {
+					String[] parts = string.split(":");
+					String id, data = null;
+					if(parts.length == 1){
+						id = string;
+					} else if(parts.length ==2){
+						id = parts[0];
+						data = parts[1];
+					} else {
+						//wut
+						getLogger().warning("invalid climbey item " + string);
+						continue;
+					}
+					
+					if(data != null && !tryParseInt(data)){
+						getLogger().warning("invalid climbey item data " + string);
+						continue;
+					}
+					Material test;
+					if(tryParseInt(id)){
+						test = Material.getMaterial(Integer.parseInt(id));
+					} else {
+						test = Material.getMaterial(id);
+					}
+					
+					if(test == null){
+						getLogger().warning("unknown climbey item id " + string);
+						continue;
+					}
+					
+					String f = id + ((data != null)?":"+data:"");
+					
+					blocklist.add(f);
+	
+				}
+			}
+		}
+					
 		// end Config part
-
+		
 		getCommand("vive").setExecutor(new ViveCommand(this));
 		getCommand("vse").setExecutor(new ViveCommand(this));
 		getCommand("vive").setTabCompleter(new ConstructTabCompleter());
@@ -365,5 +413,14 @@ public class VSE extends JavaPlugin implements Listener {
 				}
 			}
 		}
+	}
+	
+	boolean tryParseInt(String value) {  
+	     try {  
+	         Integer.parseInt(value);  
+	         return true;  
+	      } catch (NumberFormatException e) {  
+	         return false;  
+	      }  
 	}
 }

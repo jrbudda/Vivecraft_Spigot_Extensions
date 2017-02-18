@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
@@ -120,9 +121,29 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 					if(vse.getConfig().getBoolean("SendPlayerData.enabled") == true)
 						sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});
 					
-					if(vse.getConfig().getBoolean("climbey.enabled") == true)
-						sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.CLIMBING.ordinal()});
-					
+					if(vse.getConfig().getBoolean("climbey.enabled") == true){
+
+						final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+						final ObjectOutputStream objectOutputStream =
+								new ObjectOutputStream(byteArrayOutputStream);
+						objectOutputStream.writeByte(PacketDiscriminators.CLIMBING.ordinal());
+						String mode = vse.getConfig().getString("climbey.blockmode","none");
+						byte m = 0;
+						if(!sender.hasPermission(vse.getConfig().getString("permissions.climbgroup"))){
+							if(mode.trim().equalsIgnoreCase("include"))
+								m = 1;
+							else if(mode.trim().equalsIgnoreCase("exclude"))
+								m = 2;
+						}
+						objectOutputStream.writeByte(m);
+						objectOutputStream.writeObject(vse.blocklist);
+						objectOutputStream.flush();
+						objectOutputStream.close();
+
+						final byte[] p = byteArrayOutputStream.toByteArray();
+
+						sender.sendPluginMessage(vse, vse.CHANNEL, p);
+					}
 					sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.TELEPORT.ordinal()});
 
 					
