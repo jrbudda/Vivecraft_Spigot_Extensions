@@ -112,6 +112,7 @@ public class VSE extends JavaPlugin implements Listener {
 		config.options().copyDefaults(true);
 		saveDefaultConfig();
 		saveConfig();
+		saveResource("config-instructions.yml", true);
 		ConfigurationSection sec = config.getConfigurationSection("climbey");
 		
 		if(sec!=null){
