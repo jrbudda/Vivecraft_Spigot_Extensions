@@ -36,6 +36,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import net.milkbowl.vault.item.Items;
 import net.milkbowl.vault.permission.Permission;
+import net.minecraft.server.v1_11_R1.Block;
 import net.minecraft.server.v1_11_R1.CreativeModeTab;
 import net.minecraft.server.v1_11_R1.EntityCreeper;
 import net.minecraft.server.v1_11_R1.EntityEnderman;
@@ -135,11 +136,12 @@ public class VSE extends JavaPlugin implements Listener {
 						getLogger().warning("invalid climbey item data " + string);
 						continue;
 					}
-					Material test;
+					
+					Block test;
 					if(tryParseInt(id)){
-						test = Material.getMaterial(Integer.parseInt(id));
+						test = Block.getById(Integer.parseInt(id));
 					} else {
-						test = Material.getMaterial(id);
+						test = Block.getByName(id);
 					}
 					
 					if(test == null){
