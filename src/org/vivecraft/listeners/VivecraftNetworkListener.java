@@ -124,9 +124,11 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 					if(vse.getConfig().getBoolean("climbey.enabled") == true){
 
 						final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+						byteArrayOutputStream.write(PacketDiscriminators.CLIMBING.ordinal());
+						
 						final ObjectOutputStream objectOutputStream =
 								new ObjectOutputStream(byteArrayOutputStream);
-						objectOutputStream.writeByte(PacketDiscriminators.CLIMBING.ordinal());
 						String mode = vse.getConfig().getString("climbey.blockmode","none");
 						byte m = 0;
 						if(!sender.hasPermission(vse.getConfig().getString("permissions.climbgroup"))){
@@ -138,12 +140,18 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 						objectOutputStream.writeByte(m);
 						objectOutputStream.writeObject(vse.blocklist);
 						objectOutputStream.flush();
-						objectOutputStream.close();
 
 						final byte[] p = byteArrayOutputStream.toByteArray();
-
+						
 						sender.sendPluginMessage(vse, vse.CHANNEL, p);
+						for (byte b : p) {
+							vse.getLogger().info(b+ " ");
+						}
+						vse.getLogger().info("sent climb " + p.length);
+						objectOutputStream.close();
+						
 					}
+					
 					sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.TELEPORT.ordinal()});
 
 					
