@@ -145,9 +145,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 						final byte[] p = byteArrayOutputStream.toByteArray();
 						
 						sender.sendPluginMessage(vse, vse.CHANNEL, p);
-						for (byte b : p) {
-							vse.getLogger().info(b+ " ");
-						}
+
 						objectOutputStream.close();
 						
 					}
