@@ -30,6 +30,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -83,6 +84,7 @@ public class VSE extends JavaPlugin implements Listener {
 		ItemMeta meta = is.getItemMeta();
 		meta.setDisplayName("Jump Boots");
 		meta.setUnbreakable(true);
+		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 		is.setItemMeta(meta);
 		ShapedRecipe recipe = new ShapedRecipe(is);
 		recipe.shape("B", "S");
@@ -94,6 +96,7 @@ public class VSE extends JavaPlugin implements Listener {
 		ItemMeta meta2 = is2.getItemMeta();
 		meta2.setDisplayName("Climb Claws");
 		meta2.setUnbreakable(true);
+		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 		is2.setItemMeta(meta2);
 		ShapedRecipe recipe2 = new ShapedRecipe(is2);
 		recipe2.shape("E E", "S S");
@@ -303,7 +306,6 @@ public class VSE extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onDisable() {
-		saveConfig();
 		getServer().getScheduler().cancelTask(task);
 		super.onDisable();
 	}

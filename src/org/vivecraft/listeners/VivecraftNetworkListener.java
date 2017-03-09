@@ -136,6 +136,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 								m = 1;
 							else if(mode.trim().equalsIgnoreCase("exclude"))
 								m = 2;
+						} else {
 						}
 						objectOutputStream.writeByte(m);
 						objectOutputStream.writeObject(vse.blocklist);
@@ -147,7 +148,6 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 						for (byte b : p) {
 							vse.getLogger().info(b+ " ");
 						}
-						vse.getLogger().info("sent climb " + p.length);
 						objectOutputStream.close();
 						
 					}
