@@ -50,7 +50,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		VivePlayer vp = VSE.vivePlayers.get(sender.getUniqueId());
 		
 		PacketDiscriminators disc = PacketDiscriminators.values()[payload[0]];
-		if(vp == null && disc.ordinal() > 0) {
+		if(vp == null && disc != PacketDiscriminators.VERSION) {
 			//how?
 			return;
 		}
@@ -75,20 +75,20 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			//only we can use that word.
 			break;
 		case VERSION:
+			vp = new VivePlayer(sender);
 			ByteArrayInputStream byin = new ByteArrayInputStream(data);
 			DataInputStream da = new DataInputStream(byin);
 			InputStreamReader is = new InputStreamReader(da);
 			BufferedReader br = new BufferedReader(is);
-			VSE.vivePlayers.put(sender.getUniqueId(), new VivePlayer(sender));
+			VSE.vivePlayers.put(sender.getUniqueId(), vp);
 
 			sender.sendPluginMessage(vse, vse.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getDescription().getFullName()));
-			
-			VivePlayer vivepl = VSE.vivePlayers.get(sender.getUniqueId());
+
 			try {
 				String version = br.readLine();
 				
-				if(vivepl.isSeated()){
-					vivepl.setVR(true);
+				if(vp.isSeated()){ //this cant happen
+					vp.setVR(true);
 					if(vse.getConfig().getBoolean("welcomemsg.enabled")){
 						String message = vse.getConfig().getString("welcomemsg.welcomeSeated");
 						String format = message.replace("&player", sender.getDisplayName());
@@ -98,7 +98,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 					}
 				}else
 				if(version.contains("NONVR")){
-					vivepl.setVR(false);
+					vp.setVR(false);
 					
 					if(vse.getConfig().getBoolean("welcomemsg.enabled")){
 						String message = vse.getConfig().getString("welcomemsg.welcomenonVR");
@@ -108,7 +108,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 						}
 					}
 				}else{
-					vivepl.setVR(true);
+					vp.setVR(true);
 					
 					if(vse.getConfig().getBoolean("welcomemsg.enabled")){
 						String message = vse.getConfig().getString("welcomemsg.welcomeVR");
@@ -181,7 +181,8 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			break;
 		}
 	}
-
+	
+	
 	public static byte[] StringToPayload(PacketDiscriminators version, String input){
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		byte[] bytes = input.getBytes(Charsets.UTF_8);

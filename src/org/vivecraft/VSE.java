@@ -70,16 +70,17 @@ public class VSE extends JavaPlugin implements Listener {
 	public final String CHANNEL = "Vivecraft";
 
 	public static Map<UUID, VivePlayer> vivePlayers = new HashMap<UUID, VivePlayer>();
-
+	public static VSE me;
+	
 	int task = 0;
-	private String readurl = "https://raw.githubusercontent.com/jaron780/Vivecraft_Spigot_Extensions/master/version.txt";
+	private String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/master/version.txt";
 	
 	public List<String> blocklist = new ArrayList<>();
 	
 	@Override
 	public void onEnable() {
 		super.onEnable();
-		
+		me = this;
 		ItemStack is = new ItemStack(Material.LEATHER_BOOTS);
 		ItemMeta meta = is.getItemMeta();
 		meta.setDisplayName("Jump Boots");
@@ -313,38 +314,37 @@ public class VSE extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		vivePlayers.remove(event.getPlayer().getUniqueId());
-		if(getConfig().getBoolean("welcomemsg.enabled")){
-			String message = getConfig().getString("welcomemsg.leaveMessage");
-			String format = message.replace("&player", event.getPlayer().getDisplayName());
-			for(Player p : Bukkit.getOnlinePlayers()){
-				ViveCommand.sendMessage(format,p);
-			}
-		}
+		broadcastConfigString("welcomemsg.leaveMessage", event.getPlayer().getDisplayName());
 	}
 
 	@EventHandler
 	public void onPlayerConnect(PlayerJoinEvent event) {
 		final Player p = event.getPlayer();
-		
+
 		if (getConfig().getBoolean("general.debug")) {
 			getLogger().info(p.getName() + " Has joined the server");
 		}
-		if (getConfig().getBoolean("general.vive-only")) {
-			getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-				@Override
-				public void run() {
-					if (VSE.this.getConfig().getBoolean("general.debug")) {
-						VSE.this.getLogger().info("Checking player for ViveCraft");
-					}
+		getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+			@Override
+			public void run() {
+				if (VSE.this.getConfig().getBoolean("general.debug")) {
+					VSE.this.getLogger().info("Checking player for ViveCraft");
+				}
+				if (getConfig().getBoolean("general.vive-only")) {
 					if ((p.isOnline()) && (!isVive(p))) {
 						VSE.this.getLogger().info(p.getName() + " " + "got kicked for not using Vivecraft");
 						p.kickPlayer(VSE.this.getConfig().getString("general.vive-only-kickmessage"));
-					}
+					}		
+				} else {
+					if (p.isOnline()) {
+						sendWelcomeMessage(p);
+					}	
 				}
-			}, getConfig().getInt("general.vive-only-kickwaittime"));
-		}
+			}
+		}, getConfig().getInt("general.vive-only-kickwaittime"));
+
 		if(p.isOp())
-		startUpdateCheck(p);
+			startUpdateCheck(p);
 	}
 	
 	public void startUpdateCheck(Player p) {
@@ -357,18 +357,23 @@ public class VSE extends JavaPlugin implements Listener {
 				URL url = new URL(readurl);
 				BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
 				String str;
+				String updatemsg = null;
 				while ((str = br.readLine()) != null) {
 					String line = str;
-//					if (line.charAt(0) == 'R' && line.charAt(1) == '2') {
-					if(line.toLowerCase().startsWith(version.toLowerCase())){
-						String updatemsg = line.substring(version.length() + 2);
+					String[] bits = line.split(":");
+					if(bits[0].trim().equalsIgnoreCase(version)){
+						updatemsg = bits[1].trim();
 						getLogger().info(updatemsg);
 						ViveCommand.sendMessage(updatemsg, p);
+						break;
 					}
 				}
 				br.close();
+				if(updatemsg == null){
+					ViveCommand.sendMessage("This version of VSE is unknown", p);
+				}
 			} catch (IOException e) {
-			getLogger().severe("The update URL is invalid! Please message Jaron780 on discord!");
+				getLogger().severe("Error retrieving version list: " + e.getMessage());
 			}
 		}
 	}
@@ -428,4 +433,32 @@ public class VSE extends JavaPlugin implements Listener {
 	         return false;  
 	      }  
 	}
+	
+	public void broadcastConfigString(String node, String playername){
+		String message = this.getConfig().getString(node);
+		if(message.isEmpty()) return;
+		String format = message.replace("&player", playername);
+		for(Player p : Bukkit.getOnlinePlayers()){
+			ViveCommand.sendMessage(format,p);
+		}
+	}
+
+	
+	public void sendWelcomeMessage(Player p){
+		if(!getConfig().getBoolean("welcomemsg.enabled"))return;
+
+		VivePlayer vp = VSE.vivePlayers.get(p.getUniqueId());
+		
+		if(vp==null){
+			broadcastConfigString("welcomemsg.welcomeVanilla", p.getDisplayName());
+		} else {
+			if(vp.isSeated())
+				broadcastConfigString("welcomemsg.welcomeSeated", p.getDisplayName());
+			else if (!vp.isVR())
+				broadcastConfigString("welcomemsg.welcomenonVR", p.getDisplayName());
+			else
+				broadcastConfigString("welcomemsg.welcomeVR", p.getDisplayName());
+		}
+	}
+	
 }

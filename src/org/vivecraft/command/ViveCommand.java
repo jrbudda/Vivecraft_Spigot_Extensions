@@ -127,9 +127,11 @@ public class ViveCommand implements CommandExecutor {
 					plugin.saveConfig();
 				} else
 				//
-				if(command.equals("list") && sender.isOp()){
+				if(command.equals("list")){
 					Iterator it = VSE.vivePlayers.entrySet().iterator();
 					int size = VSE.vivePlayers.size();
+					int total = plugin.getServer().getOnlinePlayers().size();		
+					sendMessage("There are " + total +" players online", player);
 					if(size >= 2){
 						sendMessage("There are "+VSE.vivePlayers.size() + " Vivecraft Players",player);
 					}else{
