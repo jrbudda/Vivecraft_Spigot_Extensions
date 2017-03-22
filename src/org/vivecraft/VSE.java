@@ -324,6 +324,11 @@ public class VSE extends JavaPlugin implements Listener {
 		if (getConfig().getBoolean("general.debug")) {
 			getLogger().info(p.getName() + " Has joined the server");
 		}
+		
+		int t = getConfig().getInt("general.vive-only-kickwaittime",100);
+		if(t < 100) t = 100;
+		if(t > 1000) t = 1000;
+		
 		getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			@Override
 			public void run() {
@@ -341,7 +346,7 @@ public class VSE extends JavaPlugin implements Listener {
 					}	
 				}
 			}
-		}, getConfig().getInt("general.vive-only-kickwaittime"));
+		}, t);
 
 		if(p.isOp())
 			startUpdateCheck(p);
