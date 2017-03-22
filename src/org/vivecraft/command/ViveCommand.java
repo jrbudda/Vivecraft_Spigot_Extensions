@@ -132,14 +132,15 @@ public class ViveCommand implements CommandExecutor {
 					int size = VSE.vivePlayers.size();
 					int total = plugin.getServer().getOnlinePlayers().size();		
 					sendMessage("There are " + total +" players online", player);
-					if(size >= 2){
-						sendMessage("There are "+VSE.vivePlayers.size() + " Vivecraft Players",player);
-					}else{
+					
+					if(size > 1){
+						sendMessage("There are " + size + " Vivecraft Players",player);
+					}else if(size ==1){
 						sendMessage("There is 1 Vivecraft Player",player);
-					}
-					if(size == 0){
+					}else{
 						sendMessage("There are no Vivecraft players",player);
 					}
+					
 					while (it.hasNext()) {
 						Map.Entry pair = (Map.Entry)it.next();
 						VivePlayer vp = (VivePlayer)pair.getValue();

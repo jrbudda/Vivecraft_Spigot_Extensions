@@ -46,15 +46,15 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 	public void onPluginMessageReceived(String channel, Player sender, byte[] payload) {
 		if(!channel.equalsIgnoreCase(vse.CHANNEL)) return;
 		if(payload.length==0) return;
-		
+
 		VivePlayer vp = VSE.vivePlayers.get(sender.getUniqueId());
-		
+
 		PacketDiscriminators disc = PacketDiscriminators.values()[payload[0]];
 		if(vp == null && disc != PacketDiscriminators.VERSION) {
 			//how?
 			return;
 		}
-		
+
 		byte[] data = Arrays.copyOfRange(payload, 1, payload.length);
 		switch (disc){
 		case CONTROLLER0DATA:
@@ -86,74 +86,50 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 
 			try {
 				String version = br.readLine();
-				
-				if(vp.isSeated()){ //this cant happen
-					vp.setVR(true);
-					if(vse.getConfig().getBoolean("welcomemsg.enabled")){
-						String message = vse.getConfig().getString("welcomemsg.welcomeSeated");
-						String format = message.replace("&player", sender.getDisplayName());
-						for(Player p : Bukkit.getOnlinePlayers()){
-							ViveCommand.sendMessage(format,p);
-						}
-					}
-				}else
+
 				if(version.contains("NONVR")){
+					vse.getLogger().info("NONVR" + sender.getDisplayName());
 					vp.setVR(false);
-					
-					if(vse.getConfig().getBoolean("welcomemsg.enabled")){
-						String message = vse.getConfig().getString("welcomemsg.welcomenonVR");
-						String format = message.replace("&player", sender.getDisplayName());
-						for(Player p : Bukkit.getOnlinePlayers()){
-							ViveCommand.sendMessage(format,p);
-						}
-					}
-				}else{
-					vp.setVR(true);
-					
-					if(vse.getConfig().getBoolean("welcomemsg.enabled")){
-						String message = vse.getConfig().getString("welcomemsg.welcomeVR");
-						String format = message.replace("&player", sender.getDisplayName());
-						for(Player p : Bukkit.getOnlinePlayers()){
-							ViveCommand.sendMessage(format,p);
-						}
-					}
-					
-					if(vse.getConfig().getBoolean("SendPlayerData.enabled") == true)
-						sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});
-					
-					if(vse.getConfig().getBoolean("climbey.enabled") == true){
-
-						final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-						byteArrayOutputStream.write(PacketDiscriminators.CLIMBING.ordinal());
-						
-						final ObjectOutputStream objectOutputStream =
-								new ObjectOutputStream(byteArrayOutputStream);
-						String mode = vse.getConfig().getString("climbey.blockmode","none");
-						byte m = 0;
-						if(!sender.hasPermission(vse.getConfig().getString("permissions.climbgroup"))){
-							if(mode.trim().equalsIgnoreCase("include"))
-								m = 1;
-							else if(mode.trim().equalsIgnoreCase("exclude"))
-								m = 2;
-						} else {
-						}
-						objectOutputStream.writeByte(m);
-						objectOutputStream.writeObject(vse.blocklist);
-						objectOutputStream.flush();
-
-						final byte[] p = byteArrayOutputStream.toByteArray();
-						
-						sender.sendPluginMessage(vse, vse.CHANNEL, p);
-
-						objectOutputStream.close();
-						
-					}
-					
-					sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.TELEPORT.ordinal()});
-
-					
 				}
+				else{
+					vse.getLogger().info("VR" + sender.getDisplayName());
+					vp.setVR(true);
+				}
+
+				if(vse.getConfig().getBoolean("SendPlayerData.enabled") == true)
+					sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});
+
+				if(vse.getConfig().getBoolean("climbey.enabled") == true){
+
+					final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+					byteArrayOutputStream.write(PacketDiscriminators.CLIMBING.ordinal());
+
+					final ObjectOutputStream objectOutputStream =
+							new ObjectOutputStream(byteArrayOutputStream);
+					String mode = vse.getConfig().getString("climbey.blockmode","none");
+					byte m = 0;
+					if(!sender.hasPermission(vse.getConfig().getString("permissions.climbgroup"))){
+						if(mode.trim().equalsIgnoreCase("include"))
+							m = 1;
+						else if(mode.trim().equalsIgnoreCase("exclude"))
+							m = 2;
+					} else {
+					}
+					objectOutputStream.writeByte(m);
+					objectOutputStream.writeObject(vse.blocklist);
+					objectOutputStream.flush();
+
+					final byte[] p = byteArrayOutputStream.toByteArray();
+
+					sender.sendPluginMessage(vse, vse.CHANNEL, p);
+
+					objectOutputStream.close();
+
+				}
+
+				sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.TELEPORT.ordinal()});
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -172,7 +148,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
+
 			break;
 		case CLIMBING:
 			EntityPlayer nms = 	((CraftPlayer)sender).getHandle();

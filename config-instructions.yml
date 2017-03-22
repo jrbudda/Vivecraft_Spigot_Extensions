@@ -7,7 +7,7 @@ general:
   #The message to show kicked non-vive players.
   vive-only-kickmessage: This server is configured for Vivecraft players only.
   #Ticks to wait before kicking a player. The player's client must send a Vivecraft VERSION info in that time.
-  vive-only-kickwaittime: 10
+  vive-only-kickwaittime: 100
   printmoney: false
 SendPlayerData:
   #Send player data to all clients with Vivecraft

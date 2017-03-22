@@ -138,8 +138,6 @@ public class VivePlayer {
 		return false;
 	}
 
-	// etc
-
 	public byte[] getUberPacket() {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		try {
