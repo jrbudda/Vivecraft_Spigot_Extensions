@@ -9,13 +9,13 @@ import org.vivecraft.VSE;
 
 import com.google.common.base.Predicate;
 
-import net.minecraft.server.v1_11_R1.Blocks;
-import net.minecraft.server.v1_11_R1.EntityEnderman;
-import net.minecraft.server.v1_11_R1.EntityHuman;
-import net.minecraft.server.v1_11_R1.Item;
-import net.minecraft.server.v1_11_R1.ItemStack;
-import net.minecraft.server.v1_11_R1.PathfinderGoalNearestAttackableTarget;
-import net.minecraft.server.v1_11_R1.Vec3D;
+import net.minecraft.server.v1_10_R1.Blocks;
+import net.minecraft.server.v1_10_R1.EntityEnderman;
+import net.minecraft.server.v1_10_R1.EntityHuman;
+import net.minecraft.server.v1_10_R1.Item;
+import net.minecraft.server.v1_10_R1.ItemStack;
+import net.minecraft.server.v1_10_R1.PathfinderGoalNearestAttackableTarget;
+import net.minecraft.server.v1_10_R1.Vec3D;
 
 public class CustomPathFinderGoalPlayerWhoLookedAtTarget 
  extends PathfinderGoalNearestAttackableTarget<EntityHuman>
@@ -56,7 +56,7 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget
 
 	 private boolean isLookingAtMe(EntityHuman entityhuman)
 	  {
-	    ItemStack itemstack = (ItemStack)entityhuman.inventory.armor.get(3);
+	    ItemStack itemstack = (ItemStack)entityhuman.inventory.armor[3];
 	    if (itemstack.getItem() == Item.getItemOf(Blocks.PUMPKIN)) {
 	      return false;
 	    }

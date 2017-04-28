@@ -18,9 +18,9 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -35,19 +35,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.milkbowl.vault.item.Items;
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.v1_11_R1.Block;
-import net.minecraft.server.v1_11_R1.CreativeModeTab;
-import net.minecraft.server.v1_11_R1.EntityCreeper;
-import net.minecraft.server.v1_11_R1.EntityEnderman;
-import net.minecraft.server.v1_11_R1.EnumItemSlot;
-import net.minecraft.server.v1_11_R1.Item;
-import net.minecraft.server.v1_11_R1.ItemArmor;
-import net.minecraft.server.v1_11_R1.ItemArmor.EnumArmorMaterial;
-import net.minecraft.server.v1_11_R1.ItemShears;
-import net.minecraft.server.v1_11_R1.MinecraftKey;
-import net.minecraft.server.v1_11_R1.PathfinderGoalSelector;
+import net.minecraft.server.v1_10_R1.Block;
+import net.minecraft.server.v1_10_R1.EntityCreeper;
+import net.minecraft.server.v1_10_R1.EntityEnderman;
+import net.minecraft.server.v1_10_R1.PathfinderGoalSelector;
 
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -62,7 +54,6 @@ import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 import org.vivecraft.utils.Headshot;
-import org.vivecraft.utils.ItemVivecraft;
 
 public class VSE extends JavaPlugin implements Listener {
 	FileConfiguration config = getConfig();
@@ -84,7 +75,7 @@ public class VSE extends JavaPlugin implements Listener {
 		ItemStack is = new ItemStack(Material.LEATHER_BOOTS);
 		ItemMeta meta = is.getItemMeta();
 		meta.setDisplayName("Jump Boots");
-		meta.setUnbreakable(true);
+		meta.spigot().setUnbreakable(true);
 		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 		is.setItemMeta(meta);
 		ShapedRecipe recipe = new ShapedRecipe(is);
@@ -96,7 +87,7 @@ public class VSE extends JavaPlugin implements Listener {
 		ItemStack is2 = new ItemStack(Material.SHEARS);
 		ItemMeta meta2 = is2.getItemMeta();
 		meta2.setDisplayName("Climb Claws");
-		meta2.setUnbreakable(true);
+		meta2.spigot().setUnbreakable(true);
 		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 		is2.setItemMeta(meta2);
 		ShapedRecipe recipe2 = new ShapedRecipe(is2);
