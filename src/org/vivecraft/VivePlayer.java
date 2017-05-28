@@ -87,12 +87,11 @@ public class VivePlayer {
 	// TODO: implement
 	public Location getControllerPos(int c) {
 		try {
-			if(controller0data != null && controller0data != null){
+			if(controller0data != null && controller1data != null){
 				
 				ByteArrayInputStream byin = new ByteArrayInputStream(c==0?controller0data:controller1data);
 				DataInputStream da = new DataInputStream(byin);
 		
-				@SuppressWarnings("unused")
 				boolean rev = da.readBoolean();
 				float x = da.readFloat();
 				float y = da.readFloat();

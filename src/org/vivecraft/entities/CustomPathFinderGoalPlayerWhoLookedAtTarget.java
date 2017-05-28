@@ -25,13 +25,13 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget
 	private int k;
 	private int l;
 
-	private Method di;
+	private Method df;
 	
 	public CustomPathFinderGoalPlayerWhoLookedAtTarget(EntityEnderman entityenderman)
 	{
 		super(entityenderman, EntityHuman.class, false);
 		this.i = entityenderman;
-		this.di = VSE.getPrivateMethod("di", EntityEnderman.class);
+		this.df = VSE.getPrivateMethod("df", EntityEnderman.class);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -57,7 +57,7 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget
 	 private boolean isLookingAtMe(EntityHuman entityhuman)
 	  {
 	    ItemStack itemstack = (ItemStack)entityhuman.inventory.armor[3];
-	    if (itemstack.getItem() == Item.getItemOf(Blocks.PUMPKIN)) {
+	    if (itemstack !=null && itemstack.getItem() == Item.getItemOf(Blocks.PUMPKIN)) {
 	      return false;
 	    }
 	    
@@ -123,7 +123,7 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget
 				{
 					if (((EntityHuman)this.d).h(this.i) < 16.0D) {
 						try {
-							di.invoke(this.i, (Object[]) null);
+							df.invoke(this.i, (Object[]) null);
 						} catch (Exception e1) {
 						}
 					}
