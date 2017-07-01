@@ -1,7 +1,7 @@
 package org.vivecraft.listeners;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,10 +15,10 @@ import org.bukkit.util.Vector;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 
-import net.minecraft.server.v1_11_R1.EntityPlayer;
-import net.minecraft.server.v1_11_R1.Item;
-import net.minecraft.server.v1_11_R1.ItemStack;
-import net.minecraft.server.v1_11_R1.MathHelper;
+import net.minecraft.server.v1_12_R1.EntityPlayer;
+import net.minecraft.server.v1_12_R1.Item;
+import net.minecraft.server.v1_12_R1.ItemStack;
+import net.minecraft.server.v1_12_R1.MathHelper;
 
 public class VivecraftItemListener implements Listener{
 	VSE vse = null;

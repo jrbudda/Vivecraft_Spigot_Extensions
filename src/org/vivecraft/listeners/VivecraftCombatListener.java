@@ -1,6 +1,6 @@
 package org.vivecraft.listeners;
 
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftArrow;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;

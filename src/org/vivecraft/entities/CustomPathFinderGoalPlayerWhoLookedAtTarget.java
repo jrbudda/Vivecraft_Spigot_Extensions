@@ -9,13 +9,13 @@ import org.vivecraft.VSE;
 
 import com.google.common.base.Predicate;
 
-import net.minecraft.server.v1_11_R1.Blocks;
-import net.minecraft.server.v1_11_R1.EntityEnderman;
-import net.minecraft.server.v1_11_R1.EntityHuman;
-import net.minecraft.server.v1_11_R1.Item;
-import net.minecraft.server.v1_11_R1.ItemStack;
-import net.minecraft.server.v1_11_R1.PathfinderGoalNearestAttackableTarget;
-import net.minecraft.server.v1_11_R1.Vec3D;
+import net.minecraft.server.v1_12_R1.Blocks;
+import net.minecraft.server.v1_12_R1.EntityEnderman;
+import net.minecraft.server.v1_12_R1.EntityHuman;
+import net.minecraft.server.v1_12_R1.Item;
+import net.minecraft.server.v1_12_R1.ItemStack;
+import net.minecraft.server.v1_12_R1.PathfinderGoalNearestAttackableTarget;
+import net.minecraft.server.v1_12_R1.Vec3D;
 
 public class CustomPathFinderGoalPlayerWhoLookedAtTarget 
  extends PathfinderGoalNearestAttackableTarget<EntityHuman>
@@ -39,17 +39,18 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget
 	{
 		double d0 = i();
 
-		this.j = this.i.world.a(this.i.locX, this.i.locY, this.i.locZ, d0, d0, null, new Predicate()
+		this.j = this.i.world.a(this.i.locX, this.i.locY, this.i.locZ, d0, d0, null, new Predicate<EntityHuman>()
 		{
 			public boolean a(@Nullable EntityHuman entityhuman)
 			{
 				return (entityhuman != null) && isLookingAtMe((entityhuman));
 			}
 
-			public boolean apply(@Nullable Object object)
+			public boolean apply(EntityHuman object)
 			{
 				return a((EntityHuman)object);
 			}
+
 		});
 		return this.j != null;
 	}

@@ -18,9 +18,9 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -37,17 +37,17 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import net.milkbowl.vault.item.Items;
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.v1_11_R1.Block;
-import net.minecraft.server.v1_11_R1.CreativeModeTab;
-import net.minecraft.server.v1_11_R1.EntityCreeper;
-import net.minecraft.server.v1_11_R1.EntityEnderman;
-import net.minecraft.server.v1_11_R1.EnumItemSlot;
-import net.minecraft.server.v1_11_R1.Item;
-import net.minecraft.server.v1_11_R1.ItemArmor;
-import net.minecraft.server.v1_11_R1.ItemArmor.EnumArmorMaterial;
-import net.minecraft.server.v1_11_R1.ItemShears;
-import net.minecraft.server.v1_11_R1.MinecraftKey;
-import net.minecraft.server.v1_11_R1.PathfinderGoalSelector;
+import net.minecraft.server.v1_12_R1.Block;
+import net.minecraft.server.v1_12_R1.CreativeModeTab;
+import net.minecraft.server.v1_12_R1.EntityCreeper;
+import net.minecraft.server.v1_12_R1.EntityEnderman;
+import net.minecraft.server.v1_12_R1.EnumItemSlot;
+import net.minecraft.server.v1_12_R1.Item;
+import net.minecraft.server.v1_12_R1.ItemArmor;
+import net.minecraft.server.v1_12_R1.ItemArmor.EnumArmorMaterial;
+import net.minecraft.server.v1_12_R1.ItemShears;
+import net.minecraft.server.v1_12_R1.MinecraftKey;
+import net.minecraft.server.v1_12_R1.PathfinderGoalSelector;
 
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -73,7 +73,7 @@ public class VSE extends JavaPlugin implements Listener {
 	public static VSE me;
 	
 	int task = 0;
-	private String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/master/version.txt";
+	private String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.12/version.txt";
 	
 	public List<String> blocklist = new ArrayList<>();
 	
