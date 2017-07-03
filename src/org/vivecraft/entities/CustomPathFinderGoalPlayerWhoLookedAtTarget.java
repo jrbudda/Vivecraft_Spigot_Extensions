@@ -31,7 +31,7 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget
 	{
 		super(entityenderman, EntityHuman.class, false);
 		this.i = entityenderman;
-		this.di = VSE.getPrivateMethod("di", EntityEnderman.class);
+		this.di = VSE.getPrivateMethod("dm", EntityEnderman.class);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
