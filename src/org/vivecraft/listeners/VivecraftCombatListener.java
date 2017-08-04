@@ -33,9 +33,9 @@ public class VivecraftCombatListener implements Listener{
 			   return;
 
 		    Player pl = (Player)proj.getShooter();
-		    VivePlayer vp = (VivePlayer)VSE.vivePlayers.get(pl.getUniqueId());
+		    final VivePlayer vp = (VivePlayer)VSE.vivePlayers.get(pl.getUniqueId());
 		   
-		   int hand = proj instanceof CraftArrow ? 1 : 0;
+		   final int hand = proj instanceof CraftArrow ? 1 : 0;
 
 		   //TODO: check for seated mode.
 		   
