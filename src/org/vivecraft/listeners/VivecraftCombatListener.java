@@ -35,8 +35,8 @@ public class VivecraftCombatListener implements Listener{
 		    Player pl = (Player)proj.getShooter();
 		    VivePlayer vp = (VivePlayer)VSE.vivePlayers.get(pl.getUniqueId());
 		   
-		   int hand = 0;
-		   if (proj instanceof CraftArrow) hand = 1;
+		   int hand = proj instanceof CraftArrow ? 1 : 0;
+
 		   //TODO: check for seated mode.
 		   
 		   if ((vp == null) && (this.vse.getConfig().getBoolean("general.debug"))) {
@@ -46,11 +46,15 @@ public class VivecraftCombatListener implements Listener{
 		   //this only works if the incoming speed is at max (based! on draw time)
 		   //TODO: properly scale in all cases.
 		   
-		   proj.teleport(vp.getControllerPos(hand));
 		   if(proj.getType() == EntityType.ARROW && vp.getDraw() != 0) {
 			   proj.setVelocity(proj.getVelocity().multiply(vp.getDraw()));  
 		   }
-		   
+	        vse.getServer().getScheduler().scheduleSyncDelayedTask(vse, new Runnable() {
+	            @Override
+	            public void run() {
+	     		   proj.teleport(vp.getControllerPos(hand));
+	            }
+	        }, 1);
 	   }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
