@@ -35,18 +35,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.milkbowl.vault.item.Items;
 import net.milkbowl.vault.permission.Permission;
 import net.minecraft.server.v1_12_R1.Block;
-import net.minecraft.server.v1_12_R1.CreativeModeTab;
 import net.minecraft.server.v1_12_R1.EntityCreeper;
 import net.minecraft.server.v1_12_R1.EntityEnderman;
-import net.minecraft.server.v1_12_R1.EnumItemSlot;
-import net.minecraft.server.v1_12_R1.Item;
-import net.minecraft.server.v1_12_R1.ItemArmor;
-import net.minecraft.server.v1_12_R1.ItemArmor.EnumArmorMaterial;
-import net.minecraft.server.v1_12_R1.ItemShears;
-import net.minecraft.server.v1_12_R1.MinecraftKey;
 import net.minecraft.server.v1_12_R1.PathfinderGoalSelector;
 
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -62,7 +54,6 @@ import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 import org.vivecraft.utils.Headshot;
-import org.vivecraft.utils.ItemVivecraft;
 
 public class VSE extends JavaPlugin implements Listener {
 	FileConfiguration config = getConfig();
@@ -169,7 +160,6 @@ public class VSE extends JavaPlugin implements Listener {
 		getCommand("vive").setTabCompleter(new ConstructTabCompleter());
 		getCommand("vse").setTabCompleter(new ConstructTabCompleter());
 
-		
 		getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, new VivecraftNetworkListener(this));
 		getServer().getMessenger().registerOutgoingPluginChannel(this, CHANNEL);
 		
@@ -193,10 +183,13 @@ public class VSE extends JavaPlugin implements Listener {
 		//check for any creepers and modify the fuse radius
 		CheckAllEntities();
 		
-		//Easter egg
-		if(getConfig().getBoolean("general.printmoney")){
-			getLogger().warning("\r\n||====================================================================||\r\n||//$\\\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\//$\\\\||\r\n||(100)==================| FEDERAL RESERVE NOTE |================(100)||\r\n||\\\\$//        ~         '------========--------'                \\\\$//||\r\n||<< /        /$\\              // ____ \\\\                         \\ >>||\r\n||>>|  12    //L\\\\            // ///..) \\\\         L38036133B   12 |<<||\r\n||<<|        \\\\ //           || <||  >\\  ||                        |>>||\r\n||>>|         \\$/            ||  $$ --/  ||        One Hundred     |<<||\r\n||<<|      L38036133B        *\\\\  |\\_/  //* series                 |>>||\r\n||>>|  12                     *\\\\/___\\_//*   1989                  |<<||\r\n||<<\\      Treasurer     ______/Franklin\\________     Secretary 12 />>||\r\n||//$\\                 ~|UNITED STATES OF AMERICA|~               /$\\\\||\r\n||(100)===================  ONE HUNDRED DOLLARS =================(100)||\r\n||\\\\$//\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\\\$//||\r\n||====================================================================||");
-		}
+		getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
+			@Override
+			public void run() {
+				startUpdateCheck();
+			}
+		}, 1);
+		
 	}
 		
 	public static Object getPrivateField(String fieldName, Class<PathfinderGoalSelector> clazz, Object object)
@@ -347,12 +340,10 @@ public class VSE extends JavaPlugin implements Listener {
 				}
 			}
 		}, t);
-
-		if(p.isOp())
-			startUpdateCheck(p);
+		
 	}
 	
-	public void startUpdateCheck(Player p) {
+	public void startUpdateCheck() {
 		PluginDescriptionFile pdf = getDescription();
 		String version = pdf.getVersion();
 		System.out.println("Version: " + version);
@@ -369,13 +360,13 @@ public class VSE extends JavaPlugin implements Listener {
 					if(bits[0].trim().equalsIgnoreCase(version)){
 						updatemsg = bits[1].trim();
 						getLogger().info(updatemsg);
-						ViveCommand.sendMessage(updatemsg, p);
+						//ViveCommand.sendMessage(updatemsg, p);
 						break;
 					}
 				}
 				br.close();
 				if(updatemsg == null){
-					ViveCommand.sendMessage("This version of VSE is unknown", p);
+					getLogger().info(updatemsg);
 				}
 			} catch (IOException e) {
 				getLogger().severe("Error retrieving version list: " + e.getMessage());

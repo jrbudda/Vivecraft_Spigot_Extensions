@@ -10,12 +10,10 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
-import org.vivecraft.command.ViveCommand;
 
 import com.google.common.base.Charsets;
 

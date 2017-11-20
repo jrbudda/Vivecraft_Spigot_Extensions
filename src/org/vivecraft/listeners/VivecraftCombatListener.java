@@ -1,5 +1,6 @@
 package org.vivecraft.listeners;
 
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -15,6 +16,8 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 import org.vivecraft.utils.Headshot;
+
+import net.minecraft.server.v1_12_R1.Vec3D;
 
 
 public class VivecraftCombatListener implements Listener{
@@ -46,14 +49,15 @@ public class VivecraftCombatListener implements Listener{
 		   //this only works if the incoming speed is at max (based! on draw time)
 		   //TODO: properly scale in all cases.
 		   
-
 		   if(proj.getType() == EntityType.ARROW && vp.getDraw() != 0) {
 			   proj.setVelocity(proj.getVelocity().multiply(vp.getDraw()));  
 		   }
 	        vse.getServer().getScheduler().scheduleSyncDelayedTask(vse, new Runnable() {
 	            @Override
 	            public void run() {
-	     		   proj.teleport(vp.getControllerPos(hand));
+	               Vec3D aim = vp.getControllerDir(hand);
+	               Location pos = vp.getControllerPos(hand);
+	     		   proj.teleport(new Location(proj.getWorld(), pos.getX() + aim.x*0.6f, pos.getY()+aim.y*0.6f, pos.getZ()+aim.z*0.6f));
 	            }
 	        }, 1);
 	   }
