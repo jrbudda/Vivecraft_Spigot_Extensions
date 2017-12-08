@@ -107,7 +107,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 							new ObjectOutputStream(byteArrayOutputStream);
 					String mode = vse.getConfig().getString("climbey.blockmode","none");
 					byte m = 0;
-					if(!sender.hasPermission(vse.getConfig().getString("permissions.climbgroup"))){
+					if(!sender.hasPermission(vse.getConfig().getString("permissions.climbperm"))){
 						if(mode.trim().equalsIgnoreCase("include"))
 							m = 1;
 						else if(mode.trim().equalsIgnoreCase("exclude"))

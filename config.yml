@@ -48,7 +48,7 @@ permissions:
   #Permission group for vive users in free move mode.
   freemovegroup: vive.freemovegroup
   #Permission to override climb limitations.
-  climbgroup: vive.climbanywhere
+  climbperm: vive.climbanywhere
 welcomemsg:
   enabled: false
   #Remove message to not send or set to nothing. ex: leaveMessage:

@@ -183,6 +183,12 @@ public class VSE extends JavaPlugin implements Listener {
 		//check for any creepers and modify the fuse radius
 		CheckAllEntities();
 		
+		vault = true;
+		if(getServer().getPluginManager().getPlugin("Vault") == null || getServer().getPluginManager().getPlugin("Vault").isEnabled() == false) {
+			getLogger().severe("Vault not found, permissions groups will not be set");
+			vault = false;
+		}	
+		
 		getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
 			@Override
 			public void run() {
@@ -325,31 +331,35 @@ public class VSE extends JavaPlugin implements Listener {
 		getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			@Override
 			public void run() {
-				if (VSE.this.getConfig().getBoolean("general.debug")) {
+				
+				if (VSE.this.getConfig().getBoolean("general.debug")) 
 					VSE.this.getLogger().info("Checking player for ViveCraft");
-				}
+				
+				
 				if (getConfig().getBoolean("general.vive-only")) {
 					if ((p.isOnline()) && (!isVive(p))) {
 						VSE.this.getLogger().info(p.getName() + " " + "got kicked for not using Vivecraft");
 						p.kickPlayer(VSE.this.getConfig().getString("general.vive-only-kickmessage"));
 					}		
-				} else {
-					if (p.isOnline()) {
-						sendWelcomeMessage(p);
-					}	
 				}
+				
+				if (p.isOnline()) {
+					sendWelcomeMessage(p);
+					setPermissionsGroup(p);
+				}	
+				
 			}
 		}, t);
 		
 	}
-	
+		
 	public void startUpdateCheck() {
 		PluginDescriptionFile pdf = getDescription();
 		String version = pdf.getVersion();
-		System.out.println("Version: " + version);
+		getLogger().info("Version: " + version);
 		if (getConfig().getBoolean("general.checkforupdate", true)) {
 			try {
-				getLogger().info("Checking for a update...");
+				getLogger().info("Checking for update...");
 				URL url = new URL(readurl);
 				BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
 				String str;
@@ -366,7 +376,7 @@ public class VSE extends JavaPlugin implements Listener {
 				}
 				br.close();
 				if(updatemsg == null){
-					getLogger().info(updatemsg);
+					getLogger().info("Version not found. Are you from the future?");
 				}
 			} catch (IOException e) {
 				getLogger().severe("Error retrieving version list: " + e.getMessage());
@@ -405,19 +415,26 @@ public class VSE extends JavaPlugin implements Listener {
 
 	}
 
+	public boolean vault;
+	
 	public void updatePlayerPermissionGroup(Player p, Map<String, Boolean> groups) {
-		RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
-		Permission perm = rsp.getProvider();
-		if (perm != null) {
-			for (Map.Entry<String, Boolean> entry : groups.entrySet()) {
-				if (entry.getValue()) {
-					if (!perm.playerInGroup(p, entry.getKey()))
-						perm.playerAddGroup(p, entry.getKey());
-				} else {
-					if (perm.playerInGroup(p, entry.getKey()))
-						perm.playerRemoveGroup(p, entry.getKey());
+		try {	
+			if(!vault) return;			
+			RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
+			Permission perm = rsp.getProvider();
+			if (perm != null) {
+				for (Map.Entry<String, Boolean> entry : groups.entrySet()) {
+					if (entry.getValue()) {
+						if (!perm.playerInGroup(p, entry.getKey()))
+							perm.playerAddGroup(p, entry.getKey());
+					} else {
+						if (perm.playerInGroup(p, entry.getKey()))
+							perm.playerRemoveGroup(p, entry.getKey());
+					}
 				}
 			}
+		} catch (Exception e) {
+			getLogger().severe("Could not set player permission group: " + e.getMessage());
 		}
 	}
 	
