@@ -313,7 +313,9 @@ public class VSE extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		vivePlayers.remove(event.getPlayer().getUniqueId());
-		broadcastConfigString("welcomemsg.leaveMessage", event.getPlayer().getDisplayName());
+		
+		if(getConfig().getBoolean("welcomemsg.enabled"))
+			broadcastConfigString("welcomemsg.leaveMessage", event.getPlayer().getDisplayName());
 	}
 
 	@EventHandler
@@ -449,7 +451,7 @@ public class VSE extends JavaPlugin implements Listener {
 	
 	public void broadcastConfigString(String node, String playername){
 		String message = this.getConfig().getString(node);
-		if(message.isEmpty()) return;
+		if(message == null || message.isEmpty()) return;
 		String format = message.replace("&player", playername);
 		for(Player p : Bukkit.getOnlinePlayers()){
 			ViveCommand.sendMessage(format,p);
