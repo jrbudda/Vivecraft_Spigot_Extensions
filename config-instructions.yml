@@ -8,7 +8,6 @@ general:
   vive-only-kickmessage: This server is configured for Vivecraft players only.
   #Ticks to wait before kicking a player. The player's client must send a Vivecraft VERSION info in that time.
   vive-only-kickwaittime: 100
-  printmoney: false
 SendPlayerData:
   #Send player data to all clients with Vivecraft
   enabled: true
@@ -49,7 +48,7 @@ permissions:
   #Permission group for vive users in free move mode.
   freemovegroup: vive.freemovegroup
   #Permission to override climb limitations.
-  climbgroup: vive.climbanywhere
+  climbperm: vive.climbanywhere
 welcomemsg:
   enabled: false
   #Remove message to not send or set to nothing. ex: leaveMessage:

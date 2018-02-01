@@ -18,9 +18,9 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -35,19 +35,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.milkbowl.vault.item.Items;
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.v1_11_R1.Block;
-import net.minecraft.server.v1_11_R1.CreativeModeTab;
-import net.minecraft.server.v1_11_R1.EntityCreeper;
-import net.minecraft.server.v1_11_R1.EntityEnderman;
-import net.minecraft.server.v1_11_R1.EnumItemSlot;
-import net.minecraft.server.v1_11_R1.Item;
-import net.minecraft.server.v1_11_R1.ItemArmor;
-import net.minecraft.server.v1_11_R1.ItemArmor.EnumArmorMaterial;
-import net.minecraft.server.v1_11_R1.ItemShears;
-import net.minecraft.server.v1_11_R1.MinecraftKey;
-import net.minecraft.server.v1_11_R1.PathfinderGoalSelector;
+import net.minecraft.server.v1_12_R1.Block;
+import net.minecraft.server.v1_12_R1.EntityCreeper;
+import net.minecraft.server.v1_12_R1.EntityEnderman;
+import net.minecraft.server.v1_12_R1.PathfinderGoalSelector;
 
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -62,7 +54,6 @@ import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 import org.vivecraft.utils.Headshot;
-import org.vivecraft.utils.ItemVivecraft;
 
 public class VSE extends JavaPlugin implements Listener {
 	FileConfiguration config = getConfig();
@@ -73,7 +64,7 @@ public class VSE extends JavaPlugin implements Listener {
 	public static VSE me;
 	
 	int task = 0;
-	private String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/master/version.txt";
+	private String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.12/version.txt";
 	
 	public List<String> blocklist = new ArrayList<>();
 	
@@ -169,7 +160,6 @@ public class VSE extends JavaPlugin implements Listener {
 		getCommand("vive").setTabCompleter(new ConstructTabCompleter());
 		getCommand("vse").setTabCompleter(new ConstructTabCompleter());
 
-		
 		getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, new VivecraftNetworkListener(this));
 		getServer().getMessenger().registerOutgoingPluginChannel(this, CHANNEL);
 		
@@ -193,10 +183,19 @@ public class VSE extends JavaPlugin implements Listener {
 		//check for any creepers and modify the fuse radius
 		CheckAllEntities();
 		
-		//Easter egg
-		if(getConfig().getBoolean("general.printmoney")){
-			getLogger().warning("\r\n||====================================================================||\r\n||//$\\\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\//$\\\\||\r\n||(100)==================| FEDERAL RESERVE NOTE |================(100)||\r\n||\\\\$//        ~         '------========--------'                \\\\$//||\r\n||<< /        /$\\              // ____ \\\\                         \\ >>||\r\n||>>|  12    //L\\\\            // ///..) \\\\         L38036133B   12 |<<||\r\n||<<|        \\\\ //           || <||  >\\  ||                        |>>||\r\n||>>|         \\$/            ||  $$ --/  ||        One Hundred     |<<||\r\n||<<|      L38036133B        *\\\\  |\\_/  //* series                 |>>||\r\n||>>|  12                     *\\\\/___\\_//*   1989                  |<<||\r\n||<<\\      Treasurer     ______/Franklin\\________     Secretary 12 />>||\r\n||//$\\                 ~|UNITED STATES OF AMERICA|~               /$\\\\||\r\n||(100)===================  ONE HUNDRED DOLLARS =================(100)||\r\n||\\\\$//\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\\\$//||\r\n||====================================================================||");
-		}
+		vault = true;
+		if(getServer().getPluginManager().getPlugin("Vault") == null || getServer().getPluginManager().getPlugin("Vault").isEnabled() == false) {
+			getLogger().severe("Vault not found, permissions groups will not be set");
+			vault = false;
+		}	
+		
+		getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
+			@Override
+			public void run() {
+				startUpdateCheck();
+			}
+		}, 1);
+		
 	}
 		
 	public static Object getPrivateField(String fieldName, Class<PathfinderGoalSelector> clazz, Object object)
@@ -332,33 +331,35 @@ public class VSE extends JavaPlugin implements Listener {
 		getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			@Override
 			public void run() {
-				if (VSE.this.getConfig().getBoolean("general.debug")) {
+				
+				if (VSE.this.getConfig().getBoolean("general.debug")) 
 					VSE.this.getLogger().info("Checking player for ViveCraft");
-				}
+				
+				
 				if (getConfig().getBoolean("general.vive-only")) {
 					if ((p.isOnline()) && (!isVive(p))) {
 						VSE.this.getLogger().info(p.getName() + " " + "got kicked for not using Vivecraft");
 						p.kickPlayer(VSE.this.getConfig().getString("general.vive-only-kickmessage"));
 					}		
-				} else {
-					if (p.isOnline()) {
-						sendWelcomeMessage(p);
-					}	
 				}
+				
+				if (p.isOnline()) {
+					sendWelcomeMessage(p);
+					setPermissionsGroup(p);
+				}	
+				
 			}
 		}, t);
-
-		if(p.isOp())
-			startUpdateCheck(p);
+		
 	}
-	
-	public void startUpdateCheck(Player p) {
+		
+	public void startUpdateCheck() {
 		PluginDescriptionFile pdf = getDescription();
 		String version = pdf.getVersion();
-		System.out.println("Version: " + version);
+		getLogger().info("Version: " + version);
 		if (getConfig().getBoolean("general.checkforupdate", true)) {
 			try {
-				getLogger().info("Checking for a update...");
+				getLogger().info("Checking for update...");
 				URL url = new URL(readurl);
 				BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
 				String str;
@@ -369,13 +370,13 @@ public class VSE extends JavaPlugin implements Listener {
 					if(bits[0].trim().equalsIgnoreCase(version)){
 						updatemsg = bits[1].trim();
 						getLogger().info(updatemsg);
-						ViveCommand.sendMessage(updatemsg, p);
+						//ViveCommand.sendMessage(updatemsg, p);
 						break;
 					}
 				}
 				br.close();
 				if(updatemsg == null){
-					ViveCommand.sendMessage("This version of VSE is unknown", p);
+					getLogger().info("Version not found. Are you from the future?");
 				}
 			} catch (IOException e) {
 				getLogger().severe("Error retrieving version list: " + e.getMessage());
@@ -414,19 +415,26 @@ public class VSE extends JavaPlugin implements Listener {
 
 	}
 
+	public boolean vault;
+	
 	public void updatePlayerPermissionGroup(Player p, Map<String, Boolean> groups) {
-		RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
-		Permission perm = rsp.getProvider();
-		if (perm != null) {
-			for (Map.Entry<String, Boolean> entry : groups.entrySet()) {
-				if (entry.getValue()) {
-					if (!perm.playerInGroup(p, entry.getKey()))
-						perm.playerAddGroup(p, entry.getKey());
-				} else {
-					if (perm.playerInGroup(p, entry.getKey()))
-						perm.playerRemoveGroup(p, entry.getKey());
+		try {	
+			if(!vault) return;			
+			RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
+			Permission perm = rsp.getProvider();
+			if (perm != null) {
+				for (Map.Entry<String, Boolean> entry : groups.entrySet()) {
+					if (entry.getValue()) {
+						if (!perm.playerInGroup(p, entry.getKey()))
+							perm.playerAddGroup(p, entry.getKey());
+					} else {
+						if (perm.playerInGroup(p, entry.getKey()))
+							perm.playerRemoveGroup(p, entry.getKey());
+					}
 				}
 			}
+		} catch (Exception e) {
+			getLogger().severe("Could not set player permission group: " + e.getMessage());
 		}
 	}
 	

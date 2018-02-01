@@ -9,17 +9,15 @@ import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
-import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
-import org.vivecraft.command.ViveCommand;
 
 import com.google.common.base.Charsets;
 
-import net.minecraft.server.v1_11_R1.EntityPlayer;
+import net.minecraft.server.v1_12_R1.EntityPlayer;
 
 public class VivecraftNetworkListener implements PluginMessageListener {
 	public VSE vse;
@@ -109,7 +107,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 							new ObjectOutputStream(byteArrayOutputStream);
 					String mode = vse.getConfig().getString("climbey.blockmode","none");
 					byte m = 0;
-					if(!sender.hasPermission(vse.getConfig().getString("permissions.climbgroup"))){
+					if(!sender.hasPermission(vse.getConfig().getString("permissions.climbperm"))){
 						if(mode.trim().equalsIgnoreCase("include"))
 							m = 1;
 						else if(mode.trim().equalsIgnoreCase("exclude"))

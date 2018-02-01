@@ -1,24 +1,19 @@
 package org.vivecraft.listeners;
 
-import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
+import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 
 import org.bukkit.util.Vector;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 
-import net.minecraft.server.v1_11_R1.EntityPlayer;
-import net.minecraft.server.v1_11_R1.Item;
-import net.minecraft.server.v1_11_R1.ItemStack;
-import net.minecraft.server.v1_11_R1.MathHelper;
+import net.minecraft.server.v1_12_R1.MathHelper;
+import net.minecraft.server.v1_12_R1.Vec3D;
 
 public class VivecraftItemListener implements Listener{
 	VSE vse = null;
@@ -46,7 +41,8 @@ public class VivecraftItemListener implements Listener{
 			 v.setZ((double)(MathHelper.cos(yaw * 0.017453292F) * MathHelper.cos(player.getLocation().getPitch() * 0.017453292F) * f2));
 			 v.setY((double)(MathHelper.sin(pitch * 0.017453292F) * f2 + 0.1F));
 			 
-			 event.getItemDrop().teleport(vp.getControllerPos(0));
+             Vec3D aim = vp.getControllerDir(0);
+			 event.getItemDrop().teleport(vp.getControllerPos(0).add(0.2f*aim.x,0.25f*aim.y - 0.2f, 0.2f*aim.z));
 			 event.getItemDrop().setVelocity(v);
 		 }
 	 }

@@ -5,13 +5,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 import org.vivecraft.utils.Quaternion;
 import org.vivecraft.utils.Vector3;
 
-import net.minecraft.server.v1_11_R1.Vec3D;
+import net.minecraft.server.v1_12_R1.Vec3D;
 
 public class VivePlayer {
 
@@ -22,7 +22,7 @@ public class VivePlayer {
 	boolean isTeleportMode;
 	boolean isReverseHands;
 	boolean isSeated;
-	boolean worldScale;
+	float worldScale;
 	boolean isVR;
 
 	public Player player;
@@ -50,7 +50,6 @@ public class VivePlayer {
 		return 0;
 	}
 	
-	@SuppressWarnings("unused")
 	public Vec3D getHMDDir(){
 		try {
 			if(hmdData != null){
@@ -58,7 +57,7 @@ public class VivePlayer {
 				ByteArrayInputStream byin = new ByteArrayInputStream(hmdData);
 				DataInputStream da = new DataInputStream(byin);
 		
-				boolean seated = da.readBoolean();
+				this.isSeated = da.readBoolean();
 				float lx = da.readFloat();
 				float ly = da.readFloat();
 				float lz = da.readFloat();
@@ -70,7 +69,7 @@ public class VivePlayer {
 			    Vector3 forward = new Vector3(0,0,-1);
 				Quaternion q = new Quaternion(w, x, y, z);
 				Vector3 out = q.multiply(forward);
-				
+	
 				
 				//System.out.println("("+out.getX()+","+out.getY()+","+out.getZ()+")" + " : W:" + w + " X: "+x + " Y:" + y+ " Z:" + z);
 				da.close(); //needed?
@@ -84,7 +83,66 @@ public class VivePlayer {
 		return ((CraftPlayer)player).getHandle().f(1.0f);
 	}
 	
-	// TODO: implement
+	public Vec3D getControllerDir(int controller){
+		byte[] data = controller0data;
+		if(controller == 1) data = controller1data;
+		if(this.isSeated) controller = 0;
+		if(data != null){
+
+			ByteArrayInputStream byin = new ByteArrayInputStream(data);
+			DataInputStream da = new DataInputStream(byin);
+
+			try {
+
+				this.isReverseHands = da.readBoolean();
+
+				float lx = da.readFloat();
+				float ly = da.readFloat();
+				float lz = da.readFloat();
+
+				float w = da.readFloat();
+				float x = da.readFloat();
+				float y = da.readFloat();
+				float z = da.readFloat();
+				Vector3 forward = new Vector3(0,0,-1);
+				Quaternion q = new Quaternion(w, x, y, z);
+				Vector3 out = q.multiply(forward);
+
+				da.close(); //needed?
+				return new Vec3D(out.getX(), out.getY(), out.getZ());
+			} catch (IOException e) {
+			}
+		}else{
+		}
+		
+		return ((CraftPlayer)player).getHandle().f(1.0f);
+
+	}
+	public Location getHMDPos() {
+		try {
+			if(hmdData != null ){
+				
+				ByteArrayInputStream byin = new ByteArrayInputStream(hmdData);
+				DataInputStream da = new DataInputStream(byin);
+		
+				this.isSeated= da.readBoolean();
+				float lx = da.readFloat();
+				float ly = da.readFloat();
+				float lz = da.readFloat();
+				
+				da.close(); //needed?
+								
+				return new Location(player.getWorld(), lx, ly, lz);
+			}else{
+			}
+		} catch (IOException e) {
+
+		}
+	 
+		return player.getLocation(); //why
+
+	}
+	
 	public Location getControllerPos(int c) {
 		try {
 			if(controller0data != null && controller0data != null){
@@ -92,13 +150,24 @@ public class VivePlayer {
 				ByteArrayInputStream byin = new ByteArrayInputStream(c==0?controller0data:controller1data);
 				DataInputStream da = new DataInputStream(byin);
 		
-				@SuppressWarnings("unused")
-				boolean rev = da.readBoolean();
+				this.isReverseHands = da.readBoolean();
 				float x = da.readFloat();
 				float y = da.readFloat();
 				float z = da.readFloat();
 				
 				da.close(); //needed?
+				
+				if (this.isSeated){
+					Vec3D dir = this.getHMDDir();
+					dir = dir.b((float) Math.toRadians(c==0?-35:35));
+					dir = new Vec3D(dir.x, 0, dir.z);
+					dir = dir.a();
+					Location out = this.getHMDPos().add(dir.x * 0.3 * worldScale, -0.4* worldScale ,dir.z*0.3* worldScale);
+					x = (float) out.getX();
+					y = (float) out.getY();
+					z = (float) out.getZ();
+				}
+				
 				return new Location(player.getWorld(), x, y, z);
 			}else{
 			}
