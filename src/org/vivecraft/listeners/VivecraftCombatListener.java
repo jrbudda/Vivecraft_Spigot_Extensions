@@ -42,10 +42,6 @@ public class VivecraftCombatListener implements Listener{
 
 		final boolean arrow = proj instanceof CraftArrow;
 
-		final int hand = arrow ? 1 : 0;
-
-		//TODO: check for seated mode.
-
 		if ((vp == null) && (this.vse.getConfig().getBoolean("general.debug"))) {
 			vse.getLogger().warning(" Error on projectile launch!");
 		}
@@ -57,17 +53,23 @@ public class VivecraftCombatListener implements Listener{
 			proj.setVelocity(proj.getVelocity().multiply(vp.getDraw()));  
 		}
 
-		vse.getServer().getScheduler().runTaskLater(vse, new Runnable() {
+		vse.getServer().getScheduler().runTaskLater(vse, new Runnable() { 
+			//The bug necessitating this to be delayed a tick has been fixed in Spigot 1.12.2, but leave here for compatibility.
 			@Override
 			public void run() {
+				
+				int hand = arrow ? 1 : 0;
+
 				Vec3D aim = vp.getControllerDir(hand);
 				
 				if(arrow){
 					aim = vp.getControllerDir(0);
-					if(!vp.isSeated()){
+					if(!vp.isSeated() && vp.getDraw() !=0){ //standing
 						Vector m = (vp.getControllerPos(1).subtract(vp.getControllerPos(0))).toVector();
 						m = m.normalize();
 						aim = new Vec3D(m.getX(),  m.getY(), m.getZ());
+					} else { //seated or roomscale off
+						hand = 0;
 					}
 				}               
 				
