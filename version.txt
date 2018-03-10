@@ -3,4 +3,5 @@
 1.12-r2: VSE has a newer version!
 1.12-r3: VSE has a newer version!
 1.12.X-r4: VSE has a newer version!
-1.12.X-r5: VSE is up to date!
+1.12.X-r5: VSE has a newer version!
+1.12.X-r6: VSE is up to date!
