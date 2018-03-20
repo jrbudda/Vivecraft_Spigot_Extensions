@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -44,6 +45,7 @@ import net.minecraft.server.v1_12_R1.PathfinderGoalSelector;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.mcstats.Metrics;
 import org.spigotmc.SpigotConfig;
 import org.vivecraft.command.ConstructTabCompleter;
@@ -64,21 +66,24 @@ public class VSE extends JavaPlugin implements Listener {
 	public static VSE me;
 	
 	int task = 0;
-	private String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.12/version.txt";
+	private String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/master/version.txt";
 	
 	public List<String> blocklist = new ArrayList<>();
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onEnable() {
 		super.onEnable();
+		
 		me = this;
+		
 		ItemStack is = new ItemStack(Material.LEATHER_BOOTS);
 		ItemMeta meta = is.getItemMeta();
 		meta.setDisplayName("Jump Boots");
 		meta.setUnbreakable(true);
 		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 		is.setItemMeta(meta);
-		ShapedRecipe recipe = new ShapedRecipe(is);
+		ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(this, "jump_boots"),is);
 		recipe.shape("B", "S");
 		recipe.setIngredient('B', Material.LEATHER_BOOTS);
 		recipe.setIngredient('S', Material.SLIME_BLOCK);
@@ -90,7 +95,7 @@ public class VSE extends JavaPlugin implements Listener {
 		meta2.setUnbreakable(true);
 		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 		is2.setItemMeta(meta2);
-		ShapedRecipe recipe2 = new ShapedRecipe(is2);
+		ShapedRecipe recipe2 = new ShapedRecipe( new NamespacedKey(this, "climb_claws"), is2);
 		recipe2.shape("E E", "S S");
 		recipe2.setIngredient('E', Material.SPIDER_EYE);
 		recipe2.setIngredient('S', Material.SHEARS);
@@ -188,8 +193,7 @@ public class VSE extends JavaPlugin implements Listener {
 			getLogger().severe("Vault not found, permissions groups will not be set");
 			vault = false;
 		}	
-		
-		getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
+		getServer().getScheduler().scheduleAsyncDelayedTask(this, new BukkitRunnable() {
 			@Override
 			public void run() {
 				startUpdateCheck();

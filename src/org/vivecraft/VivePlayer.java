@@ -50,6 +50,7 @@ public class VivePlayer {
 		return 0;
 	}
 	
+	@SuppressWarnings("unused")
 	public Vec3D getHMDDir(){
 		try {
 			if(hmdData != null){
@@ -83,6 +84,7 @@ public class VivePlayer {
 		return ((CraftPlayer)player).getHandle().f(1.0f);
 	}
 	
+	@SuppressWarnings("unused")
 	public Vec3D getControllerDir(int controller){
 		byte[] data = controller0data;
 		if(controller == 1) data = controller1data;

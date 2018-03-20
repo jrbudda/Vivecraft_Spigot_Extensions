@@ -12,7 +12,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
@@ -53,30 +52,24 @@ public class VivecraftCombatListener implements Listener{
 			proj.setVelocity(proj.getVelocity().multiply(vp.getDraw()));  
 		}
 
-		vse.getServer().getScheduler().runTaskLater(vse, new Runnable() { 
-			//The bug necessitating this to be delayed a tick has been fixed in Spigot 1.12.2, but leave here for compatibility.
-			@Override
-			public void run() {
-				
-				int hand = arrow ? 1 : 0;
+		int hand = arrow ? 1 : 0;
 
-				Vec3D aim = vp.getControllerDir(hand);
-				
-				if(arrow){
-					aim = vp.getControllerDir(0);
-					if(!vp.isSeated() && vp.getDraw() !=0){ //standing
-						Vector m = (vp.getControllerPos(1).subtract(vp.getControllerPos(0))).toVector();
-						m = m.normalize();
-						aim = new Vec3D(m.getX(),  m.getY(), m.getZ());
-					} else { //seated or roomscale off
-						hand = 0;
-					}
-				}               
-				
-				Location pos = vp.getControllerPos(hand);
-				proj.teleport(new Location(proj.getWorld(), pos.getX() + aim.x*0.6f, pos.getY()+aim.y*0.6f, pos.getZ()+aim.z*0.6f));
+		Vec3D aim = vp.getControllerDir(hand);
+
+		if(arrow){
+			aim = vp.getControllerDir(0);
+			if(!vp.isSeated() && vp.getDraw() !=0){ //standing
+				Vector m = (vp.getControllerPos(1).subtract(vp.getControllerPos(0))).toVector();
+				m = m.normalize();
+				aim = new Vec3D(m.getX(),  m.getY(), m.getZ());
+			} else { //seated or roomscale off
+				hand = 0;
 			}
-		}, 0);
+		}               
+
+		Location pos = vp.getControllerPos(hand);
+		proj.teleport(new Location(proj.getWorld(), pos.getX() + aim.x*0.6f, pos.getY()+aim.y*0.6f, pos.getZ()+aim.z*0.6f));
+
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
