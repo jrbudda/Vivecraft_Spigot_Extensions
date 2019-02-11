@@ -2,9 +2,9 @@ package org.vivecraft.entities;
 
 import org.vivecraft.VSE;
 
-import net.minecraft.server.v1_12_R1.EntityCreeper;
-import net.minecraft.server.v1_12_R1.EntityLiving;
-import net.minecraft.server.v1_12_R1.PathfinderGoal;
+import net.minecraft.server.v1_13_R2.EntityCreeper;
+import net.minecraft.server.v1_13_R2.EntityLiving;
+import net.minecraft.server.v1_13_R2.PathfinderGoal;
 
 public class CustomGoalSwell extends PathfinderGoal {
 
@@ -27,12 +27,12 @@ public class CustomGoalSwell extends PathfinderGoal {
 			 if(localEntityLiving != null && VSE.vivePlayers.containsKey(localEntityLiving.getUniqueID()) && VSE.isVive(VSE.vivePlayers.get(localEntityLiving.getUniqueID()).player))
 			 creeperBlowyUppyRadius = vse.getConfig().getDouble("CreeperRadius.radius");
 		 }
-		return (this.a.dm() > 0) || ((localEntityLiving != null) && (this.a.h(localEntityLiving) < (creeperBlowyUppyRadius*creeperBlowyUppyRadius)));
+		return (   this.a.dz() > 0) || ((localEntityLiving != null) && (this.a.h(localEntityLiving) < (creeperBlowyUppyRadius*creeperBlowyUppyRadius)));
 	}
 	
 	  public void c()
 	  {
-	    this.a.getNavigation().o();
+	    this.a.getNavigation().q();
 	    this.b = this.a.getGoalTarget();
 	  }
 	  

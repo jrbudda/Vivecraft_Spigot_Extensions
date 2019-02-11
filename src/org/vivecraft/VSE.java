@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
@@ -19,9 +20,9 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -37,10 +38,10 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.v1_12_R1.Block;
-import net.minecraft.server.v1_12_R1.EntityCreeper;
-import net.minecraft.server.v1_12_R1.EntityEnderman;
-import net.minecraft.server.v1_12_R1.PathfinderGoalSelector;
+import net.minecraft.server.v1_13_R2.Block;
+import net.minecraft.server.v1_13_R2.EntityCreeper;
+import net.minecraft.server.v1_13_R2.EntityEnderman;
+import net.minecraft.server.v1_13_R2.PathfinderGoalSelector;
 
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -60,7 +61,7 @@ import org.vivecraft.utils.Headshot;
 public class VSE extends JavaPlugin implements Listener {
 	FileConfiguration config = getConfig();
 
-	public final String CHANNEL = "Vivecraft";
+	public final String CHANNEL = "vivecraft:data";
 
 	public static Map<UUID, VivePlayer> vivePlayers = new HashMap<UUID, VivePlayer>();
 	public static VSE me;
@@ -69,6 +70,8 @@ public class VSE extends JavaPlugin implements Listener {
 	private String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/master/version.txt";
 	
 	public List<String> blocklist = new ArrayList<>();
+	
+	public boolean debug = true;
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -140,9 +143,11 @@ public class VSE extends JavaPlugin implements Listener {
 					
 					Block test;
 					if(tryParseInt(id)){
-						test = Block.getById(Integer.parseInt(id));
+						test = (Block) Block.getByCombinedId(Integer.parseInt(id));
 					} else {
-						test = Block.getByName(id);
+						getLogger().warning("Unsupported climbey block. Names no longer supported");					
+						//test = Block.getByName(id);
+						test = null;
 					}
 					
 					if(test == null){
@@ -178,6 +183,9 @@ public class VSE extends JavaPlugin implements Listener {
         	SpigotConfig.movedWronglyThreshold = getConfig().getDouble("setSpigotConfig.movedWronglyThreshold");
 			SpigotConfig.movedTooQuicklyMultiplier = getConfig().getDouble("setSpigotConfig.movedTooQuickly");
         }
+        
+		debug = (getConfig().getBoolean("general.debug", false));
+
         
 		task = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
@@ -224,12 +232,12 @@ public class VSE extends JavaPlugin implements Listener {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Method getPrivateMethod(String methodName, Class clazz)
+	public static Method getPrivateMethod(String methodName, Class clazz, Class param)
 	{
 		Method m = null;
 		try
 		{
-			m = clazz.getDeclaredMethod(methodName);
+			m = clazz.getDeclaredMethod(methodName, param);
 			m.setAccessible(true);
 		}
 		catch(NoSuchMethodException e)
@@ -237,6 +245,15 @@ public class VSE extends JavaPlugin implements Listener {
 			e.printStackTrace();
 		}
 		return m;
+	}
+	
+	public static Object invoke(Method m, Object object, Object param) {
+		try {
+			return  m.invoke(object, param);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -326,10 +343,8 @@ public class VSE extends JavaPlugin implements Listener {
 	public void onPlayerConnect(PlayerJoinEvent event) {
 		final Player p = event.getPlayer();
 
-		if (getConfig().getBoolean("general.debug")) {
-			getLogger().info(p.getName() + " Has joined the server");
-		}
-		
+		if (debug) getLogger().info(p.getName() + " Has joined the server");
+			
 		int t = getConfig().getInt("general.vive-only-kickwaittime",100);
 		if(t < 100) t = 100;
 		if(t > 1000) t = 1000;
@@ -338,7 +353,7 @@ public class VSE extends JavaPlugin implements Listener {
 			@Override
 			public void run() {
 				
-				if (VSE.this.getConfig().getBoolean("general.debug")) 
+				if (debug) 
 					VSE.this.getLogger().info("Checking player for ViveCraft");
 				
 				
@@ -352,7 +367,11 @@ public class VSE extends JavaPlugin implements Listener {
 				if (p.isOnline()) {
 					sendWelcomeMessage(p);
 					setPermissionsGroup(p);
-				}	
+				}	 else {
+					if (debug) 
+						VSE.this.getLogger().info(p.getName() + " no longer online! ");
+				}
+					
 				
 			}
 		}, t);
@@ -416,7 +435,7 @@ public class VSE extends JavaPlugin implements Listener {
 			if (g_freemove != null)
 				groups.put(g_freemove, !vivePlayers.get(p.getUniqueId()).isTeleportMode);
 		}
-
+		
 		updatePlayerPermissionGroup(p, groups);
 
 	}
@@ -431,14 +450,23 @@ public class VSE extends JavaPlugin implements Listener {
 			if (perm != null) {
 				for (Map.Entry<String, Boolean> entry : groups.entrySet()) {
 					if (entry.getValue()) {
-						if (!perm.playerInGroup(p, entry.getKey()))
+						if (!perm.playerInGroup(p, entry.getKey())) {
+							if (debug) 
+								VSE.this.getLogger().info("Adding " + p.getName() + " to " + entry.getKey());
 							perm.playerAddGroup(p, entry.getKey());
+						}
 					} else {
-						if (perm.playerInGroup(p, entry.getKey()))
+						if (perm.playerInGroup(p, entry.getKey())) {
+							if (debug) 
+								VSE.this.getLogger().info("Removing " + p.getName() + " from " + entry.getKey());
 							perm.playerRemoveGroup(p, entry.getKey());
+						}
 					}
 				}
+			} else {
+				VSE.this.getLogger().info("Permissions error: Registered permissions provider is null!");
 			}
+			
 		} catch (Exception e) {
 			getLogger().severe("Could not set player permission group: " + e.getMessage());
 		}

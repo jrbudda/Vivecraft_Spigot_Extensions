@@ -1,7 +1,7 @@
 package org.vivecraft.listeners;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArrow;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -17,7 +17,7 @@ import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 import org.vivecraft.utils.Headshot;
 
-import net.minecraft.server.v1_12_R1.Vec3D;
+import net.minecraft.server.v1_13_R2.Vec3D;
 
 
 public class VivecraftCombatListener implements Listener{
