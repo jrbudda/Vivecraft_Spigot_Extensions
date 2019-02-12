@@ -23,6 +23,7 @@ local.properties
 out/
 .idea/
 generated/
+*.iml
 
 # Gradle
 .gradle/

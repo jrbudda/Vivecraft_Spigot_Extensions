@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import net.minecraft.server.v1_13_R2.IRegistry;
+import net.minecraft.server.v1_13_R2.MinecraftKey;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -125,42 +127,12 @@ public class VSE extends JavaPlugin implements Listener {
 			//make an attempt to validate these on the server for debugging.
 			if(temp != null){
 				for (String string : temp) {
-					String[] parts = string.split(":");
-					String id, data = null;
-					if(parts.length == 1){
-						id = string;
-					} else if(parts.length ==2){
-						id = parts[0];
-						data = parts[1];
-					} else {
-						//wut
-						getLogger().warning("invalid climbey item " + string);
+					if (IRegistry.BLOCK.get(new MinecraftKey(string)) == null) {
+						getLogger().warning("Unknown climbey block name: " + string);
 						continue;
 					}
-					
-					if(data != null && !tryParseInt(data)){
-						getLogger().warning("invalid climbey item data " + string);
-						continue;
-					}
-					
-					Block test;
-					if(tryParseInt(id)){
-						test = (Block) Block.getByCombinedId(Integer.parseInt(id));
-					} else {
-						getLogger().warning("Unsupported climbey block. Names no longer supported");					
-						//test = Block.getByName(id);
-						test = null;
-					}
-					
-					if(test == null){
-						getLogger().warning("unknown climbey item id " + string);
-						continue;
-					}
-					
-					String f = id + ((data != null)?":"+data:"");
-					
-					blocklist.add(f);
-	
+
+					blocklist.add(string);
 				}
 			}
 		}
