@@ -58,6 +58,8 @@ import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 import org.vivecraft.utils.Headshot;
 
+import com.google.common.math.PairedStatsAccumulator;
+
 public class VSE extends JavaPlugin implements Listener {
 	FileConfiguration config = getConfig();
 
@@ -71,7 +73,7 @@ public class VSE extends JavaPlugin implements Listener {
 	
 	public List<String> blocklist = new ArrayList<>();
 	
-	public boolean debug = true;
+	public boolean debug = false;
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -237,7 +239,11 @@ public class VSE extends JavaPlugin implements Listener {
 		Method m = null;
 		try
 		{
-			m = clazz.getDeclaredMethod(methodName, param);
+			if(param == null) {
+				m = clazz.getDeclaredMethod(methodName);
+			} else {
+				m = clazz.getDeclaredMethod(methodName, param);
+			}
 			m.setAccessible(true);
 		}
 		catch(NoSuchMethodException e)
@@ -249,7 +255,10 @@ public class VSE extends JavaPlugin implements Listener {
 	
 	public static Object invoke(Method m, Object object, Object param) {
 		try {
-			return  m.invoke(object, param);
+			if(param == null) 
+				return  m.invoke(object);
+			else
+				return  m.invoke(object, param);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
