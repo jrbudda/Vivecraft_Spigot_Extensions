@@ -165,10 +165,12 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		byte[] bytes = input.getBytes(Charsets.UTF_8);
 		int len = bytes.length;
-		if( len > 255) return output.toByteArray();
 		try {
 			output.write((byte)version.ordinal());
-			output.write((byte) len);
+			if(!writeVarInt(output, len, 2)) {
+				output.reset();
+				return output.toByteArray();
+			}
 			//TODO: check endianness.
 			output.write(bytes);
 		} catch (IOException e) {
@@ -178,5 +180,21 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		
 	}
 	
+    public static int varIntByteCount(int toCount)
+    {
+        return (toCount & 0xFFFFFF80) == 0 ? 1 : ((toCount & 0xFFFFC000) == 0 ? 2 : ((toCount & 0xFFE00000) == 0 ? 3 : ((toCount & 0xF0000000) == 0 ? 4 : 5)));
+    }
+	
+    public static boolean writeVarInt(ByteArrayOutputStream to, int toWrite, int maxSize)
+    {
+        if (varIntByteCount(toWrite) > maxSize) return false;
+        while ((toWrite & -128) != 0)
+        {
+            to.write(toWrite & 127 | 128);
+            toWrite >>>= 7;
+        }
 
+        to.write(toWrite);
+        return true;
+    }
 }
