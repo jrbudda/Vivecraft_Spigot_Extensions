@@ -64,6 +64,6 @@ climbey:
   blockmode: None
   #The list of blocks for use with include/exclude block mode. use name or id. Specify data with :data. i.e. red wool is 'wool:14' or '35:14'. uses mojang block names, not spigot materials.
   blocklist:
-   - wool:0
+   - wool
    - dirt
    - grass
