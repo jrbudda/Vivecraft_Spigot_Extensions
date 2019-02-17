@@ -114,6 +114,8 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 							byteArrayOutputStream.write(1);
 						else if(mode.trim().equalsIgnoreCase("exclude"))
 							byteArrayOutputStream.write(2);
+						else
+							byteArrayOutputStream.write(0);
 					} else {
 						byteArrayOutputStream.write(0);
 					}
