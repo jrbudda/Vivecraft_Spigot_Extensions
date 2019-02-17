@@ -106,28 +106,25 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 					final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
 					byteArrayOutputStream.write(PacketDiscriminators.CLIMBING.ordinal());
+					byteArrayOutputStream.write(1); // climbey allowed
 
-					final ObjectOutputStream objectOutputStream =
-							new ObjectOutputStream(byteArrayOutputStream);
 					String mode = vse.getConfig().getString("climbey.blockmode","none");
-					byte m = 0;
 					if(!sender.hasPermission(vse.getConfig().getString("permissions.climbperm"))){
 						if(mode.trim().equalsIgnoreCase("include"))
-							m = 1;
+							byteArrayOutputStream.write(1);
 						else if(mode.trim().equalsIgnoreCase("exclude"))
-							m = 2;
+							byteArrayOutputStream.write(2);
 					} else {
+						byteArrayOutputStream.write(0);
 					}
-					objectOutputStream.writeByte(m);
-					objectOutputStream.writeObject(vse.blocklist);
-					objectOutputStream.flush();
+
+					for (String block : vse.blocklist) {
+						if (!writeString(byteArrayOutputStream, block))
+							vse.getLogger().warning("Block name too long: " + block);
+					}
 
 					final byte[] p = byteArrayOutputStream.toByteArray();
-
 					sender.sendPluginMessage(vse, vse.CHANNEL, p);
-
-					objectOutputStream.close();
-
 				}
 
 				sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.TELEPORT.ordinal()});
@@ -163,21 +160,29 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 	
 	public static byte[] StringToPayload(PacketDiscriminators version, String input){
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		byte[] bytes = input.getBytes(Charsets.UTF_8);
-		int len = bytes.length;
-		try {
-			output.write((byte)version.ordinal());
-			if(!writeVarInt(output, len, 2)) {
-				output.reset();
-				return output.toByteArray();
-			}
-			//TODO: check endianness.
-			output.write(bytes);
-		} catch (IOException e) {
+
+		output.write((byte)version.ordinal());
+		if(!writeString(output, input)) {
+			output.reset();
+			return output.toByteArray();
 		}
 
 		return output.toByteArray();
 		
+	}
+
+	public static boolean writeString(ByteArrayOutputStream output, String str) {
+		byte[] bytes = str.getBytes(Charsets.UTF_8);
+		int len = bytes.length;
+		try {
+			if(!writeVarInt(output, len, 2))
+				return false;
+			output.write(bytes);
+		} catch (IOException e) {
+			return false;
+		}
+
+		return true;
 	}
 	
     public static int varIntByteCount(int toCount)
