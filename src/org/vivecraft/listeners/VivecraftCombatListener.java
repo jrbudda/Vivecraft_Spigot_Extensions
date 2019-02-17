@@ -1,12 +1,12 @@
 package org.vivecraft.listeners;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -32,14 +32,15 @@ public class VivecraftCombatListener implements Listener{
 	public void onProjectileLaunch(ProjectileLaunchEvent event) {
 		//position all projectiles correctly.
 
-		final Projectile proj = event.getEntity();
+		Projectile proj = event.getEntity();
+		
 		if (!(proj.getShooter() instanceof Player) || !VSE.isVive((Player) proj.getShooter()))
 			return;
 
 		Player pl = (Player)proj.getShooter();
 		final VivePlayer vp = (VivePlayer)VSE.vivePlayers.get(pl.getUniqueId());
 
-		final boolean arrow = proj instanceof CraftArrow;
+		final boolean arrow = proj instanceof Arrow && !(proj instanceof Trident);
 
 		if ((vp == null) && (this.vse.getConfig().getBoolean("general.debug"))) {
 			vse.getLogger().warning(" Error on projectile launch!");
@@ -68,12 +69,23 @@ public class VivecraftCombatListener implements Listener{
 		}               
 
 		Location pos = vp.getControllerPos(hand);
-		proj.teleport(new Location(proj.getWorld(), pos.getX() + aim.x*0.6f, pos.getY()+aim.y*0.6f, pos.getZ()+aim.z*0.6f));
+		Location loc = new Location(proj.getWorld(), pos.getX() + aim.x*0.6f, pos.getY()+aim.y*0.6f, pos.getZ()+aim.z*0.6f);
+	
+	//	loc.setPitch(-(float)Math.toDegrees(Math.asin(aim.y/aim.b())));
+	//	loc.setYaw((float)Math.toDegrees(Math.atan2(aim.x, aim.z)));
+		
+		double velo = proj.getVelocity().length();	
 
+		proj.setVelocity(new Vector(aim.x*velo, aim.y*velo, aim.z*velo));
+		
+		proj.teleport(loc);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void onProjectileHit(EntityDamageByEntityEvent event) {
+		
+		if(event.getDamager() instanceof Trident) return;
+		
 		if (event.getDamager() instanceof Arrow && event.getEntity() instanceof LivingEntity) {
 			final Arrow arrow = (Arrow) event.getDamager();
 			LivingEntity target = (LivingEntity) event.getEntity();

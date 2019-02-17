@@ -379,12 +379,9 @@ public class VSE extends JavaPlugin implements Listener {
 				}	 else {
 					if (debug) 
 						VSE.this.getLogger().info(p.getName() + " no longer online! ");
-				}
-					
-				
+				}		
 			}
 		}, t);
-		
 	}
 		
 	public void startUpdateCheck() {
