@@ -62,7 +62,7 @@ climbey:
   enabled: false
   #Sets which blocks are climb-able. Options are 'None': List ignored. All blocks are climbable. 'Include': Only blocks on the list are climbable. 'Exclude': All blocks are climbable except those on the list
   blockmode: None
-  #The list of blocks for use with include/exclude block mode. use name or id. Specify data with :data. i.e. red wool is 'wool:14' or '35:14'. uses mojang block names, not spigot materials.
+  #The list of block names for use with include/exclude block mode.
   blocklist:
     - white_wool
     - dirt
