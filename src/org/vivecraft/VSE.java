@@ -392,7 +392,9 @@ public class VSE extends JavaPlugin implements Listener {
 	}
 
 	public void setPermissionsGroup(Player p) {
-
+		if(!vault) return;	
+		if(!getConfig().getBoolean("permissions.enabled")) return;
+		
 		Map<String, Boolean> groups = new HashMap<String, Boolean>();
 
 		boolean isvive = isVive(p);
@@ -418,7 +420,7 @@ public class VSE extends JavaPlugin implements Listener {
 	
 	public void updatePlayerPermissionGroup(Player p, Map<String, Boolean> groups) {
 		try {	
-			if(!vault) return;			
+				
 			RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
 			Permission perm = rsp.getProvider();
 			if (perm != null) {

@@ -41,6 +41,8 @@ bow:
   #Set if players can headshot mobs (only horizontal mobs)
   headshotmobs: true
 permissions:
+  #enable setting player groups for vive users.
+  enabled: false
   #Permission group for Vive users
   vivegroup: vive.vivegroup
   #Permission group for non-Vive users
