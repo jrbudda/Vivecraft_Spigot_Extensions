@@ -6,7 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
@@ -18,6 +18,7 @@ import org.vivecraft.VivePlayer;
 import com.google.common.base.Charsets;
 
 import net.minecraft.server.v1_13_R2.EntityPlayer;
+import net.minecraft.server.v1_13_R2.PlayerConnection;
 
 public class VivecraftNetworkListener implements PluginMessageListener {
 	public VSE vse;
@@ -40,7 +41,8 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		CLIMBING
 	}
 	
-
+	Field floatingCount = null;
+	String floatinCountObf = "C";
 	
 	@Override
 	public void onPluginMessageReceived(String channel, Player sender, byte[] payload) {
@@ -152,8 +154,25 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 
 			break;
 		case CLIMBING:
+			
+			if(floatingCount == null) {
+				try {
+					floatingCount = PlayerConnection.class.getDeclaredField(floatinCountObf);
+				} catch (NoSuchFieldException e) {
+				} catch (SecurityException e) {
+				}
+				floatingCount.setAccessible(true);
+			}		
+			
 			EntityPlayer nms = 	((CraftPlayer)sender).getHandle();
 			nms.fallDistance = 0;
+			
+			try {
+				floatingCount.setInt(nms.playerConnection, 0);
+			} catch (IllegalArgumentException e) {
+			} catch (IllegalAccessException e) {
+			}
+
 		default:
 			break;
 		}
