@@ -68,8 +68,14 @@ public class VivecraftCombatListener implements Listener{
 		}               
 
 		Location pos = vp.getControllerPos(hand);
-		proj.teleport(new Location(proj.getWorld(), pos.getX() + aim.x*0.6f, pos.getY()+aim.y*0.6f, pos.getZ()+aim.z*0.6f));
+	
+		Location loc = new Location(proj.getWorld(), pos.getX() + aim.x*0.6f, pos.getY()+aim.y*0.6f, pos.getZ()+aim.z*0.6f);
 
+		double velo = proj.getVelocity().length();	
+
+		proj.setVelocity(new Vector(aim.x*velo, aim.y*velo, aim.z*velo));
+
+		proj.teleport(loc);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)

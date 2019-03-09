@@ -190,7 +190,8 @@ public class VSE extends JavaPlugin implements Listener {
 		
 		vault = true;
 		if(getServer().getPluginManager().getPlugin("Vault") == null || getServer().getPluginManager().getPlugin("Vault").isEnabled() == false) {
-			getLogger().severe("Vault not found, permissions groups will not be set");
+			if(getConfig().getBoolean("permissions.enabled"))
+				getLogger().severe("Vault not found, permissions groups will not be set");		
 			vault = false;
 		}	
 		getServer().getScheduler().scheduleAsyncDelayedTask(this, new BukkitRunnable() {
@@ -399,7 +400,10 @@ public class VSE extends JavaPlugin implements Listener {
 	}
 
 	public void setPermissionsGroup(Player p) {
-
+		
+		if(!vault) return;	
+		if(!getConfig().getBoolean("permissions.enabled")) return;
+		
 		Map<String, Boolean> groups = new HashMap<String, Boolean>();
 
 		boolean isvive = isVive(p);

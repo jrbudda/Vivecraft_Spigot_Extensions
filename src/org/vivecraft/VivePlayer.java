@@ -21,7 +21,6 @@ public class VivePlayer {
 	public byte[] draw;
 	boolean isTeleportMode;
 	boolean isReverseHands;
-	boolean isSeated;
 	float worldScale;
 	boolean isVR;
 
@@ -58,7 +57,7 @@ public class VivePlayer {
 				ByteArrayInputStream byin = new ByteArrayInputStream(hmdData);
 				DataInputStream da = new DataInputStream(byin);
 		
-				this.isSeated = da.readBoolean();
+				boolean isSeated = da.readBoolean();
 				float lx = da.readFloat();
 				float ly = da.readFloat();
 				float lz = da.readFloat();
@@ -88,7 +87,7 @@ public class VivePlayer {
 	public Vec3D getControllerDir(int controller){
 		byte[] data = controller0data;
 		if(controller == 1) data = controller1data;
-		if(this.isSeated) controller = 0;
+		if(this.isSeated()) controller = 0;
 		if(data != null){
 
 			ByteArrayInputStream byin = new ByteArrayInputStream(data);
@@ -127,7 +126,7 @@ public class VivePlayer {
 				ByteArrayInputStream byin = new ByteArrayInputStream(hmdData);
 				DataInputStream da = new DataInputStream(byin);
 		
-				this.isSeated= da.readBoolean();
+				boolean isSeated= da.readBoolean();
 				float lx = da.readFloat();
 				float ly = da.readFloat();
 				float lz = da.readFloat();
@@ -159,7 +158,7 @@ public class VivePlayer {
 				
 				da.close(); //needed?
 				
-				if (this.isSeated){
+				if (this.isSeated()){
 					Vec3D dir = this.getHMDDir();
 					dir = dir.b((float) Math.toRadians(c==0?-35:35));
 					dir = new Vec3D(dir.x, 0, dir.z);
