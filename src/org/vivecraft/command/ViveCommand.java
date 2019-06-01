@@ -1,7 +1,7 @@
 package org.vivecraft.command;
 
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -21,34 +21,48 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class ViveCommand implements CommandExecutor {
 
 	private VSE plugin;
-	private static ArrayList<Cmd> commands = new ArrayList<Cmd>();
+	private static Map<String, Cmd> commands = new LinkedHashMap<>();
 
 	public ViveCommand(VSE vse) {
 		plugin = vse;
-		commands.add(new Cmd("vive-only", "Set to true to only allow Vivecraft players to play. Default: false","Example: /vse vive-only true"));
-		commands.add(new Cmd("waittime","Ticks to wait before kicking a player. The player's client must send a Vivecraft VERSION info in that time. Default: 60","Example: /vse waittime 60"));
-		commands.add(new Cmd("version", "returns the version of the plugin.","Example: /vse version"));
-		commands.add(new Cmd("sendplayerdata", "set to false to disable sending player to data to clients. Default: true","Example: /vse sendplayerdata true"));
-		commands.add(new Cmd("creeperradius", "type false to disable or type a number to change the radius. Default: 1.75","Example: /vse creeperradius 1.75"));
-		commands.add(new Cmd("bow", "Sets the multiplier for bow damage of vive users. Default: 2","Example: /vse bow 2"));
-		commands.add(new Cmd("checkforupdate", "Checked for an update every time an OP joins the server","Example: /vse checkforupdate true"));
-		commands.add(new Cmd("set", "Allows Editing the plugin config ingame. May need to restart server to take effect.","Example: /vse set general.vive-only true"));
-		commands.add(new Cmd("list", "Lists all the users using Vivecraft.","Example: /vse list"));
+		addCommand(new Cmd("vive-only", "Set to true to only allow Vivecraft players to play. Default: false","Example: /vse vive-only true"));
+		addCommand(new Cmd("waittime","Ticks to wait before kicking a player. The player's client must send a Vivecraft VERSION info in that time. Default: 60","Example: /vse waittime 60"));
+		addCommand(new Cmd("version", "returns the version of the plugin.","Example: /vse version"));
+		addCommand(new Cmd("sendplayerdata", "set to false to disable sending player to data to clients. Default: true","Example: /vse sendplayerdata true"));
+		addCommand(new Cmd("creeperradius", "type false to disable or type a number to change the radius. Default: 1.75","Example: /vse creeperradius 1.75"));
+		addCommand(new Cmd("bow", "Sets the multiplier for bow damage of vive users. Default: 2","Example: /vse bow 2"));
+		addCommand(new Cmd("checkforupdate", "Checked for an update every time an OP joins the server","Example: /vse checkforupdate true"));
+		addCommand(new Cmd("set", "Allows Editing the plugin config ingame. May need to restart server to take effect.","Example: /vse set general.vive-only true"));
+		addCommand(new Cmd("list", "Lists all the users using Vivecraft.","Example: /vse list"));
 	}
-	
-	public static ArrayList<Cmd> getCommands(){
+
+	private void addCommand(Cmd cmd) {
+		commands.put(cmd.getCommand().toLowerCase(), cmd);
+	}
+
+	public static Map<String, Cmd> getCommands(){
 		return commands;
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (sender instanceof Player){
 			Player player = (Player) sender;
 			if (args.length >= 1) {
-				String command = args[0].toLowerCase();
+				Cmd cmd = commands.get(args[0].toLowerCase());
 				//
-				if (command.equals("vive-only") && sender.isOp()) {
+				if(cmd == null) {
+					sendMessage("Unknown command", player);
+					return true;
+				}
+
+				if(!sender.hasPermission(cmd.getPermission())) {
+					sendMessage("You don't have the permission to execute this command!", player);
+					return true;
+				}
+
+				if(cmd.getCommand().equals("vive-only")) {
 					if (args.length >= 2) {
 						if (args[1].toLowerCase().equals("true")) {
 							plugin.getConfig().set("vive-only.enabled", true);
@@ -64,7 +78,7 @@ public class ViveCommand implements CommandExecutor {
 					plugin.saveConfig();
 				} else
 			    //
-				if(command.equals("sendplayerdata") && sender.isOp()){
+				if(cmd.getCommand().equals("sendplayerdata")){
 					if(args.length >= 2){
 						if(args[1].toLowerCase().equals("true")){
 							plugin.getConfig().set("SendPlayerData.enabled", true);
@@ -78,7 +92,7 @@ public class ViveCommand implements CommandExecutor {
 					}
 				}else
 				//
-				if(command.equals("creeperradius") && sender.isOp()){
+				if(cmd.getCommand().equals("creeperradius")){
 					if(args.length >= 2){
 						if(args[1].toLowerCase().equals("true")){
 							plugin.getConfig().set("CreeperRadius.enabled", true);
@@ -99,7 +113,7 @@ public class ViveCommand implements CommandExecutor {
 					}
 				}else
 				//
-				if (command.equals("waittime") && sender.isOp()) {
+				if(cmd.getCommand().equals("waittime")) {
 					if (args.length >= 2) {
 						try {
 							plugin.getConfig().set("vive-only.waittime", Integer.parseInt(args[1]));
@@ -113,7 +127,7 @@ public class ViveCommand implements CommandExecutor {
 					plugin.saveConfig();
 				} else
 				//
-				if (command.equals("bow") && sender.isOp()) {
+				if(cmd.getCommand().equals("bow")) {
 					if (args.length >= 2) {
 						try {
 							plugin.getConfig().set("bow.multiplier", Integer.parseInt(args[1]));
@@ -127,7 +141,7 @@ public class ViveCommand implements CommandExecutor {
 					plugin.saveConfig();
 				} else
 				//
-				if(command.equals("list")){
+				if(cmd.getCommand().equals("list")){
 					Iterator it = VSE.vivePlayers.entrySet().iterator();
 					int size = VSE.vivePlayers.size();
 					int total = plugin.getServer().getOnlinePlayers().size();		
@@ -149,7 +163,7 @@ public class ViveCommand implements CommandExecutor {
 					
 				}else
 				//
-				if(command.equals("set") && sender.isOp()){
+				if(cmd.getCommand().equals("set")){
 					if (args.length >= 3) {
 						String config = args[1];
 						if(plugin.getConfig().get(config) != null){
@@ -179,13 +193,13 @@ public class ViveCommand implements CommandExecutor {
 					}
 				}else
 				//
-				if (command.equals("version")) {
+				if (cmd.getCommand().equals("version")) {
 					PluginDescriptionFile pdf = plugin.getDescription();
 					String version = pdf.getVersion();
 					sendMessage("Version: " + version, player);
 				} else
 				//	
-				if(command.equals("checkforupdate")){
+				if(cmd.getCommand().equals("checkforupdate")){
 					if(args.length >= 2){
 						if(args[1].toLowerCase().equals("true")){
 							plugin.getConfig().set("checkforupdate.enabled", true);
@@ -199,22 +213,18 @@ public class ViveCommand implements CommandExecutor {
 					}
 				}else
 				//
-				if (command.equals("help")) {
+				if(cmd.getCommand().equals("help")) {
 										
 					player.sendMessage(ChatColor.BLUE + "-------------- " + ChatColor.GRAY + "VSE Commands" + ChatColor.BLUE + " --------------");
-					for (Cmd cm : commands) {
-						
-						TextComponent tc = new TextComponent();
-			            tc.setText(ChatColor.BLUE + cm.getCommand() + ": " + ChatColor.WHITE + cm.getDescription());
-			            tc.setHoverEvent(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(cm.getHoverText()).color(ChatColor.BLUE).create()));
-			            player.spigot().sendMessage(tc);
+					for (Cmd cm : commands.values()) {
+						if (sender.hasPermission(cm.getPermission())) {
+							TextComponent tc = new TextComponent();
+							tc.setText(ChatColor.BLUE + cm.getCommand() + ": " + ChatColor.WHITE + cm.getDescription());
+							tc.setHoverEvent(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(cm.getHoverText()).color(ChatColor.BLUE).create()));
+							player.spigot().sendMessage(tc);
+						}
 					}
 
-				} else {
-					if(!sender.isOp()){
-						sendMessage("You must be OP to use these commands", player);
-					}else
-					sendMessage("Unknown command", player);
 				}
 				if(sender.isOp()) plugin.saveConfig();
 			}else{

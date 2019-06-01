@@ -23,4 +23,8 @@ public class Cmd {
 	public String getHoverText(){
 		return this.hovertext;
 	}
+
+	public String getPermission() {
+		return "vive.command." + cmd.toLowerCase();
+	}
 }
