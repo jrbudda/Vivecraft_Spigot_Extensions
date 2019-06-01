@@ -59,6 +59,10 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			return;
 		}
 
+		if(!sender.hasPermission("vive.use")) {
+			return;
+		}
+
 		byte[] data = Arrays.copyOfRange(payload, 1, payload.length);
 		switch (disc){
 		case CONTROLLER0DATA:
@@ -111,7 +115,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 					byteArrayOutputStream.write(1); // climbey allowed
 
 					String mode = vse.getConfig().getString("climbey.blockmode","none");
-					if(!sender.hasPermission(vse.getConfig().getString("permissions.climbperm"))){
+					if(!sender.hasPermission("vive.climbanywhere")){
 						if(mode.trim().equalsIgnoreCase("include"))
 							byteArrayOutputStream.write(1);
 						else if(mode.trim().equalsIgnoreCase("exclude"))

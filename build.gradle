@@ -13,12 +13,12 @@ repositories {
 	maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
-ext.mcversion = '1.11.2'
+ext.mcversion = '1.13.2'
 version = '0.1'
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-	compile "org.spigotmc:spigot-api:1.11.2-R0.1-SNAPSHOT"
+	compile "org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT"
 	compile "net.milkbowl.vault:VaultAPI:1.6"
 	compile fileTree(dir: 'lib', include: '*.jar')
 }

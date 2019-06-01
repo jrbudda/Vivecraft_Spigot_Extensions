@@ -15,9 +15,9 @@ public class ConstructTabCompleter implements TabCompleter {
 		List<String> list = new ArrayList<String>();
 		if(arg0 instanceof Player){
 			if(arg3.length >= 1){
-				for(Cmd cmd: ViveCommand.getCommands()){
-					if(cmd.getCommand().startsWith(arg3[0]))
-					list.add(cmd.getCommand());
+				for(Cmd cmd: ViveCommand.getCommands().values()){
+					if(cmd.getCommand().startsWith(arg3[0].toLowerCase()))
+						list.add(cmd.getCommand());
 				}
 				return list;
 			}
