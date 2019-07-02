@@ -11,8 +11,8 @@ import org.bukkit.util.Vector;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 
-import net.minecraft.server.v1_13_R2.MathHelper;
-import net.minecraft.server.v1_13_R2.Vec3D;
+import net.minecraft.server.v1_14_R1.MathHelper;
+import net.minecraft.server.v1_14_R1.Vec3D;
 
 public class VivecraftItemListener implements Listener{
 	VSE vse = null;

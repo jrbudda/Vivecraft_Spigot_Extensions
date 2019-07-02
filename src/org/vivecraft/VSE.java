@@ -20,9 +20,9 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -52,11 +52,12 @@ import org.vivecraft.listeners.VivecraftNetworkListener;
 import org.vivecraft.utils.Headshot;
 
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.v1_13_R2.EntityCreeper;
-import net.minecraft.server.v1_13_R2.EntityEnderman;
-import net.minecraft.server.v1_13_R2.IRegistry;
-import net.minecraft.server.v1_13_R2.MinecraftKey;
-import net.minecraft.server.v1_13_R2.PathfinderGoalSelector;
+import net.minecraft.server.v1_14_R1.EntityCreeper;
+import net.minecraft.server.v1_14_R1.EntityEnderman;
+import net.minecraft.server.v1_14_R1.IRegistry;
+import net.minecraft.server.v1_14_R1.MinecraftKey;
+import net.minecraft.server.v1_14_R1.PathfinderGoalSelector;
+import net.minecraft.server.v1_14_R1.PathfinderGoalWrapped;
 
 public class VSE extends JavaPlugin implements Listener {
 	FileConfiguration config = getConfig();
@@ -155,7 +156,6 @@ public class VSE extends JavaPlugin implements Listener {
         }
         
 		debug = (getConfig().getBoolean("general.debug", false));
-
         
 		task = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
@@ -252,31 +252,27 @@ public class VSE extends JavaPlugin implements Listener {
 	public void EditEntity(Entity entity){
 		if(entity.getType() == EntityType.CREEPER){	
 			EntityCreeper e = ((CraftCreeper) entity).getHandle();
-			@SuppressWarnings("rawtypes")
-			LinkedHashSet goalB = (LinkedHashSet )getPrivateField("b", PathfinderGoalSelector.class, e.goalSelector);
-			int x = 0;
-			for(Object b: goalB){
-				if(x==1){
+			@SuppressWarnings("unchecked")
+			LinkedHashSet<PathfinderGoalWrapped> goalB = (LinkedHashSet<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.targetSelector);
+			for(PathfinderGoalWrapped b: goalB){
+				if(b.h()==2){
 					goalB.remove(b);
 					break;
 				}
-				x+=1;
 			}
-			e.goalSelector.a(2, new CustomGoalSwell(e));
+			e.goalSelector.a(new PathfinderGoalWrapped(2, new CustomGoalSwell(e)));
 		}
 		else if(entity.getType() == EntityType.ENDERMAN && ((CraftEntity)entity).getHandle() instanceof EntityEnderman){			
 			EntityEnderman e = ((CraftEnderman) entity).getHandle();
-			@SuppressWarnings("rawtypes")
-			LinkedHashSet goalB = (LinkedHashSet )getPrivateField("b", PathfinderGoalSelector.class, e.targetSelector);
-			int x = 0;
-			for(Object b: goalB){
-				if(x==0){
+			@SuppressWarnings("unchecked" )
+			LinkedHashSet<PathfinderGoalWrapped> goalB = (LinkedHashSet<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.targetSelector);
+			for(PathfinderGoalWrapped b: goalB){
+				if(b.h()==1){
 					goalB.remove(b);
 					break;
 				}
-				x+=1;
 			}
-			e.targetSelector.a(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e));
+			e.targetSelector.a(new PathfinderGoalWrapped(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e)));
 		}
 	}
 
@@ -332,8 +328,7 @@ public class VSE extends JavaPlugin implements Listener {
 				
 				if (debug) 
 					VSE.this.getLogger().info("Checking player for ViveCraft");
-				
-				
+							
 				if (getConfig().getBoolean("general.vive-only")) {
 					if ((p.isOnline()) && (!isVive(p))) {
 						VSE.this.getLogger().info(p.getName() + " " + "got kicked for not using Vivecraft");
@@ -344,7 +339,7 @@ public class VSE extends JavaPlugin implements Listener {
 				if (p.isOnline()) {
 					sendWelcomeMessage(p);
 					setPermissionsGroup(p);
-				}	 else {
+				} else {
 					if (debug) 
 						VSE.this.getLogger().info(p.getName() + " no longer online! ");
 				}		

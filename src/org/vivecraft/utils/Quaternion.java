@@ -1,7 +1,7 @@
 package org.vivecraft.utils;
 
-import org.lwjgl.util.vector.Matrix3f;
-import org.lwjgl.util.vector.Matrix4f;
+import org.vivecraft.utils.lwjgl.Matrix3f;
+import org.vivecraft.utils.lwjgl.Matrix4f;
 
 /**
  *

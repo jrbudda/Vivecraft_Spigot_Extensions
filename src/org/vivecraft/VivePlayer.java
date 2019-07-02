@@ -5,13 +5,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 import org.vivecraft.utils.Quaternion;
 import org.vivecraft.utils.Vector3;
 
-import net.minecraft.server.v1_13_R2.Vec3D;
+import net.minecraft.server.v1_14_R1.Vec3D;
 
 public class VivePlayer {
 
@@ -162,7 +162,7 @@ public class VivePlayer {
 					Vec3D dir = this.getHMDDir();
 					dir = dir.b((float) Math.toRadians(c==0?-35:35));
 					dir = new Vec3D(dir.x, 0, dir.z);
-					dir = dir.a();
+					dir = dir.d();
 					Location out = this.getHMDPos().add(dir.x * 0.3 * worldScale, -0.4* worldScale ,dir.z*0.3* worldScale);
 					x = (float) out.getX();
 					y = (float) out.getY();
