@@ -66,6 +66,15 @@ climbey:
   blockmode: None
   #The list of block names for use with include/exclude block mode.
   blocklist:
-   - white_wool
-   - dirt
-   - grass_block
+    - white_wool
+    - dirt
+    - grass_block
+teleport:
+  #Enforce limited teleport range and frequency in survival
+  limitedsurvival: false
+  #Maximum blocks players can teleport up. Set to 0 to disable. Max: 4
+  uplimit: 1
+  #Maximum blocks players can teleport down. Set to 0 to disable. Max: 16
+  downlimit: 4
+  #Maximum blocks players can teleport horizontally. Set to 0 to disable. Max: 32
+  horizontallimit: 16

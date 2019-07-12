@@ -18,6 +18,7 @@ import org.vivecraft.VivePlayer;
 import com.google.common.base.Charsets;
 
 import net.minecraft.server.v1_14_R1.EntityPlayer;
+import net.minecraft.server.v1_14_R1.MathHelper;
 import net.minecraft.server.v1_14_R1.PlayerConnection;
 
 public class VivecraftNetworkListener implements PluginMessageListener {
@@ -38,7 +39,8 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		MOVEMODE,
 		UBERPACKET,
 		TELEPORT,
-		CLIMBING
+		CLIMBING,
+		LIMIT_TELEPORT
 	}
 	
 	Field floatingCount = null;
@@ -126,6 +128,18 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 						if (!writeString(byteArrayOutputStream, block))
 							vse.getLogger().warning("Block name too long: " + block);
 					}
+
+					final byte[] p = byteArrayOutputStream.toByteArray();
+					sender.sendPluginMessage(vse, vse.CHANNEL, p);
+				}
+
+				if (vse.getConfig().getBoolean("teleport.limitedsurvival")) {
+					final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+					byteArrayOutputStream.write(1); // do it
+					byteArrayOutputStream.write(MathHelper.clamp(vse.getConfig().getInt("teleport.uplimit"), 0, 4));
+					byteArrayOutputStream.write(MathHelper.clamp(vse.getConfig().getInt("teleport.downlimit"), 0, 16));
+					byteArrayOutputStream.write(MathHelper.clamp(vse.getConfig().getInt("teleport.horizontallimit"), 0, 32));
 
 					final byte[] p = byteArrayOutputStream.toByteArray();
 					sender.sendPluginMessage(vse, vse.CHANNEL, p);
