@@ -1,6 +1,7 @@
 package org.vivecraft.listeners;
 
 import org.bukkit.Location;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -40,7 +41,7 @@ public class VivecraftCombatListener implements Listener{
 		Player pl = (Player)proj.getShooter();
 		final VivePlayer vp = (VivePlayer)VSE.vivePlayers.get(pl.getUniqueId());
 
-		final boolean arrow = proj instanceof Arrow && !(proj instanceof Trident);
+		final boolean arrow = proj instanceof AbstractArrow && !(proj instanceof Trident);
 
 		if ((vp == null) && (this.vse.getConfig().getBoolean("general.debug"))) {
 			vse.getLogger().warning(" Error on projectile launch!");

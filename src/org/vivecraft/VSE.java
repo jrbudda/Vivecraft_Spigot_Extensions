@@ -327,7 +327,7 @@ public class VSE extends JavaPlugin implements Listener {
 			public void run() {
 				
 				if (debug) 
-					VSE.this.getLogger().info("Checking player for ViveCraft");
+					VSE.this.getLogger().info("Checking player for Vivecraft");
 							
 				if (getConfig().getBoolean("general.vive-only")) {
 					if ((p.isOnline()) && (!isVive(p))) {
