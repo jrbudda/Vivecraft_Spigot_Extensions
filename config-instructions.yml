@@ -70,6 +70,8 @@ climbey:
     - dirt
     - grass_block
 teleport:
+  #Whether direct teleport is enabled. It is recommended to leave this enabled for players prone to VR sickness.
+  enable: true
   #Limit teleport range and frequency in survival
   limitedsurvival: false
   #Maximum blocks players can teleport up. Set to 0 to disable. Max: 4
@@ -78,3 +80,10 @@ teleport:
   downlimit: 4
   #Maximum blocks players can teleport horizontally. Set to 0 to disable. Max: 32
   horizontallimit: 16
+worldscale:
+  #Limit the range of world scale players can use
+  limitrange: false
+  #Upper limit of range
+  max: 2
+  #Lower limit of range
+  min: 0.5

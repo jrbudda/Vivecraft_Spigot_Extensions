@@ -147,7 +147,20 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 					sender.sendPluginMessage(vse, vse.CHANNEL, p);
 				}
 
-				sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.TELEPORT.ordinal()});
+				if (vse.getConfig().getBoolean("worldscale.limitrange")) {
+					final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+					baos.write(PacketDiscriminators.SETTING_OVERRIDE.ordinal());
+
+					writeSetting(baos, "worldScale.min", MathHelper.a(vse.getConfig().getDouble("worldscale.min"), 0.1, 100));
+					writeSetting(baos, "worldScale.max", MathHelper.a(vse.getConfig().getDouble("worldscale.max"), 0.1, 100));
+
+					final byte[] p = baos.toByteArray();
+					sender.sendPluginMessage(vse, vse.CHANNEL, p);
+				}
+
+				if (vse.getConfig().getBoolean("teleport.enabled"))
+					sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.TELEPORT.ordinal()});
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -156,6 +169,9 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		case WORLDSCALE:
 			break;
 		case TELEPORT:
+			if (!vse.getConfig().getBoolean("teleport.enabled"))
+				break;
+
 			ByteArrayInputStream in = new ByteArrayInputStream(data);
 			DataInputStream d = new DataInputStream(in);
 			try {
