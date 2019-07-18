@@ -19,9 +19,10 @@ public class VivePlayer {
 	public byte[] controller0data;
 	public byte[] controller1data;
 	public byte[] draw;
+	public float worldScale;
+	public float heightScale;
 	boolean isTeleportMode;
 	boolean isReverseHands;
-	float worldScale;
 	boolean isVR;
 
 	public Player player;
@@ -218,6 +219,8 @@ public class VivePlayer {
 			output.write(hmdData);
 			output.write(controller0data);
 			output.write(controller1data);
+			output.write(java.nio.ByteBuffer.allocate(4).putFloat(worldScale).array());
+			output.write(java.nio.ByteBuffer.allocate(4).putFloat(heightScale).array());
 		} catch (IOException e) {
 
 		}

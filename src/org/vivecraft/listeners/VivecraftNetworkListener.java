@@ -40,7 +40,8 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		UBERPACKET,
 		TELEPORT,
 		CLIMBING,
-		SETTING_OVERRIDE
+		SETTING_OVERRIDE,
+		HEIGHT
 	}
 	
 	Field floatingCount = null;
@@ -167,6 +168,22 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			}
 			break;
 		case WORLDSCALE:
+			ByteArrayInputStream a = new ByteArrayInputStream(data);
+			DataInputStream b = new DataInputStream(a);
+			try {
+				vp.worldScale = b.readFloat();
+			} catch (IOException e2) {
+				e2.printStackTrace();
+			}
+			break;
+		case HEIGHT:
+			ByteArrayInputStream a1 = new ByteArrayInputStream(data);
+			DataInputStream b1 = new DataInputStream(a1);
+			try {
+				vp.heightScale = b1.readFloat();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 			break;
 		case TELEPORT:
 			if (!vse.getConfig().getBoolean("teleport.enabled"))
