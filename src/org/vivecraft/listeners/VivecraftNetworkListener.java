@@ -18,6 +18,7 @@ import org.vivecraft.VivePlayer;
 import com.google.common.base.Charsets;
 
 import net.minecraft.server.v1_14_R1.EntityPlayer;
+import net.minecraft.server.v1_14_R1.MathHelper;
 import net.minecraft.server.v1_14_R1.PlayerConnection;
 
 public class VivecraftNetworkListener implements PluginMessageListener {
@@ -38,7 +39,8 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		MOVEMODE,
 		UBERPACKET,
 		TELEPORT,
-		CLIMBING
+		CLIMBING,
+		SETTING_OVERRIDE
 	}
 	
 	Field floatingCount = null;
@@ -131,7 +133,34 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 					sender.sendPluginMessage(vse, vse.CHANNEL, p);
 				}
 
-				sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.TELEPORT.ordinal()});
+				if (vse.getConfig().getBoolean("teleport.limitedsurvival")) {
+					final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+					baos.write(PacketDiscriminators.SETTING_OVERRIDE.ordinal());
+
+					writeSetting(baos, "limitedTeleport", true); // do it
+					writeSetting(baos, "teleportLimitUp", MathHelper.clamp(vse.getConfig().getInt("teleport.uplimit"), 0, 4));
+					writeSetting(baos, "teleportLimitDown", MathHelper.clamp(vse.getConfig().getInt("teleport.downlimit"), 0, 16));
+					writeSetting(baos, "teleportLimitHoriz", MathHelper.clamp(vse.getConfig().getInt("teleport.horizontallimit"), 0, 32));
+
+					final byte[] p = baos.toByteArray();
+					sender.sendPluginMessage(vse, vse.CHANNEL, p);
+				}
+
+				if (vse.getConfig().getBoolean("worldscale.limitrange")) {
+					final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+					baos.write(PacketDiscriminators.SETTING_OVERRIDE.ordinal());
+
+					writeSetting(baos, "worldScale.min", MathHelper.a(vse.getConfig().getDouble("worldscale.min"), 0.1, 100));
+					writeSetting(baos, "worldScale.max", MathHelper.a(vse.getConfig().getDouble("worldscale.max"), 0.1, 100));
+
+					final byte[] p = baos.toByteArray();
+					sender.sendPluginMessage(vse, vse.CHANNEL, p);
+				}
+
+				if (vse.getConfig().getBoolean("teleport.enabled"))
+					sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.TELEPORT.ordinal()});
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -140,6 +169,9 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		case WORLDSCALE:
 			break;
 		case TELEPORT:
+			if (!vse.getConfig().getBoolean("teleport.enabled"))
+				break;
+
 			ByteArrayInputStream in = new ByteArrayInputStream(data);
 			DataInputStream d = new DataInputStream(in);
 			try {
@@ -177,7 +209,17 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			break;
 		}
 	}
-	
+
+	public void writeSetting(ByteArrayOutputStream output, String name, Object value) {
+		if (!writeString(output, name)) {
+			vse.getLogger().warning("Setting name too long: " + name);
+			return;
+		}
+		if (!writeString(output, value.toString())) {
+			vse.getLogger().warning("Setting value too long: " + value);
+			writeString(output, "");
+		}
+	}
 	
 	public static byte[] StringToPayload(PacketDiscriminators version, String input){
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
