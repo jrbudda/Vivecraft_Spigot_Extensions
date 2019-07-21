@@ -2,8 +2,10 @@ package org.vivecraft.entities;
 
 import java.lang.reflect.Method;
 
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.vivecraft.VSE;
-
+import org.vivecraft.VivePlayer;
 
 import net.minecraft.server.v1_14_R1.Blocks;
 import net.minecraft.server.v1_14_R1.Entity;
@@ -57,6 +59,14 @@ extends PathfinderGoalNearestAttackableTarget<EntityHuman> {
 		   } else {
 			   Vec3D vec3d = entityhuman.f(1.0F).d();
 			   Vec3D vec3d1 = new Vec3D(i.locX - entityhuman.locX, i.getBoundingBox().minY + (double)i.getHeadHeight() - (entityhuman.locY + (double)entityhuman.getHeadHeight()), i.locZ - entityhuman.locZ);
+			   //VSE MODIFICATION
+			   if(VSE.isVive((Player)entityhuman.getBukkitEntity())){
+				   VivePlayer vp = VSE.vivePlayers.get(entityhuman.getBukkitEntity().getUniqueId());
+				   vec3d = vp.getHMDDir();
+				   Location hmdpos = vp.getHMDPos();
+				   vec3d1 = new Vec3D(i.locX - hmdpos.getX(), i.getBoundingBox().minY + (double)i.getHeadHeight() - hmdpos.getY(), i.locZ - hmdpos.getZ());
+			   }
+			   ////
 			   double d0 = vec3d1.f();
 			   vec3d1 = vec3d1.d();
 			   double d1 = vec3d.b(vec3d1);
