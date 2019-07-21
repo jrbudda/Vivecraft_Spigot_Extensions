@@ -11,6 +11,8 @@ import net.minecraft.server.v1_14_R1.Blocks;
 import net.minecraft.server.v1_14_R1.Entity;
 import net.minecraft.server.v1_14_R1.EntityEnderman;
 import net.minecraft.server.v1_14_R1.EntityHuman;
+import net.minecraft.server.v1_14_R1.EntityLiving;
+import net.minecraft.server.v1_14_R1.EntityPlayer;
 import net.minecraft.server.v1_14_R1.ItemStack;
 import net.minecraft.server.v1_14_R1.MovingObjectPosition;
 import net.minecraft.server.v1_14_R1.PathfinderGoalNearestAttackableTarget;
@@ -39,16 +41,19 @@ extends PathfinderGoalNearestAttackableTarget<EntityHuman> {
 	      });
 	   }
 
+	   @Override
 	   public boolean a() {
-	      this.j = this.i.world.a(this.m, this.i);
+	      this.j = this.i.world.a(this.m, (EntityLiving)this.i);
 	      return this.j != null;
 	   }
-
+	   
+	   @Override
 	   public void c() {
 	      this.k = 5;
 	      this.l = 0;
 	   }
-
+	   
+	   @Override
 	   public void d() {
 	      this.j = null;
 	      super.d();
@@ -62,7 +67,7 @@ extends PathfinderGoalNearestAttackableTarget<EntityHuman> {
 			   Vec3D vec3d = entityhuman.f(1.0F).d();
 			   Vec3D vec3d1 = new Vec3D(i.locX - entityhuman.locX, i.getBoundingBox().minY + (double)i.getHeadHeight() - (entityhuman.locY + (double)entityhuman.getHeadHeight()), i.locZ - entityhuman.locZ);
 			   //VSE MODIFICATION
-			   boolean vr = VSE.isVive((Player)entityhuman.getBukkitEntity());
+			   boolean vr = entityhuman instanceof EntityPlayer && VSE.isVive((Player)entityhuman.getBukkitEntity());
 			   VivePlayer vp = null;
 			   Vec3D hmdpos = null;
 			   if(vr){
@@ -84,7 +89,8 @@ extends PathfinderGoalNearestAttackableTarget<EntityHuman> {
 	        if (i.world.rayTrace(new RayTrace(source, target , RayTrace.BlockCollisionOption.COLLIDER, RayTrace.FluidCollisionOption.NONE, (Entity)i)).getType() != MovingObjectPosition.EnumMovingObjectType.MISS) return false;
 	        return true;
 	    }
-
+	    
+	   @Override
 	   public boolean b() {
 	      if (this.j != null) {
 	         if (!isLookingAtMe(this.j)) {
@@ -97,7 +103,8 @@ extends PathfinderGoalNearestAttackableTarget<EntityHuman> {
 	         return this.c != null && this.n.a(this.i, this.c) ? true : super.b();
 	      }
 	   }
-
+	   
+	   @Override
 	   public void e() {
 	      if (this.j != null) {
 	         if (--this.k <= 0) {

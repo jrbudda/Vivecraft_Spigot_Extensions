@@ -93,13 +93,11 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 
 			try {
 				String version = br.readLine();
-
+				vp.version = version;
 				if(version.contains("NONVR")){
-					vse.getLogger().info("NONVR" + sender.getDisplayName());
 					vp.setVR(false);
 				}
 				else{
-					vse.getLogger().info("VR" + sender.getDisplayName());
 					vp.setVR(true);
 				}
 

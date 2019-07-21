@@ -260,7 +260,7 @@ public class VSE extends JavaPlugin implements Listener {
 					break;
 				}
 			}
-			e.goalSelector.a(new PathfinderGoalWrapped(2, new CustomGoalSwell(e)));
+			e.goalSelector.a(2, new CustomGoalSwell(e));
 		}
 		else if(entity.getType() == EntityType.ENDERMAN && ((CraftEntity)entity).getHandle() instanceof EntityEnderman){			
 			EntityEnderman e = ((CraftEnderman) entity).getHandle();
@@ -272,7 +272,7 @@ public class VSE extends JavaPlugin implements Listener {
 					break;
 				}
 			}
-			e.targetSelector.a(new PathfinderGoalWrapped(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e)));
+			e.targetSelector.a(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e));
 		}
 	}
 
@@ -322,26 +322,31 @@ public class VSE extends JavaPlugin implements Listener {
 		if(t < 100) t = 100;
 		if(t > 1000) t = 1000;
 		
+		if (debug) 
+			getLogger().info("Checking " + event.getPlayer().getName() + " for Vivecraft");
+
 		getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			@Override
 			public void run() {
 				
-				if (debug) 
-					VSE.this.getLogger().info("Checking player for Vivecraft");
-							
-				if (getConfig().getBoolean("general.vive-only")) {
-					if ((p.isOnline()) && (!isVive(p))) {
-						VSE.this.getLogger().info(p.getName() + " " + "got kicked for not using Vivecraft");
-						p.kickPlayer(VSE.this.getConfig().getString("general.vive-only-kickmessage"));
-					}		
-				}
-				
 				if (p.isOnline()) {
-					sendWelcomeMessage(p);
-					setPermissionsGroup(p);
+					if(isVive(p)) {
+     					VivePlayer vp = VSE.vivePlayers.get(p.getUniqueId());
+     					if(debug)
+     						getLogger().info(p.getName() + " using: " + vp.version + " " + (vp.isVR() ? "VR" : "NONVR")  + " " + (vp.isSeated() ? "SEATED" : ""));
+						sendWelcomeMessage(p);
+						setPermissionsGroup(p);
+					} else {
+						if(debug)
+							getLogger().info(p.getName() + " Vivecraft not detected");
+						if (getConfig().getBoolean("general.vive-only")) {
+							getLogger().info(p.getName() + " " + "got kicked for not using Vivecraft");
+							p.kickPlayer(getConfig().getString("general.vive-only-kickmessage"));
+						}
+					}					
 				} else {
 					if (debug) 
-						VSE.this.getLogger().info(p.getName() + " no longer online! ");
+						getLogger().info(p.getName() + " no longer online! ");
 				}		
 			}
 		}, t);
@@ -423,19 +428,19 @@ public class VSE extends JavaPlugin implements Listener {
 					if (entry.getValue()) {
 						if (!perm.playerInGroup(p, entry.getKey())) {
 							if (debug) 
-								VSE.this.getLogger().info("Adding " + p.getName() + " to " + entry.getKey());
+								getLogger().info("Adding " + p.getName() + " to " + entry.getKey());
 							perm.playerAddGroup(p, entry.getKey());
 						}
 					} else {
 						if (perm.playerInGroup(p, entry.getKey())) {
 							if (debug) 
-								VSE.this.getLogger().info("Removing " + p.getName() + " from " + entry.getKey());
+								getLogger().info("Removing " + p.getName() + " from " + entry.getKey());
 							perm.playerRemoveGroup(p, entry.getKey());
 						}
 					}
 				}
 			} else {
-				VSE.this.getLogger().info("Permissions error: Registered permissions provider is null!");
+				getLogger().info("Permissions error: Registered permissions provider is null!");
 			}
 			
 		} catch (Exception e) {

@@ -26,6 +26,7 @@ public class VivePlayer {
 	boolean isVR;
 
 	public Player player;
+	public String version;
 
 	public VivePlayer(Player player) {
 		this.player = player;	
