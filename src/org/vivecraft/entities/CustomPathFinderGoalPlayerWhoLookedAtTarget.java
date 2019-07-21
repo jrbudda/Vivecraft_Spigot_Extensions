@@ -12,8 +12,10 @@ import net.minecraft.server.v1_14_R1.Entity;
 import net.minecraft.server.v1_14_R1.EntityEnderman;
 import net.minecraft.server.v1_14_R1.EntityHuman;
 import net.minecraft.server.v1_14_R1.ItemStack;
+import net.minecraft.server.v1_14_R1.MovingObjectPosition;
 import net.minecraft.server.v1_14_R1.PathfinderGoalNearestAttackableTarget;
 import net.minecraft.server.v1_14_R1.PathfinderTargetCondition;
+import net.minecraft.server.v1_14_R1.RayTrace;
 import net.minecraft.server.v1_14_R1.Vec3D;
 
 public class CustomPathFinderGoalPlayerWhoLookedAtTarget 
@@ -60,19 +62,28 @@ extends PathfinderGoalNearestAttackableTarget<EntityHuman> {
 			   Vec3D vec3d = entityhuman.f(1.0F).d();
 			   Vec3D vec3d1 = new Vec3D(i.locX - entityhuman.locX, i.getBoundingBox().minY + (double)i.getHeadHeight() - (entityhuman.locY + (double)entityhuman.getHeadHeight()), i.locZ - entityhuman.locZ);
 			   //VSE MODIFICATION
-			   if(VSE.isVive((Player)entityhuman.getBukkitEntity())){
-				   VivePlayer vp = VSE.vivePlayers.get(entityhuman.getBukkitEntity().getUniqueId());
+			   boolean vr = VSE.isVive((Player)entityhuman.getBukkitEntity());
+			   VivePlayer vp = null;
+			   Vec3D hmdpos = null;
+			   if(vr){
+				   vp = VSE.vivePlayers.get(entityhuman.getBukkitEntity().getUniqueId());
 				   vec3d = vp.getHMDDir();
-				   Location hmdpos = vp.getHMDPos();
+				   Location h = vp.getHMDPos();
+				   hmdpos = new Vec3D(h.getX(), h.getY(), h.getZ());
 				   vec3d1 = new Vec3D(i.locX - hmdpos.getX(), i.getBoundingBox().minY + (double)i.getHeadHeight() - hmdpos.getY(), i.locZ - hmdpos.getZ());
 			   }
 			   ////
 			   double d0 = vec3d1.f();
 			   vec3d1 = vec3d1.d();
 			   double d1 = vec3d.b(vec3d1);
-			   return d1 > 1.0D - 0.025D / d0 ? entityhuman.hasLineOfSight(i) : false;
+			   return d1 > 1.0D - 0.025D / d0 ? (vr ? hasLineOfSight(hmdpos, new Vec3D(i.locX, i.locY + (double)i.getHeadHeight(), i.locZ)) : entityhuman.hasLineOfSight(i)) : false;
 		   }
 	   }
+
+	    private boolean hasLineOfSight(Vec3D source, Vec3D target) {
+	        if (i.world.rayTrace(new RayTrace(source, target , RayTrace.BlockCollisionOption.COLLIDER, RayTrace.FluidCollisionOption.NONE, (Entity)i)).getType() != MovingObjectPosition.EnumMovingObjectType.MISS) return false;
+	        return true;
+	    }
 
 	   public boolean b() {
 	      if (this.j != null) {
