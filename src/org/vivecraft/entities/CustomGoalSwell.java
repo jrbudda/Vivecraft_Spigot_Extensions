@@ -28,7 +28,7 @@ public class CustomGoalSwell extends PathfinderGoal {
 			if(localEntityLiving != null && VSE.vivePlayers.containsKey(localEntityLiving.getUniqueID()) && VSE.isVive(VSE.vivePlayers.get(localEntityLiving.getUniqueID()).player))
 				creeperBlowyUppyRadius = vse.getConfig().getDouble("CreeperRadius.radius");
 		}
-        if (this.a.dW() > 0) return true;
+        if (this.a.dV() > 0) return true;
         if (localEntityLiving == null) return false;
         if (!(this.a.h((Entity)localEntityLiving) < creeperBlowyUppyRadius*creeperBlowyUppyRadius)) return false;
         return true;

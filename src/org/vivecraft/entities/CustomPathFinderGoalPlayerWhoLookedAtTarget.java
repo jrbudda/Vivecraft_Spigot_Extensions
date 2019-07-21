@@ -22,13 +22,13 @@ extends PathfinderGoalNearestAttackableTarget<EntityHuman> {
 	   private int l;
 	   private final PathfinderTargetCondition m;
 	   private final PathfinderTargetCondition n = (new PathfinderTargetCondition()).c();
-	   private Method dW;
+	   private Method dV;
 	   private Method a_entity;
 		
 	   public CustomPathFinderGoalPlayerWhoLookedAtTarget(EntityEnderman entityenderman) {
 	      super(entityenderman, EntityHuman.class, false);
 	      this.i = entityenderman;
-	      this.dW = VSE.getPrivateMethod("dW", EntityEnderman.class, null);
+	      this.dV = VSE.getPrivateMethod("dV", EntityEnderman.class, null);
 	      this.a_entity = VSE.getPrivateMethod("a", EntityEnderman.class, Entity.class);
 	      this.m = (new PathfinderTargetCondition()).a(this.k()).a((entityliving) -> {
 	         return isLookingAtMe((EntityHuman)entityliving);
@@ -88,7 +88,7 @@ extends PathfinderGoalNearestAttackableTarget<EntityHuman> {
 	         if (this.c != null && !this.i.isPassenger()) {
 	            if (isLookingAtMe((EntityHuman)this.c)) {
 	               if (this.c.h(this.i) < 16.0D) {
-	            	   VSE.invoke(this.dW, this.i, null);
+	            	   VSE.invoke(this.dV, this.i, null);
 	               }
 
 	               this.l = 0;
