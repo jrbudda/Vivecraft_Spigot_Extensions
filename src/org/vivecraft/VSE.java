@@ -330,11 +330,11 @@ public class VSE extends JavaPlugin implements Listener {
 			public void run() {
 				
 				if (p.isOnline()) {
+			
 					if(isVive(p)) {
      					VivePlayer vp = VSE.vivePlayers.get(p.getUniqueId());
      					if(debug)
      						getLogger().info(p.getName() + " using: " + vp.version + " " + (vp.isVR() ? "VR" : "NONVR")  + " " + (vp.isSeated() ? "SEATED" : ""));
-						sendWelcomeMessage(p);
 						setPermissionsGroup(p);
 					} else {
 						if(debug)
@@ -342,8 +342,10 @@ public class VSE extends JavaPlugin implements Listener {
 						if (getConfig().getBoolean("general.vive-only")) {
 							getLogger().info(p.getName() + " " + "got kicked for not using Vivecraft");
 							p.kickPlayer(getConfig().getString("general.vive-only-kickmessage"));
+							return;
 						}
-					}					
+					}		
+					sendWelcomeMessage(p);
 				} else {
 					if (debug) 
 						getLogger().info(p.getName() + " no longer online! ");
