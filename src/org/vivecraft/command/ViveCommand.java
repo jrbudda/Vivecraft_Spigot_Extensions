@@ -44,20 +44,25 @@ public class ViveCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
-		if (args.length == 0) {
+		int arg_length = args.length; //looks better than spamming up with args.length, even though its the same length
+		if (arg_length == 0) {
 			sendMessage("Download Vivecraft at http://www.vivecraft.org/ type '/vive help' to list options",sender);
 			return true;
 		}
 
 		String command = args[0].toLowerCase();
 
+
 		if (command.equals("vive-only") && sender.isOp()) {
-			if (args.length >= 2) {
-				if (args[1].toLowerCase().equals("true")) {
+			if (arg_length >= 2) {
+				//who wrote this garbage?
+				String arg_1 = args[1].toLowerCase();
+				
+				if (arg_1.equals("true")) {
 					plugin.getConfig().set("vive-only.enabled", true);
 					sendMessage("Vive-Only has been enabled.", sender);
 
-				} else if (args[1].toLowerCase().equals("false")) {
+				} else if (arg_1.equals("false")) {
 					plugin.getConfig().set("vive-only.enabled", false);
 					sendMessage("Vive-Only has been disabled.", sender);
 				}
@@ -67,24 +72,26 @@ public class ViveCommand implements CommandExecutor {
 			plugin.saveConfig();
 		} 
 		else if(command.equals("sendplayerdata") && sender.isOp()){
-			if(args.length >= 2){
-				if(args[1].toLowerCase().equals("true")){
+			if(arg_length >= 2){
+				String arg_1 = args[1].toLowerCase();
+				if(arg_1.equals("true")){
 					plugin.getConfig().set("SendPlayerData.enabled", true);
 					sendMessage("SendPlayerData has been enabled.", sender);
-				}else if (args[1].toLowerCase().equals("false")) {
+				}else if (arg_1.equals("false")) {
 					plugin.getConfig().set("SendPlayerData.enabled", false);
 					sendMessage("SendPlayerData has been disabled.", sender);
 				}
 			}else{
-				sendMessage("SendPlayerData: " + plugin.getConfig().get("SendPlayerData.enabled"),sender);
+				sendMessage("SendPlayerData: " + plugin.getConfig().get("SendPlayerData.enabled"), sender);
 			}
 		}
 		else if(command.equals("creeperradius") && sender.isOp()){
-			if(args.length >= 2){
-				if(args[1].toLowerCase().equals("true")){
+			if(arg_length >= 2){
+				String arg_1 = args[1].toLowerCase();
+				if(arg_1.equals("true")){
 					plugin.getConfig().set("CreeperRadius.enabled", true);
 					sendMessage("Creeper Radius has been enabled.", sender);
-				}else if (args[1].toLowerCase().equals("false")) {
+				}else if (arg_1.equals("false")) {
 					plugin.getConfig().set("CreeperRadius.enabled", false);
 					sendMessage("Creeper Radius has been disabled.", sender);
 				}else{
@@ -100,7 +107,7 @@ public class ViveCommand implements CommandExecutor {
 			}
 		}
 		else if (command.equals("waittime") && sender.isOp()) {
-			if (args.length >= 2) {
+			if (arg_length >= 2) {
 				try {
 					plugin.getConfig().set("vive-only.waittime", Integer.parseInt(args[1]));
 					sendMessage("waittime set to " + Integer.parseInt(args[1]), sender);
@@ -113,7 +120,7 @@ public class ViveCommand implements CommandExecutor {
 			plugin.saveConfig();
 		} 
 		else if (command.equals("bow") && sender.isOp()) {
-			if (args.length >= 2) {
+			if (arg_length >= 2) {
 				try {
 					plugin.getConfig().set("bow.multiplier", Integer.parseInt(args[1]));
 					sendMessage("Multiplier set to " + Integer.parseInt(args[1]), sender);
@@ -147,7 +154,7 @@ public class ViveCommand implements CommandExecutor {
 
 		}
 		else if(command.equals("set") && sender.isOp()){
-			if (args.length >= 3) {
+			if (arg_length >= 3) {
 				String config = args[1];
 				if(plugin.getConfig().get(config) != null){
 					if(isBoolean(args[2])){
@@ -157,10 +164,10 @@ public class ViveCommand implements CommandExecutor {
 							plugin.getConfig().set(config, Double.parseDouble(args[2]));
 						}else{
 							String test = "";
-							if(args.length > 3){
-								for(int i = 2; i < args.length; i++){
+							if(arg_length > 3){
+								for(int i = 2; i < arg_length; i++){
 									test = test + args[i];
-									if(i < args.length-1){
+									if(i < arg_length-1){
 										test = test + " ";
 									}
 								}
@@ -181,11 +188,12 @@ public class ViveCommand implements CommandExecutor {
 			sendMessage("Version: " + version, sender);
 		} 
 		else if(command.equals("checkforupdate")){
-			if(args.length >= 2){
-				if(args[1].toLowerCase().equals("true")){
+			if(arg_length >= 2){
+				String arg_1 = args[1].toLowerCase();
+				if(arg_1.equals("true")){
 					plugin.getConfig().set("checkforupdate.enabled", true);
 					sendMessage("Update checker has been enabled.", sender);
-				}else if (args[1].toLowerCase().equals("false")) {
+				}else if (arg_1.equals("false")) {
 					plugin.getConfig().set("checkforupdate.enabled", false);
 					sendMessage("Update checker has been disabled.", sender);
 				}
