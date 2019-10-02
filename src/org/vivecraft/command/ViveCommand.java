@@ -51,9 +51,9 @@ public class ViveCommand implements CommandExecutor {
 		}
 
 		String command = args[0].toLowerCase();
+		boolean is_op = sender.isOp();
 
-
-		if (command.equals("vive-only") && sender.isOp()) {
+		if (command.equals("vive-only") && is_op) {
 			if (arg_length >= 2) {
 				//who wrote this garbage?
 				String arg_1 = args[1].toLowerCase();
@@ -71,7 +71,7 @@ public class ViveCommand implements CommandExecutor {
 			}
 			plugin.saveConfig();
 		} 
-		else if(command.equals("sendplayerdata") && sender.isOp()){
+		else if(command.equals("sendplayerdata") && is_op){
 			if(arg_length >= 2){
 				String arg_1 = args[1].toLowerCase();
 				if(arg_1.equals("true")){
@@ -85,7 +85,7 @@ public class ViveCommand implements CommandExecutor {
 				sendMessage("SendPlayerData: " + plugin.getConfig().get("SendPlayerData.enabled"), sender);
 			}
 		}
-		else if(command.equals("creeperradius") && sender.isOp()){
+		else if(command.equals("creeperradius") && is_op){
 			if(arg_length >= 2){
 				String arg_1 = args[1].toLowerCase();
 				if(arg_1.equals("true")){
@@ -106,7 +106,7 @@ public class ViveCommand implements CommandExecutor {
 				sendMessage("Creeper Radius: " + plugin.getConfig().get("CreeperRadius.enabled") + " Radius set to: " + plugin.getConfig().getDouble("CreeperRadius.radius"),sender);
 			}
 		}
-		else if (command.equals("waittime") && sender.isOp()) {
+		else if (command.equals("waittime") && is_op) {
 			if (arg_length >= 2) {
 				try {
 					plugin.getConfig().set("vive-only.waittime", Integer.parseInt(args[1]));
@@ -119,7 +119,7 @@ public class ViveCommand implements CommandExecutor {
 			}
 			plugin.saveConfig();
 		} 
-		else if (command.equals("bow") && sender.isOp()) {
+		else if (command.equals("bow") && is_op) {
 			if (arg_length >= 2) {
 				try {
 					plugin.getConfig().set("bow.multiplier", Integer.parseInt(args[1]));
@@ -153,7 +153,7 @@ public class ViveCommand implements CommandExecutor {
 			}
 
 		}
-		else if(command.equals("set") && sender.isOp()){
+		else if(command.equals("set") && is_op){
 			if (arg_length >= 3) {
 				String config = args[1];
 				if(plugin.getConfig().get(config) != null){
@@ -211,14 +211,15 @@ public class ViveCommand implements CommandExecutor {
 				sender.spigot().sendMessage(tc);
 			}
 		} else {
-			if(!sender.isOp()){
+			if(!is_op){
 				sendMessage("You must be OP to use these commands", sender);
 			}else
 				sendMessage("Unknown command", sender);
 		}
 
 
-		if(sender.isOp()) plugin.saveConfig();
+		if(is_op)
+			plugin.saveConfig();
 
 		return true;
 	}
