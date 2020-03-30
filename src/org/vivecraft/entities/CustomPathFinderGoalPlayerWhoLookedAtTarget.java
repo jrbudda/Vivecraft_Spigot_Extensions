@@ -7,18 +7,18 @@ import org.bukkit.entity.Player;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 
-import net.minecraft.server.v1_14_R1.Blocks;
-import net.minecraft.server.v1_14_R1.Entity;
-import net.minecraft.server.v1_14_R1.EntityEnderman;
-import net.minecraft.server.v1_14_R1.EntityHuman;
-import net.minecraft.server.v1_14_R1.EntityLiving;
-import net.minecraft.server.v1_14_R1.EntityPlayer;
-import net.minecraft.server.v1_14_R1.ItemStack;
-import net.minecraft.server.v1_14_R1.MovingObjectPosition;
-import net.minecraft.server.v1_14_R1.PathfinderGoalNearestAttackableTarget;
-import net.minecraft.server.v1_14_R1.PathfinderTargetCondition;
-import net.minecraft.server.v1_14_R1.RayTrace;
-import net.minecraft.server.v1_14_R1.Vec3D;
+import net.minecraft.server.v1_15_R1.Blocks;
+import net.minecraft.server.v1_15_R1.Entity;
+import net.minecraft.server.v1_15_R1.EntityEnderman;
+import net.minecraft.server.v1_15_R1.EntityHuman;
+import net.minecraft.server.v1_15_R1.EntityLiving;
+import net.minecraft.server.v1_15_R1.EntityPlayer;
+import net.minecraft.server.v1_15_R1.ItemStack;
+import net.minecraft.server.v1_15_R1.MovingObjectPosition;
+import net.minecraft.server.v1_15_R1.PathfinderGoalNearestAttackableTarget;
+import net.minecraft.server.v1_15_R1.PathfinderTargetCondition;
+import net.minecraft.server.v1_15_R1.RayTrace;
+import net.minecraft.server.v1_15_R1.Vec3D;
 
 public class CustomPathFinderGoalPlayerWhoLookedAtTarget 
 extends PathfinderGoalNearestAttackableTarget<EntityHuman> {
@@ -28,13 +28,13 @@ extends PathfinderGoalNearestAttackableTarget<EntityHuman> {
 	   private int l;
 	   private final PathfinderTargetCondition m;
 	   private final PathfinderTargetCondition n = (new PathfinderTargetCondition()).c();
-	   private Method dV;
+	   private Method eq;
 	   private Method a_entity;
 		
 	   public CustomPathFinderGoalPlayerWhoLookedAtTarget(EntityEnderman entityenderman) {
 	      super(entityenderman, EntityHuman.class, false);
 	      this.i = entityenderman;
-	      this.dV = VSE.getPrivateMethod("dV", EntityEnderman.class, null);
+	      this.eq = VSE.getPrivateMethod("eq", EntityEnderman.class, null);
 	      this.a_entity = VSE.getPrivateMethod("a", EntityEnderman.class, Entity.class);
 	      this.m = (new PathfinderTargetCondition()).a(this.k()).a((entityliving) -> {
 	         return isLookingAtMe((EntityHuman)entityliving);
@@ -65,7 +65,7 @@ extends PathfinderGoalNearestAttackableTarget<EntityHuman> {
 			   return false;
 		   } else {
 			   Vec3D vec3d = entityhuman.f(1.0F).d();
-			   Vec3D vec3d1 = new Vec3D(i.locX - entityhuman.locX, i.getBoundingBox().minY + (double)i.getHeadHeight() - (entityhuman.locY + (double)entityhuman.getHeadHeight()), i.locZ - entityhuman.locZ);
+			   Vec3D vec3d1 = new Vec3D(i.locX() - entityhuman.locX(), i.getHeadY() - entityhuman.getHeadY(), i.locZ() - entityhuman.locZ());
 			   //VSE MODIFICATION
 			   boolean vr = entityhuman instanceof EntityPlayer && VSE.isVive((Player)entityhuman.getBukkitEntity());
 			   VivePlayer vp = null;
@@ -75,13 +75,17 @@ extends PathfinderGoalNearestAttackableTarget<EntityHuman> {
 				   vec3d = vp.getHMDDir();
 				   Location h = vp.getHMDPos();
 				   hmdpos = new Vec3D(h.getX(), h.getY(), h.getZ());
-				   vec3d1 = new Vec3D(i.locX - hmdpos.getX(), i.getBoundingBox().minY + (double)i.getHeadHeight() - hmdpos.getY(), i.locZ - hmdpos.getZ());
+				   vec3d1 = new Vec3D(i.locX() - hmdpos.getX(), i.getHeadY() - hmdpos.getY(), i.locZ() - hmdpos.getZ());
 			   }
 			   ////
 			   double d0 = vec3d1.f();
 			   vec3d1 = vec3d1.d();
 			   double d1 = vec3d.b(vec3d1);
-			   return d1 > 1.0D - 0.025D / d0 ? (vr ? hasLineOfSight(hmdpos, new Vec3D(i.locX, i.locY + (double)i.getHeadHeight(), i.locZ)) : entityhuman.hasLineOfSight(i)) : false;
+			   if (!(d1 > 1.0 - 0.025 / d0)) return false;
+			   if (vr)
+				   return hasLineOfSight(hmdpos, new Vec3D(i.locX(), i.getHeadY(), i.locZ()));
+			   else
+				   return entityhuman.hasLineOfSight((Entity)i);
 		   }
 	   }
 
@@ -116,7 +120,7 @@ extends PathfinderGoalNearestAttackableTarget<EntityHuman> {
 	         if (this.c != null && !this.i.isPassenger()) {
 	            if (isLookingAtMe((EntityHuman)this.c)) {
 	               if (this.c.h(this.i) < 16.0D) {
-	            	   VSE.invoke(this.dV, this.i, null);
+	            	   VSE.invoke(this.eq, this.i, null);
 	               }
 
 	               this.l = 0;

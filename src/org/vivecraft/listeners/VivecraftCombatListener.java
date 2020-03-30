@@ -18,7 +18,7 @@ import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 import org.vivecraft.utils.Headshot;
 
-import net.minecraft.server.v1_14_R1.Vec3D;
+import net.minecraft.server.v1_15_R1.Vec3D;
 
 
 public class VivecraftCombatListener implements Listener{

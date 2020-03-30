@@ -4,8 +4,10 @@ general:
   checkforupdate: true
   #Set to true to only allow Vivecraft players to play.
   vive-only: false
+  #If true, creates an exclusion for vive-only for opped players. No effect if vive-only is false.
+  allow-op: true
   #The message to show kicked non-vive players.
-  vive-only-kickmessage: This server is configured for Vivecraft players only.
+  vive-only-kickmessage: This server is configured for Vivecraft VR players only.
   #Ticks to wait before kicking a player. The player's client must send a Vivecraft VERSION info in that time.
   vive-only-kickwaittime: 100
 SendPlayerData:

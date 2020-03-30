@@ -5,13 +5,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 import org.vivecraft.utils.Quaternion;
 import org.vivecraft.utils.Vector3;
 
-import net.minecraft.server.v1_14_R1.Vec3D;
+import net.minecraft.server.v1_15_R1.Vec3D;
+
 
 public class VivePlayer {
 
@@ -20,7 +21,7 @@ public class VivePlayer {
 	public byte[] controller1data;
 	public byte[] draw;
 	public float worldScale;
-	public float heightScale;
+	public float heightScale = 1f;
 	boolean isTeleportMode;
 	boolean isReverseHands;
 	boolean isVR;

@@ -20,9 +20,9 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -52,12 +52,13 @@ import org.vivecraft.listeners.VivecraftNetworkListener;
 import org.vivecraft.utils.Headshot;
 
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.v1_14_R1.EntityCreeper;
-import net.minecraft.server.v1_14_R1.EntityEnderman;
-import net.minecraft.server.v1_14_R1.IRegistry;
-import net.minecraft.server.v1_14_R1.MinecraftKey;
-import net.minecraft.server.v1_14_R1.PathfinderGoalSelector;
-import net.minecraft.server.v1_14_R1.PathfinderGoalWrapped;
+import net.minecraft.server.v1_15_R1.EntityCreeper;
+import net.minecraft.server.v1_15_R1.EntityEnderman;
+import net.minecraft.server.v1_15_R1.IRegistry;
+import net.minecraft.server.v1_15_R1.MinecraftKey;
+import net.minecraft.server.v1_15_R1.PathfinderGoalSelector;
+import net.minecraft.server.v1_15_R1.PathfinderGoalWrapped;
+
 
 public class VSE extends JavaPlugin implements Listener {
 	FileConfiguration config = getConfig();
@@ -68,7 +69,7 @@ public class VSE extends JavaPlugin implements Listener {
 	public static VSE me;
 	
 	int task = 0;
-	private String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.14/version.txt";
+	private String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.15/version.txt";
 	
 	public List<String> blocklist = new ArrayList<>();
 	
@@ -340,8 +341,10 @@ public class VSE extends JavaPlugin implements Listener {
 						if(debug)
 							getLogger().info(p.getName() + " Vivecraft not detected");
 						if (getConfig().getBoolean("general.vive-only")) {
-							getLogger().info(p.getName() + " " + "got kicked for not using Vivecraft");
-							p.kickPlayer(getConfig().getString("general.vive-only-kickmessage"));
+							if (getConfig().getBoolean("general.allow-op") == false || !p.isOp()) {
+								getLogger().info(p.getName() + " " + "got kicked for not using Vivecraft");
+								p.kickPlayer(getConfig().getString("general.vive-only-kickmessage"));
+							}						
 							return;
 						}
 					}		
