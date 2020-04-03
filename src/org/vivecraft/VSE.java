@@ -13,6 +13,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -40,7 +41,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.mcstats.Metrics;
 import org.spigotmc.SpigotConfig;
 import org.vivecraft.command.ConstructTabCompleter;
 import org.vivecraft.command.ViveCommand;
@@ -49,6 +49,7 @@ import org.vivecraft.entities.CustomPathFinderGoalPlayerWhoLookedAtTarget;
 import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
+import org.vivecraft.metrics.Metrics;
 import org.vivecraft.utils.Headshot;
 
 import net.milkbowl.vault.permission.Permission;
@@ -63,14 +64,14 @@ import net.minecraft.server.v1_15_R1.PathfinderGoalWrapped;
 public class VSE extends JavaPlugin implements Listener {
 	FileConfiguration config = getConfig();
 
-	public final String CHANNEL = "vivecraft:data";
+	public final static String CHANNEL = "vivecraft:data";
+	private final static String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.15/version.txt";
+	private final static int bStatsId = 6931;
 
 	public static Map<UUID, VivePlayer> vivePlayers = new HashMap<UUID, VivePlayer>();
 	public static VSE me;
 	
-	int task = 0;
-	private String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.15/version.txt";
-	
+	private int sendPosDataTask = 0;
 	public List<String> blocklist = new ArrayList<>();
 	
 	public boolean debug = false;
@@ -78,10 +79,9 @@ public class VSE extends JavaPlugin implements Listener {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onEnable() {
-		super.onEnable();
-		
+		super.onEnable();		
 		me = this;
-		
+	
 		ItemStack is = new ItemStack(Material.LEATHER_BOOTS);
 		ItemMeta meta = is.getItemMeta();
 		meta.setDisplayName("Jump Boots");
@@ -107,11 +107,26 @@ public class VSE extends JavaPlugin implements Listener {
 		Bukkit.addRecipe(recipe2);
 		
 		try {
-	        Metrics metrics = new Metrics(this);
-	        metrics.start();
-	    } catch (IOException e) {
-	        // Failed to submit the stats :-(
+	        Metrics metrics = new Metrics(this, bStatsId);    
+	        metrics.addCustomChart(new Metrics.AdvancedPie("vrplayers", new Callable<Map<String, Integer>>() {
+	            @Override
+	            public Map<String, Integer> call() throws Exception {
+	            	int out = 0;
+	            	for (Player p : Bukkit.getOnlinePlayers()) {
+	            		//counts standing or seated players using VR
+						if(isVive(p)) out++;
+					} 	            	            	
+	                Map<String, Integer> valueMap = new HashMap<>();
+	                valueMap.put("VR", out);
+	                valueMap.put("NonVR", vivePlayers.size() - out);
+	                valueMap.put("Vanilla", Bukkit.getOnlinePlayers().size() - vivePlayers.size());
+	                return valueMap;
+	            }
+	        }));
+	    } catch (Exception e) {
+			getLogger().warning("Could not start bStats metrics");
 	    }
+
 		
 		// Config Part
 		config.options().copyDefaults(true);
@@ -158,7 +173,7 @@ public class VSE extends JavaPlugin implements Listener {
         
 		debug = (getConfig().getBoolean("general.debug", false));
         
-		task = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+		sendPosDataTask = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
 				sendPosData();
 			}
@@ -301,7 +316,7 @@ public class VSE extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onDisable() {
-		getServer().getScheduler().cancelTask(task);
+		getServer().getScheduler().cancelTask(sendPosDataTask);
 		super.onDisable();
 	}
 
@@ -489,4 +504,17 @@ public class VSE extends JavaPlugin implements Listener {
 		}
 	}
 	
+	public static boolean isSeated(Player player){
+		if(vivePlayers.containsKey(player.getUniqueId())){
+			return vivePlayers.get(player.getUniqueId()).isSeated();
+		}
+		return false;
+	}
+
+	public static boolean isStanding(Player player){
+		if(vivePlayers.containsKey(player.getUniqueId())){
+			if(!vivePlayers.get(player.getUniqueId()).isSeated() && vivePlayers.get(player.getUniqueId()).isVR()) return true;
+		}
+		return false;
+	}
 }

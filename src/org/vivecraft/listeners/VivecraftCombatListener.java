@@ -1,6 +1,7 @@
 package org.vivecraft.listeners;
 
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -18,6 +19,8 @@ import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 import org.vivecraft.utils.Headshot;
 
+import net.minecraft.server.v1_15_R1.EntityPlayer;
+import net.minecraft.server.v1_15_R1.EnumHand;
 import net.minecraft.server.v1_15_R1.Vec3D;
 
 
@@ -46,35 +49,31 @@ public class VivecraftCombatListener implements Listener{
 		if ((vp == null) && (this.vse.getConfig().getBoolean("general.debug"))) {
 			vse.getLogger().warning(" Error on projectile launch!");
 		}
+		
+		EntityPlayer nsme = ((CraftPlayer)pl).getHandle();
+		EnumHand h = nsme.getRaisedHand();
+
+		int c = 0;
+		if (h == EnumHand.OFF_HAND)
+			c = 1;
+		
+		Location pos = vp.getControllerPos(c);
+		Vec3D aim = vp.getControllerDir(vp.isSeated() ? 0 :c);
 
 		//this only works if the incoming speed is at max (based! on draw time)
 		//TODO: properly scale in all cases.
 
 		if(arrow && vp.getDraw() != 0) {
-			proj.setVelocity(proj.getVelocity().multiply(vp.getDraw()));  
-		}
-
-		int hand = arrow ? 1 : 0;
-
-		Vec3D aim = vp.getControllerDir(hand);
-
-		if(arrow){
-			aim = vp.getControllerDir(0);
-			if(!vp.isSeated() && vp.getDraw() !=0){ //standing
+			proj.setVelocity(proj.getVelocity().multiply(vp.getDraw()));  	
+			if(!vp.isSeated()){ //standing
+		    	pos = vp.getControllerPos(0);
 				Vector m = (vp.getControllerPos(1).subtract(vp.getControllerPos(0))).toVector();
 				m = m.normalize();
 				aim = new Vec3D(m.getX(),  m.getY(), m.getZ());
-			} else { //seated or roomscale off
-				hand = 0;
 			}
-		}               
+		}
 
-		Location pos = vp.getControllerPos(hand);
 		Location loc = new Location(proj.getWorld(), pos.getX() + aim.x*0.6f, pos.getY()+aim.y*0.6f, pos.getZ()+aim.z*0.6f);
-	
-	//	loc.setPitch(-(float)Math.toDegrees(Math.asin(aim.y/aim.b())));
-	//	loc.setYaw((float)Math.toDegrees(Math.atan2(aim.x, aim.z)));
-		
 		double velo = proj.getVelocity().length();	
 
 		proj.setVelocity(new Vector(aim.x*velo, aim.y*velo, aim.z*velo));
@@ -114,30 +113,6 @@ public class VivecraftCombatListener implements Listener{
 		}
 	}
 
-	public boolean usingVR(Player player){
-		if(VSE.vivePlayers.containsKey(player.getUniqueId())){
-			if(!VSE.vivePlayers.get(player.getUniqueId()).isVR()){
-				return false;
-			}
-			return true;
-		}
-		return false;
-	}
-
-	public boolean isSeated(Player player){
-		if(VSE.vivePlayers.containsKey(player.getUniqueId())){
-			return VSE.vivePlayers.get(player.getUniqueId()).isSeated();
-		}
-		return false;
-	}
-
-	public boolean isStanding(Player player){
-		if(VSE.vivePlayers.containsKey(player.getUniqueId())){
-			if(!VSE.vivePlayers.get(player.getUniqueId()).isSeated() && VSE.vivePlayers.get(player.getUniqueId()).isVR()) return true;
-		}
-		return false;
-	}
-
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void onDamage(EntityDamageByEntityEvent e) {
 		final Entity damager = e.getDamager();
@@ -149,28 +124,28 @@ public class VivecraftCombatListener implements Listener{
 				Player victim = (Player) damager;
 
 				if (!vse.getConfig().getBoolean("pvp.VRvsVR",true)) {
-					if (usingVR(attacker) && usingVR(victim)) {
-						if (isStanding(attacker) && isStanding(victim)) {
+					if (VSE.isVive(attacker) && VSE.isVive(victim)) {
+						if (VSE.isStanding(attacker) && VSE.isStanding(victim)) {
 							e.setCancelled(true);
 						}
 					}
 				}
 
 				if (!vse.getConfig().getBoolean("pvp.VRvsNONVR", true)) {
-					if ((usingVR(attacker) && !usingVR(victim)) || (usingVR(victim) && !usingVR(attacker))) {
+					if ((VSE.isVive(attacker) && !VSE.isVive(victim)) || (VSE.isVive(victim) && !VSE.isVive(attacker))) {
 						e.setCancelled(true);
 					}
 				}
 
 				if (!vse.getConfig().getBoolean("pvp.SEATEDVRvsNONVR", true)) {
-					if(((usingVR(attacker) && isSeated(attacker)) && !usingVR(victim)) || ((usingVR(victim) && isSeated(victim)) && !usingVR(attacker))){
+					if(((VSE.isVive(attacker) && VSE.isSeated(attacker)) && !VSE.isVive(victim)) || ((VSE.isVive(victim) && VSE.isSeated(victim)) && !VSE.isVive(attacker))){
 						e.setCancelled(true);
 					}
 				}
 
 				if (!vse.getConfig().getBoolean("pvp.VRvsSEATEDVR", true)) {
-					if (usingVR(attacker) && usingVR(victim)) {
-						if ((isSeated(attacker) && isStanding(victim)) || (isSeated(victim) && isStanding(attacker))) {
+					if (VSE.isVive(attacker) && VSE.isVive(victim)) {
+						if ((VSE.isSeated(attacker) && VSE.isStanding(victim)) || (VSE.isSeated(victim) && VSE.isStanding(attacker))) {
 							e.setCancelled(true);
 						}
 					}

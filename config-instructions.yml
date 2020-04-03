@@ -1,3 +1,4 @@
+#This file is for instructions only. Make any changes to config.yml.
 general:
   debug: false
   #will check for a newer version and alert any OP when they login to the server
