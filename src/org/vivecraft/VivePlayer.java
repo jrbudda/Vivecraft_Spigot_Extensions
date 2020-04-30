@@ -26,7 +26,8 @@ public class VivePlayer {
 	boolean isTeleportMode;
 	boolean isReverseHands;
 	boolean isVR;
-
+	public byte activeHand;
+	
 	public Player player;
 	public String version;
 

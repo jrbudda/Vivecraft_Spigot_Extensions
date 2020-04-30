@@ -3,7 +3,7 @@ general:
   debug: false
   #will check for a newer version and alert any OP when they login to the server
   checkforupdate: true
-  #Set to true to only allow Vivecraft players to play.
+  #Set to true to only allow VR players to play.
   vive-only: false
   #If true, creates an exclusion for vive-only for opped players. No effect if vive-only is false.
   allow-op: true

@@ -1,10 +1,12 @@
 package org.vivecraft.listeners;
 
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -21,6 +23,7 @@ import org.vivecraft.utils.Headshot;
 
 import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.EnumHand;
+import net.minecraft.server.v1_15_R1.MathHelper;
 import net.minecraft.server.v1_15_R1.Vec3D;
 
 
@@ -52,13 +55,9 @@ public class VivecraftCombatListener implements Listener{
 		
 		EntityPlayer nsme = ((CraftPlayer)pl).getHandle();
 		EnumHand h = nsme.getRaisedHand();
-
-		int c = 0;
-		if (h == EnumHand.OFF_HAND)
-			c = 1;
-		
-		Location pos = vp.getControllerPos(c);
-		Vec3D aim = vp.getControllerDir(vp.isSeated() ? 0 :c);
+	
+		Location pos = vp.getControllerPos(vp.activeHand);
+		Vec3D aim = vp.getControllerDir(vp.activeHand);
 
 		//this only works if the incoming speed is at max (based! on draw time)
 		//TODO: properly scale in all cases.
@@ -151,6 +150,19 @@ public class VivecraftCombatListener implements Listener{
 					}
 				}
 
+			} 
+			else if(damaged instanceof Fireball) {
+				VivePlayer vp = (VivePlayer)VSE.vivePlayers.get(damager.getUniqueId());
+				if(vp!=null && vp.isVR()) {
+					Vec3D dir = vp.getHMDDir();
+					//Interesting experiment. 
+					//We know the player's look is read immediately after this event returns.
+					//Override it here. It should be set back to normal next tick.
+					//And ideally nothing weird happens because of it.
+
+					((CraftEntity) damager).getHandle().pitch = (float) Math.toDegrees(Math.asin(dir.y/dir.f())); 
+					((CraftEntity) damager).getHandle().yaw = 	(float) Math.toDegrees(Math.atan2(-dir.x, dir.z)); 
+				}
 			}
 		}
 	}

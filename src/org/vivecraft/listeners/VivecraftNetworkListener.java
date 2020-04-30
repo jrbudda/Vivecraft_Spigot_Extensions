@@ -42,7 +42,8 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		TELEPORT,
 		CLIMBING,
 		SETTING_OVERRIDE,
-		HEIGHT
+		HEIGHT,
+		ACTIVEHAND
 	}
 	
 	Field floatingCount = null;
@@ -220,7 +221,17 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			} catch (IllegalArgumentException e) {
 			} catch (IllegalAccessException e) {
 			}
-
+			break;
+		case ACTIVEHAND:
+			ByteArrayInputStream a2 = new ByteArrayInputStream(data);
+			DataInputStream b2 = new DataInputStream(a2);
+			try {
+				vp.activeHand = b2.readByte();
+				if (vp.isSeated()) vp.activeHand = 0;
+			} catch (IOException e2) {
+				e2.printStackTrace();
+			}
+			break;	
 		default:
 			break;
 		}
