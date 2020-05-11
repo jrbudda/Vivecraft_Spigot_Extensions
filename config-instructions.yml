@@ -11,6 +11,8 @@ general:
   vive-only-kickmessage: This server is configured for Vivecraft VR players only.
   #Ticks to wait before kicking a player. The player's client must send a Vivecraft VERSION info in that time.
   vive-only-kickwaittime: 100
+  #Set to false to disable registering Vivecraft-specific crafting recipes.
+  vive-crafting: true
 SendPlayerData:
   #Send player data to all clients with Vivecraft
   enabled: true

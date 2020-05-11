@@ -81,31 +81,48 @@ public class VSE extends JavaPlugin implements Listener {
 	public void onEnable() {
 		super.onEnable();		
 		me = this;
-	
-		ItemStack is = new ItemStack(Material.LEATHER_BOOTS);
-		ItemMeta meta = is.getItemMeta();
-		meta.setDisplayName("Jump Boots");
-		meta.setUnbreakable(true);
-		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-		is.setItemMeta(meta);
-		ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(this, "jump_boots"),is);
-		recipe.shape("B", "S");
-		recipe.setIngredient('B', Material.LEATHER_BOOTS);
-		recipe.setIngredient('S', Material.SLIME_BLOCK);
-		Bukkit.addRecipe(recipe);
 		
-		ItemStack is2 = new ItemStack(Material.SHEARS);
-		ItemMeta meta2 = is2.getItemMeta();
-		meta2.setDisplayName("Climb Claws");
-		meta2.setUnbreakable(true);
-		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-		is2.setItemMeta(meta2);
-		ShapedRecipe recipe2 = new ShapedRecipe( new NamespacedKey(this, "climb_claws"), is2);
-		recipe2.shape("E E", "S S");
-		recipe2.setIngredient('E', Material.SPIDER_EYE);
-		recipe2.setIngredient('S', Material.SHEARS);
-		Bukkit.addRecipe(recipe2);
-		
+		if(getConfig().getBoolean("general.vive-crafting", true)){
+			{
+				ItemStack is = new ItemStack(Material.LEATHER_BOOTS);
+				ItemMeta meta = is.getItemMeta();
+				meta.setDisplayName("Jump Boots");
+				meta.setUnbreakable(true);
+				meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+				is.setItemMeta(meta);
+				ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(this, "jump_boots"),is);
+				recipe.shape("B", "S");
+				recipe.setIngredient('B', Material.LEATHER_BOOTS);
+				recipe.setIngredient('S', Material.SLIME_BLOCK);
+				Bukkit.addRecipe(recipe);
+			}
+			{
+				ItemStack is = new ItemStack(Material.SHEARS);
+				ItemMeta meta = is.getItemMeta();
+				meta.setDisplayName("Climb Claws");
+				meta.setUnbreakable(true);
+				meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+				is.setItemMeta(meta);
+				ShapedRecipe recipe = new ShapedRecipe( new NamespacedKey(this, "climb_claws"), is);
+				recipe.shape("E E", "S S");
+				recipe.setIngredient('E', Material.SPIDER_EYE);
+				recipe.setIngredient('S', Material.SHEARS);
+				Bukkit.addRecipe(recipe);
+			}
+			{
+				ItemStack is = new ItemStack(Material.ENDER_EYE);
+				ItemMeta meta = is.getItemMeta();
+				meta.setDisplayName("Eye of the Farseer");
+				meta.setUnbreakable(true);
+				meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+				is.setItemMeta(meta);
+				ShapedRecipe recipe3 = new ShapedRecipe(new NamespacedKey(this, "telescope"), is);
+				recipe3.shape("DED");
+				recipe3.setIngredient('D', Material.DIAMOND);
+				recipe3.setIngredient('E', Material.ENDER_EYE);
+				Bukkit.addRecipe(recipe3);
+			}
+		}
 		try {
 	        Metrics metrics = new Metrics(this, bStatsId);    
 	        metrics.addCustomChart(new Metrics.AdvancedPie("vrplayers", new Callable<Map<String, Integer>>() {
@@ -343,18 +360,22 @@ public class VSE extends JavaPlugin implements Listener {
 
 		getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			@Override
-			public void run() {
-				
-				if (p.isOnline()) {
-			
-					if(isVive(p)) {
-     					VivePlayer vp = VSE.vivePlayers.get(p.getUniqueId());
-     					if(debug)
-     						getLogger().info(p.getName() + " using: " + vp.version + " " + (vp.isVR() ? "VR" : "NONVR")  + " " + (vp.isSeated() ? "SEATED" : ""));
-						setPermissionsGroup(p);
+			public void run() {		
+				if (p.isOnline()) {	
+					boolean kick = false;
+					
+					if(vivePlayers.containsKey(p.getUniqueId())) {
+						VivePlayer vp = VSE.vivePlayers.get(p.getUniqueId());
+						if(debug)
+							getLogger().info(p.getName() + " using: " + vp.version + " " + (vp.isVR() ? "VR" : "NONVR")  + " " + (vp.isSeated() ? "SEATED" : ""));
+						if(!vp.isVR()) kick = true;
 					} else {
+						kick = true;
 						if(debug)
 							getLogger().info(p.getName() + " Vivecraft not detected");
+					}	
+
+					if(kick) {
 						if (getConfig().getBoolean("general.vive-only")) {
 							if (getConfig().getBoolean("general.allow-op") == false || !p.isOp()) {
 								getLogger().info(p.getName() + " " + "got kicked for not using Vivecraft");
@@ -362,8 +383,10 @@ public class VSE extends JavaPlugin implements Listener {
 							}						
 							return;
 						}
-					}		
+					}
+
 					sendWelcomeMessage(p);
+					setPermissionsGroup(p);
 				} else {
 					if (debug) 
 						getLogger().info(p.getName() + " no longer online! ");
@@ -440,29 +463,41 @@ public class VSE extends JavaPlugin implements Listener {
 	
 	public void updatePlayerPermissionGroup(Player p, Map<String, Boolean> groups) {
 		try {	
-				
+
 			RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
 			Permission perm = rsp.getProvider();
-			if (perm != null) {
-				for (Map.Entry<String, Boolean> entry : groups.entrySet()) {
-					if (entry.getValue()) {
-						if (!perm.playerInGroup(p, entry.getKey())) {
-							if (debug) 
-								getLogger().info("Adding " + p.getName() + " to " + entry.getKey());
-							perm.playerAddGroup(p, entry.getKey());
-						}
-					} else {
-						if (perm.playerInGroup(p, entry.getKey())) {
-							if (debug) 
-								getLogger().info("Removing " + p.getName() + " from " + entry.getKey());
-							perm.playerRemoveGroup(p, entry.getKey());
-						}
+
+			if (perm == null) {
+				getLogger().info("Permissions error: Registered permissions provider is null!");
+				return;
+			}
+			if(!perm.hasGroupSupport()) {
+				getLogger().info("Permissions error: Permission plugin does not support groups.");
+				return;
+			}
+
+			for (Map.Entry<String, Boolean> entry : groups.entrySet()) {
+				if (entry.getValue()) {
+					
+					if (!perm.playerInGroup(p, entry.getKey())) {
+						if (debug) 
+							getLogger().info("Adding " + p.getName() + " to " + entry.getKey());
+						boolean ret = perm.playerAddGroup(p, entry.getKey());
+						if(!ret)
+							getLogger().info("Failed adding " + p.getName() + " to " + entry.getKey() + ". Group may not exist.");
+
+					}
+				} else {
+					if (perm.playerInGroup(p, entry.getKey())) {
+						if (debug) 
+							getLogger().info("Removing " + p.getName() + " from " + entry.getKey());
+						boolean ret = perm.playerRemoveGroup(p, entry.getKey());
+						if(!ret)
+							getLogger().info("Failed removing " + p.getName() + " from " + entry.getKey()+ ". Group may not exist.");
 					}
 				}
-			} else {
-				getLogger().info("Permissions error: Registered permissions provider is null!");
 			}
-			
+
 		} catch (Exception e) {
 			getLogger().severe("Could not set player permission group: " + e.getMessage());
 		}

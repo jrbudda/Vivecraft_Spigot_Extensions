@@ -1,10 +1,11 @@
 name: Vivecraft-Spigot-Extensions
-version: '1.15.2-r5'
+version: '1.15.2-r6'
 api-version: 1.15
 main: org.vivecraft.VSE
 website: http://www.vivecraft.org/
 author: jrbudda, jaron780
 prefix: Vivecraft
+softdepend: [Vault]
 commands:
    Vive:
       description: Vivecraft Spigot Extensions
