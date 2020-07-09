@@ -4,10 +4,10 @@ import java.util.EnumSet;
 
 import org.vivecraft.VSE;
 
-import net.minecraft.server.v1_15_R1.Entity;
-import net.minecraft.server.v1_15_R1.EntityCreeper;
-import net.minecraft.server.v1_15_R1.EntityLiving;
-import net.minecraft.server.v1_15_R1.PathfinderGoal;
+import net.minecraft.server.v1_16_R1.Entity;
+import net.minecraft.server.v1_16_R1.EntityCreeper;
+import net.minecraft.server.v1_16_R1.EntityLiving;
+import net.minecraft.server.v1_16_R1.PathfinderGoal;
 
 public class CustomGoalSwell extends PathfinderGoal {
 
@@ -28,7 +28,7 @@ public class CustomGoalSwell extends PathfinderGoal {
 			if(localEntityLiving != null && VSE.vivePlayers.containsKey(localEntityLiving.getUniqueID()) && VSE.isVive(VSE.vivePlayers.get(localEntityLiving.getUniqueID()).player))
 				creeperBlowyUppyRadius = vse.getConfig().getDouble("CreeperRadius.radius");
 		}
-        if (this.a.l() > 0) return true;
+        if (this.a.eL() > 0) return true;
         if (localEntityLiving == null) return false;
         if (this.a.h((Entity)localEntityLiving) > creeperBlowyUppyRadius*creeperBlowyUppyRadius) return false;
         return true;

@@ -21,9 +21,9 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -53,19 +53,19 @@ import org.vivecraft.metrics.Metrics;
 import org.vivecraft.utils.Headshot;
 
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.v1_15_R1.EntityCreeper;
-import net.minecraft.server.v1_15_R1.EntityEnderman;
-import net.minecraft.server.v1_15_R1.IRegistry;
-import net.minecraft.server.v1_15_R1.MinecraftKey;
-import net.minecraft.server.v1_15_R1.PathfinderGoalSelector;
-import net.minecraft.server.v1_15_R1.PathfinderGoalWrapped;
+import net.minecraft.server.v1_16_R1.EntityCreeper;
+import net.minecraft.server.v1_16_R1.EntityEnderman;
+import net.minecraft.server.v1_16_R1.IRegistry;
+import net.minecraft.server.v1_16_R1.MinecraftKey;
+import net.minecraft.server.v1_16_R1.PathfinderGoalSelector;
+import net.minecraft.server.v1_16_R1.PathfinderGoalWrapped;
 
 
 public class VSE extends JavaPlugin implements Listener {
 	FileConfiguration config = getConfig();
 
 	public final static String CHANNEL = "vivecraft:data";
-	private final static String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.15/version.txt";
+	private final static String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.16/version.txt";
 	private final static int bStatsId = 6931;
 
 	public static Map<UUID, VivePlayer> vivePlayers = new HashMap<UUID, VivePlayer>();
@@ -470,7 +470,7 @@ public class VSE extends JavaPlugin implements Listener {
 			if (perm == null) {
 				getLogger().info("Permissions error: Registered permissions provider is null!");
 				return;
-			}
+			}			
 			if(!perm.hasGroupSupport()) {
 				getLogger().info("Permissions error: Permission plugin does not support groups.");
 				return;
@@ -479,19 +479,19 @@ public class VSE extends JavaPlugin implements Listener {
 			for (Map.Entry<String, Boolean> entry : groups.entrySet()) {
 				if (entry.getValue()) {
 					
-					if (!perm.playerInGroup(p, entry.getKey())) {
+					if (!perm.playerInGroup(null, p, entry.getKey())) {
 						if (debug) 
 							getLogger().info("Adding " + p.getName() + " to " + entry.getKey());
-						boolean ret = perm.playerAddGroup(p, entry.getKey());
+						boolean ret = perm.playerAddGroup(null, p, entry.getKey());
 						if(!ret)
 							getLogger().info("Failed adding " + p.getName() + " to " + entry.getKey() + ". Group may not exist.");
 
 					}
 				} else {
-					if (perm.playerInGroup(p, entry.getKey())) {
+					if (perm.playerInGroup(null, p, entry.getKey())) {
 						if (debug) 
 							getLogger().info("Removing " + p.getName() + " from " + entry.getKey());
-						boolean ret = perm.playerRemoveGroup(p, entry.getKey());
+						boolean ret = perm.playerRemoveGroup(null, p, entry.getKey());
 						if(!ret)
 							getLogger().info("Failed removing " + p.getName() + " from " + entry.getKey()+ ". Group may not exist.");
 					}
