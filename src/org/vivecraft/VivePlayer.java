@@ -138,7 +138,7 @@ public class VivePlayer {
 				
 				da.close(); //needed?
 								
-				return new Location(player.getWorld(), lx, ly, lz);
+				return player.getLocation().add(lx, ly, lz);
 			}else{
 			}
 		} catch (IOException e) {
@@ -174,7 +174,7 @@ public class VivePlayer {
 					z = (float) out.getZ();
 				}
 				
-				return new Location(player.getWorld(), x, y, z);
+				return player.getLocation().add(x, y, z);
 			}else{
 			}
 		} catch (IOException e) {
