@@ -169,9 +169,7 @@ public class VivePlayer {
 					dir = new Vec3D(dir.x, 0, dir.z);
 					dir = dir.d();
 					Location out = this.getHMDPos().add(dir.x * 0.3 * worldScale, -0.4* worldScale ,dir.z*0.3* worldScale);
-					x = (float) out.getX();
-					y = (float) out.getY();
-					z = (float) out.getZ();
+					return out;
 				}
 				
 				return player.getLocation().add(x, y, z);
