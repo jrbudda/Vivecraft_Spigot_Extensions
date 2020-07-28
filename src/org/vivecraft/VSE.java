@@ -286,7 +286,7 @@ public class VSE extends JavaPlugin implements Listener {
 		if(entity.getType() == EntityType.CREEPER){	
 			EntityCreeper e = ((CraftCreeper) entity).getHandle();
 			@SuppressWarnings("unchecked")
-			LinkedHashSet<PathfinderGoalWrapped> goalB = (LinkedHashSet<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.targetSelector);
+			LinkedHashSet<PathfinderGoalWrapped> goalB = (LinkedHashSet<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.goalSelector);
 			for(PathfinderGoalWrapped b: goalB){
 				if(b.h()==2){
 					goalB.remove(b);
@@ -300,12 +300,12 @@ public class VSE extends JavaPlugin implements Listener {
 			@SuppressWarnings("unchecked" )
 			LinkedHashSet<PathfinderGoalWrapped> goalB = (LinkedHashSet<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.targetSelector);
 			for(PathfinderGoalWrapped b: goalB){
-				if(b.h()==1){
+				if(b.h()==2){
 					goalB.remove(b);
 					break;
 				}
 			}
-			e.targetSelector.a(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e));
+			e.targetSelector.a(2, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e));
 		}
 	}
 
