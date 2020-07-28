@@ -44,6 +44,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.SpigotConfig;
 import org.vivecraft.command.ConstructTabCompleter;
 import org.vivecraft.command.ViveCommand;
+import org.vivecraft.entities.CustomGoalStare;
 import org.vivecraft.entities.CustomGoalSwell;
 import org.vivecraft.entities.CustomPathFinderGoalPlayerWhoLookedAtTarget;
 import org.vivecraft.listeners.VivecraftCombatListener;
@@ -313,7 +314,7 @@ public class VSE extends JavaPlugin implements Listener {
 					break;
 				}
 			}
-			e.goalSelector.a(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e));
+			e.goalSelector.a(1, new CustomGoalStare(e));
 		}
 	}
 

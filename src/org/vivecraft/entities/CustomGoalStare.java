@@ -20,7 +20,7 @@ import net.minecraft.server.v1_16_R1.PathfinderGoal;
 import net.minecraft.server.v1_16_R1.RayTrace;
 import net.minecraft.server.v1_16_R1.Vec3D;
 
-class CustomGoalStare extends PathfinderGoal {
+public class CustomGoalStare extends PathfinderGoal {
 	private final EntityEnderman i;
 	private EntityLiving b;
 
