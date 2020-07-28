@@ -360,7 +360,7 @@ public class VSE extends JavaPlugin implements Listener {
 
 		if (debug) getLogger().info(p.getName() + " Has joined the server");
 			
-		int t = getConfig().getInt("general.vive-only-kickwaittime",100);
+		int t = getConfig().getInt("general.vive-only-kickwaittime", 200);
 		if(t < 100) t = 100;
 		if(t > 1000) t = 1000;
 		
