@@ -20,8 +20,7 @@ import net.minecraft.server.v1_16_R1.PathfinderTargetCondition;
 import net.minecraft.server.v1_16_R1.RayTrace;
 import net.minecraft.server.v1_16_R1.Vec3D;
 
-public class CustomPathFinderGoalPlayerWhoLookedAtTarget 
-extends PathfinderGoalNearestAttackableTarget<EntityHuman> {
+public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends PathfinderGoalNearestAttackableTarget<EntityHuman> {
 	   private final EntityEnderman i;
 	   private EntityHuman j;
 	   private int k;

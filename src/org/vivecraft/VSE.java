@@ -282,13 +282,13 @@ public class VSE extends JavaPlugin implements Listener {
 		}
 	}
 	
+	@SuppressWarnings("unchecked" )
 	public void EditEntity(Entity entity){
 		if(entity.getType() == EntityType.CREEPER){	
 			EntityCreeper e = ((CraftCreeper) entity).getHandle();
-			@SuppressWarnings("unchecked")
 			LinkedHashSet<PathfinderGoalWrapped> goalB = (LinkedHashSet<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.goalSelector);
 			for(PathfinderGoalWrapped b: goalB){
-				if(b.h()==2){
+				if(b.h()==2){//replace swell goal. Verify priority on new version.
 					goalB.remove(b);
 					break;
 				}
@@ -297,15 +297,23 @@ public class VSE extends JavaPlugin implements Listener {
 		}
 		else if(entity.getType() == EntityType.ENDERMAN && ((CraftEntity)entity).getHandle() instanceof EntityEnderman){			
 			EntityEnderman e = ((CraftEnderman) entity).getHandle();
-			@SuppressWarnings("unchecked" )
-			LinkedHashSet<PathfinderGoalWrapped> goalB = (LinkedHashSet<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.targetSelector);
-			for(PathfinderGoalWrapped b: goalB){
-				if(b.h()==2){
-					goalB.remove(b);
+			LinkedHashSet<PathfinderGoalWrapped> targets = (LinkedHashSet<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.targetSelector);
+			for(PathfinderGoalWrapped b: targets){
+				if(b.h()==2){ //replace PlayerWhoLookedAt target. Verify priority on new version.
+					targets.remove(b);
 					break;
 				}
 			}
 			e.targetSelector.a(2, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e));
+			
+			LinkedHashSet<PathfinderGoalWrapped> goals = (LinkedHashSet<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.goalSelector);
+			for(PathfinderGoalWrapped b: goals){
+				if(b.h()==1){//replace Stare goal. Verify priority on new version.
+					goals.remove(b);
+					break;
+				}
+			}
+			e.goalSelector.a(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e));
 		}
 	}
 

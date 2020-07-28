@@ -1,4 +1,5 @@
 #this file is used to check for updates
 1.16.1-r1: VSE has an new version!
 1.16.1-r2: VSE has an new version!
-1.16.1-r3: VSE is up to date!
+1.16.1-r3: VSE has an new version!
+1.16.1-r4: VSE is up to date!
