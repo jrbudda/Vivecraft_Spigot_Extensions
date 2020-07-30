@@ -3,7 +3,7 @@ package org.vivecraft.utils;
 import org.vivecraft.utils.lwjgl.Matrix3f;
 import org.vivecraft.utils.lwjgl.Matrix4f;
 
-import com.sun.javafx.geom.Vec3d;
+import net.minecraft.server.v1_16_R1.Vec3D;
 
 /**
  *
@@ -289,9 +289,9 @@ public class Quaternion {
 		return result;
 	}
 
-	public Vec3d multiply(Vec3d vec) {
+	public Vec3D multiply(Vec3D vec) {
 		Vector3 result = multiply(new Vector3((float)vec.x, (float)vec.y, (float)vec.z));
-		return new Vec3d(result.x, result.y, result.z);
+		return new Vec3D(result.x, result.y, result.z);
 	}
 	
 	@Override
