@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
+import org.vivecraft.utils.MetadataHelper;
 
 import com.google.common.base.Charsets;
 
@@ -68,15 +69,18 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		switch (disc){
 		case CONTROLLER0DATA:
 			vp.controller0data = data;
+			MetadataHelper.updateMetdata(vp);
 			break;
 		case CONTROLLER1DATA:
 			vp.controller1data = data;
+			MetadataHelper.updateMetdata(vp);
 			break;
 		case DRAW:
 			vp.draw = data;
 			break;
 		case HEADDATA:
 			vp.hmdData = data;
+			MetadataHelper.updateMetdata(vp);
 			break;
 		case MOVEMODE:
 			break;

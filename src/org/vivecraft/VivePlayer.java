@@ -87,6 +87,34 @@ public class VivePlayer {
 	 
 		return ((CraftPlayer)player).getHandle().f(1.0f);
 	}
+
+	@SuppressWarnings("unused")
+	public Quaternion getHMDRot(){
+		try {
+			if(hmdData != null){
+
+				ByteArrayInputStream byin = new ByteArrayInputStream(hmdData);
+				DataInputStream da = new DataInputStream(byin);
+
+				boolean isSeated = da.readBoolean();
+				float lx = da.readFloat();
+				float ly = da.readFloat();
+				float lz = da.readFloat();
+
+				float w = da.readFloat();
+				float x = da.readFloat();
+				float y = da.readFloat();
+				float z = da.readFloat();
+				da.close(); //needed?
+				return new Quaternion(w, x, y, z);
+			}else{
+			}
+		} catch (IOException e) {
+
+		}
+
+		return new Quaternion();
+	}
 	
 	@SuppressWarnings("unused")
 	public Vec3D getControllerDir(int controller){
@@ -122,6 +150,39 @@ public class VivePlayer {
 		}
 		
 		return ((CraftPlayer)player).getHandle().f(1.0f);
+
+	}
+
+	@SuppressWarnings("unused")
+	public Quaternion getControllerRot(int controller){
+		byte[] data = controller0data;
+		if(controller == 1) data = controller1data;
+		if(this.isSeated()) controller = 0;
+		if(data != null){
+
+			ByteArrayInputStream byin = new ByteArrayInputStream(data);
+			DataInputStream da = new DataInputStream(byin);
+
+			try {
+
+				this.isReverseHands = da.readBoolean();
+
+				float lx = da.readFloat();
+				float ly = da.readFloat();
+				float lz = da.readFloat();
+
+				float w = da.readFloat();
+				float x = da.readFloat();
+				float y = da.readFloat();
+				float z = da.readFloat();
+				da.close(); //needed?
+				return new Quaternion(w, x, y, z);
+			} catch (IOException e) {
+			}
+		}else{
+		}
+
+		return new Quaternion();
 
 	}
 	public Location getHMDPos() {

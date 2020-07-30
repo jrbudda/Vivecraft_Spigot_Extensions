@@ -3,6 +3,8 @@ package org.vivecraft.utils;
 import org.vivecraft.utils.lwjgl.Matrix3f;
 import org.vivecraft.utils.lwjgl.Matrix4f;
 
+import com.sun.javafx.geom.Vec3d;
+
 /**
  *
  * @author Techjar
@@ -268,24 +270,29 @@ public class Quaternion {
 	}
 	
 	public Vector3 multiply(Vector3 vec) {
-	     float num = this.x * 2f;
-	     float num2 = this.y * 2f;
-	     float num3 = this.z * 2f;
-	     float num4 = this.x * num;
-	     float num5 = this.y * num2;
-	     float num6 = this.z * num3;
-	     float num7 = this.x * num2;
-	     float num8 = this.x * num3;
-	     float num9 = this.y * num3;
-	     float num10 = this.w * num;
-	     float num11 = this.w * num2;
-	     float num12 = this.w * num3;
-	     Vector3 result = new Vector3();
-	     result.x = (1f - (num5 + num6)) * vec.x + (num7 - num12) * vec.y + (num8 + num11) * vec.z;
-	     result.y = (num7 + num12) * vec.x + (1f - (num4 + num6)) * vec.y + (num9 - num10) * vec.z;
-	     result.z = (num8 - num11) * vec.x + (num9 + num10) * vec.y + (1f - (num4 + num5)) * vec.z;
-	     return result;
-	 }
+		float num = this.x * 2f;
+		float num2 = this.y * 2f;
+		float num3 = this.z * 2f;
+		float num4 = this.x * num;
+		float num5 = this.y * num2;
+		float num6 = this.z * num3;
+		float num7 = this.x * num2;
+		float num8 = this.x * num3;
+		float num9 = this.y * num3;
+		float num10 = this.w * num;
+		float num11 = this.w * num2;
+		float num12 = this.w * num3;
+		Vector3 result = new Vector3();
+		result.x = (1f - (num5 + num6)) * vec.x + (num7 - num12) * vec.y + (num8 + num11) * vec.z;
+		result.y = (num7 + num12) * vec.x + (1f - (num4 + num6)) * vec.y + (num9 - num10) * vec.z;
+		result.z = (num8 - num11) * vec.x + (num9 + num10) * vec.y + (1f - (num4 + num5)) * vec.z;
+		return result;
+	}
+
+	public Vec3d multiply(Vec3d vec) {
+		Vector3 result = multiply(new Vector3((float)vec.x, (float)vec.y, (float)vec.z));
+		return new Vec3d(result.x, result.y, result.z);
+	}
 	
 	@Override
 	public String toString() {
