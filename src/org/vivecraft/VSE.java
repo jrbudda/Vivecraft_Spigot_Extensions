@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
+import net.minecraft.server.v1_16_R1.ChatMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -24,6 +25,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftCreeper;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEnderman;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -87,10 +89,10 @@ public class VSE extends JavaPlugin implements Listener {
 			{
 				ItemStack is = new ItemStack(Material.LEATHER_BOOTS);
 				ItemMeta meta = is.getItemMeta();
-				meta.setDisplayName("Jump Boots");
 				meta.setUnbreakable(true);
 				meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 				is.setItemMeta(meta);
+				is = setLocalizedItemName(is, "vivecraft.item.jumpboots");
 				ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(this, "jump_boots"),is);
 				recipe.shape("B", "S");
 				recipe.setIngredient('B', Material.LEATHER_BOOTS);
@@ -100,10 +102,10 @@ public class VSE extends JavaPlugin implements Listener {
 			{
 				ItemStack is = new ItemStack(Material.SHEARS);
 				ItemMeta meta = is.getItemMeta();
-				meta.setDisplayName("Climb Claws");
 				meta.setUnbreakable(true);
 				meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 				is.setItemMeta(meta);
+				is = setLocalizedItemName(is, "vivecraft.item.climbclaws");
 				ShapedRecipe recipe = new ShapedRecipe( new NamespacedKey(this, "climb_claws"), is);
 				recipe.shape("E E", "S S");
 				recipe.setIngredient('E', Material.SPIDER_EYE);
@@ -113,10 +115,10 @@ public class VSE extends JavaPlugin implements Listener {
 			{
 				ItemStack is = new ItemStack(Material.ENDER_EYE);
 				ItemMeta meta = is.getItemMeta();
-				meta.setDisplayName("Eye of the Farseer");
 				meta.setUnbreakable(true);
 				meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 				is.setItemMeta(meta);
+				is = setLocalizedItemName(is, "vivecraft.item.telescope");
 				ShapedRecipe recipe3 = new ShapedRecipe(new NamespacedKey(this, "telescope"), is);
 				recipe3.shape("DED");
 				recipe3.setIngredient('D', Material.DIAMOND);
@@ -212,6 +214,12 @@ public class VSE extends JavaPlugin implements Listener {
 			}
 		}, 1);
 		
+	}
+
+	public static ItemStack setLocalizedItemName(ItemStack stack, String key) {
+		net.minecraft.server.v1_16_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
+		nmsStack.a(new ChatMessage(key));
+		return CraftItemStack.asBukkitCopy(nmsStack);
 	}
 		
 	public static Object getPrivateField(String fieldName, Class<PathfinderGoalSelector> clazz, Object object)
