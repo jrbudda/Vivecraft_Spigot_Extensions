@@ -198,7 +198,7 @@ public class VSE extends JavaPlugin implements Listener {
 				sendPosData();
 			}
 		}, 20, 1);
-		
+
 		//check for any creepers and modify the fuse radius
 		CheckAllEntities();
 		
@@ -222,7 +222,7 @@ public class VSE extends JavaPlugin implements Listener {
 		return CraftItemStack.asBukkitCopy(nmsStack);
 	}
 		
-	public static Object getPrivateField(String fieldName, Class<PathfinderGoalSelector> clazz, Object object)
+	public static Object getPrivateField(String fieldName, Class clazz, Object object)
 	{
 		Field field;
 		Object o = null;
@@ -244,7 +244,7 @@ public class VSE extends JavaPlugin implements Listener {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Method getPrivateMethod(String methodName, Class clazz, Class param)
+	public static Method getPrivateMethod(String methodName, Class clazz, Class... param)
 	{
 		Method m = null;
 		try
@@ -263,7 +263,7 @@ public class VSE extends JavaPlugin implements Listener {
 		return m;
 	}
 	
-	public static Object invoke(Method m, Object object, Object param) {
+	public static Object invoke(Method m, Object object, Object... param) {
 		try {
 			if(param == null) 
 				return  m.invoke(object);

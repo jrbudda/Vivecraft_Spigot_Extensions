@@ -9,12 +9,14 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
+import net.minecraft.server.v1_16_R1.EntityPose;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 import org.vivecraft.utils.MetadataHelper;
+import org.vivecraft.utils.PoseOverrider;
 
 import com.google.common.base.Charsets;
 
@@ -44,7 +46,8 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		CLIMBING,
 		SETTING_OVERRIDE,
 		HEIGHT,
-		ACTIVEHAND
+		ACTIVEHAND,
+		CRAWL
 	}
 	
 	Field floatingCount = null;
@@ -105,10 +108,14 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 				}
 				else{
 					vp.setVR(true);
+					PoseOverrider.injectPlayer(sender);
 				}
 
 				if(vse.getConfig().getBoolean("SendPlayerData.enabled") == true)
 					sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});
+
+				if(vse.getConfig().getBoolean("crawling.enabled") == true)
+					sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.CRAWL.ordinal()});
 
 				if(vse.getConfig().getBoolean("climbey.enabled") == true){
 
@@ -235,7 +242,20 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			} catch (IOException e2) {
 				e2.printStackTrace();
 			}
-			break;	
+			break;
+		case CRAWL:
+			if (!vse.getConfig().getBoolean("crawling.enabled"))
+				break;
+			ByteArrayInputStream a3 = new ByteArrayInputStream(data);
+			DataInputStream b3 = new DataInputStream(a3);
+			try {
+				vp.crawling = b3.readBoolean();
+				if (vp.crawling)
+					((CraftPlayer)sender).getHandle().setPose(EntityPose.SWIMMING);
+			} catch (IOException e2) {
+				e2.printStackTrace();
+			}
+			break;
 		default:
 			break;
 		}

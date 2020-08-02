@@ -73,6 +73,9 @@ climbey:
     - white_wool
     - dirt
     - grass_block
+crawling:
+  #Allows use of roomscale crawling. Disabling does not prevent vanilla crawling.
+  enabled: false
 teleport:
   #Whether direct teleport is enabled. It is recommended to leave this enabled for players prone to VR sickness.
   enable: true
