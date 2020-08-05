@@ -4,4 +4,5 @@
 1.16.1-r3: VSE has an new version!
 1.16.1-r4: VSE has an new version!
 1.16.1-r5: VSE has an new version!
-1.16.1-r6: VSE is up to date!
+1.16.1-r6: VSE has an new version!
+1.16.1-r7: VSE is up to date!
