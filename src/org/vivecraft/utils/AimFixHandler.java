@@ -30,6 +30,7 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		EntityPlayer player = ((PlayerConnection)netManager.i()).player;
 		boolean isCapturedPacket = msg instanceof PacketPlayInBlockPlace || msg instanceof PacketPlayInUseItem || msg instanceof PacketPlayInBlockDig;
+		boolean useActiveHand = !(msg instanceof PacketPlayInBlockDig) || ((PacketPlayInBlockDig)msg).d() == PacketPlayInBlockDig.EnumPlayerDigType.RELEASE_USE_ITEM;
 
 		if (!VSE.vivePlayers.containsKey(player.getProfile().getId()) || !VSE.vivePlayers.get(player.getProfile().getId()).isVR() || !isCapturedPacket || player.getMinecraftServer() == null) {
 			// we don't need to handle this packet, just defer to the next handler in the pipeline
@@ -49,11 +50,11 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 			float oldPrevYawHead = player.aK; // field_70758_at
 			float oldEyeHeight = player.getHeadHeight();
 
-			// Check again in case of race condition
-			if (VSE.vivePlayers.containsKey(player.getProfile().getId()) && VSE.vivePlayers.get(player.getProfile().getId()).isVR()) {
-				VivePlayer data = VSE.vivePlayers.get(player.getProfile().getId());
-				Location pos = data.getControllerPos(0);
-				Vec3D aim = data.getControllerDir(0);
+			VivePlayer data = null;
+			if (VSE.vivePlayers.containsKey(player.getProfile().getId()) && VSE.vivePlayers.get(player.getProfile().getId()).isVR()) { // Check again in case of race condition
+				data = VSE.vivePlayers.get(player.getProfile().getId());
+				Location pos = data.getControllerPos(useActiveHand ? data.activeHand : 0);
+				Vec3D aim = data.getControllerDir(useActiveHand ? data.activeHand : 0);
 
 				// Inject our custom orientation data
 				player.setPositionRaw(pos.getX(), pos.getY(), pos.getZ());
@@ -65,6 +66,10 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 				player.lastPitch = player.pitch;
 				player.lastYaw = player.aJ = player.aK = player.yaw;
 				VSE.setPrivateField("headHeight", Entity.class, player, 0);
+
+				// Set up offset to fix relative positions
+				// P.S. Spigot mappings are stupid
+				data.offset = oldPos.add(-pos.getX(), -pos.getY(), -pos.getZ());
 			}
 
 			// Call the packet handler directly
@@ -94,6 +99,10 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 			player.lastYaw = oldPrevYaw;
 			player.aK = oldPrevYawHead;
 			VSE.setPrivateField("headHeight", Entity.class, player, oldEyeHeight);
+
+			// Reset offset
+			if (data != null)
+				data.offset = new Vec3D(0, 0, 0);
 		});
 	}
 }

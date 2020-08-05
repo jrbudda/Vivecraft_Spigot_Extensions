@@ -28,7 +28,8 @@ public class VivePlayer {
 	boolean isVR;
 	public byte activeHand;
 	public boolean crawling;
-	
+
+	public Vec3D offset = new Vec3D(0, 0, 0);
 	public Player player;
 	public String version;
 
@@ -200,7 +201,7 @@ public class VivePlayer {
 				
 				da.close(); //needed?
 								
-				return player.getLocation().add(lx, ly, lz);
+				return player.getLocation().add(lx, ly, lz).add(offset.x, offset.y, offset.z);
 			}else{
 			}
 		} catch (IOException e) {
@@ -234,7 +235,7 @@ public class VivePlayer {
 					return out;
 				}
 				
-				return player.getLocation().add(x, y, z);
+				return player.getLocation().add(x, y, z).add(offset.x, offset.y, offset.z);
 			}else{
 			}
 		} catch (IOException e) {
