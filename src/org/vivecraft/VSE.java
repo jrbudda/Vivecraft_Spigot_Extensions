@@ -16,6 +16,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import net.minecraft.server.v1_16_R1.ChatMessage;
+import net.minecraft.server.v1_16_R1.NetworkManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -25,6 +26,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftCreeper;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEnderman;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -53,6 +55,7 @@ import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 import org.vivecraft.metrics.Metrics;
+import org.vivecraft.utils.AimFixHandler;
 import org.vivecraft.utils.Headshot;
 
 import net.milkbowl.vault.permission.Permission;
@@ -242,6 +245,27 @@ public class VSE extends JavaPlugin implements Listener {
 		}
 		return o;
 	}
+
+	public static Object setPrivateField(String fieldName, Class clazz, Object object, Object value)
+	{
+		Field field;
+		Object o = null;
+		try
+		{
+			field = clazz.getDeclaredField(fieldName);
+			field.setAccessible(true);
+			field.set(object, value);
+		}
+		catch(NoSuchFieldException e)
+		{
+			e.printStackTrace();
+		}
+		catch(IllegalAccessException e)
+		{
+			e.printStackTrace();
+		}
+		return o;
+	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static Method getPrivateMethod(String methodName, Class clazz, Class... param)
@@ -410,6 +434,9 @@ public class VSE extends JavaPlugin implements Listener {
 				}		
 			}
 		}, t);
+
+		NetworkManager netManager = ((CraftPlayer)p).getHandle().playerConnection.networkManager;
+		netManager.channel.pipeline().addBefore("packet_handler", "vr_aim_fix", new AimFixHandler(netManager));
 	}
 		
 	public void startUpdateCheck() {
