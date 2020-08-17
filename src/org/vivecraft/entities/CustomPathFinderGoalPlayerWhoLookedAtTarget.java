@@ -7,18 +7,18 @@ import org.bukkit.entity.Player;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 
-import net.minecraft.server.v1_16_R1.Blocks;
-import net.minecraft.server.v1_16_R1.Entity;
-import net.minecraft.server.v1_16_R1.EntityEnderman;
-import net.minecraft.server.v1_16_R1.EntityHuman;
-import net.minecraft.server.v1_16_R1.EntityLiving;
-import net.minecraft.server.v1_16_R1.EntityPlayer;
-import net.minecraft.server.v1_16_R1.ItemStack;
-import net.minecraft.server.v1_16_R1.MovingObjectPosition;
-import net.minecraft.server.v1_16_R1.PathfinderGoalNearestAttackableTarget;
-import net.minecraft.server.v1_16_R1.PathfinderTargetCondition;
-import net.minecraft.server.v1_16_R1.RayTrace;
-import net.minecraft.server.v1_16_R1.Vec3D;
+import net.minecraft.server.v1_16_R2.Blocks;
+import net.minecraft.server.v1_16_R2.Entity;
+import net.minecraft.server.v1_16_R2.EntityEnderman;
+import net.minecraft.server.v1_16_R2.EntityHuman;
+import net.minecraft.server.v1_16_R2.EntityLiving;
+import net.minecraft.server.v1_16_R2.EntityPlayer;
+import net.minecraft.server.v1_16_R2.ItemStack;
+import net.minecraft.server.v1_16_R2.MovingObjectPosition;
+import net.minecraft.server.v1_16_R2.PathfinderGoalNearestAttackableTarget;
+import net.minecraft.server.v1_16_R2.PathfinderTargetCondition;
+import net.minecraft.server.v1_16_R2.RayTrace;
+import net.minecraft.server.v1_16_R2.Vec3D;
 
 public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends PathfinderGoalNearestAttackableTarget<EntityHuman> {
 	   private final EntityEnderman i;
@@ -27,13 +27,13 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends PathfinderGoalN
 	   private int l;
 	   private final PathfinderTargetCondition m;
 	   private final PathfinderTargetCondition n = (new PathfinderTargetCondition()).c();
-	   private Method em;
+	   private Method eL;
 	   private Method a_entity;
 		
 	   public CustomPathFinderGoalPlayerWhoLookedAtTarget(EntityEnderman entityenderman) {
 	      super(entityenderman, EntityHuman.class, false);
 	      this.i = entityenderman;
-	      this.em = VSE.getPrivateMethod("eM", EntityEnderman.class, null);
+	      this.eL = VSE.getPrivateMethod("eL", EntityEnderman.class, null);
 	      this.a_entity = VSE.getPrivateMethod("a", EntityEnderman.class, Entity.class);
 	      this.m = (new PathfinderTargetCondition()).a(this.k()).a((entityliving) -> {
 	         return isLookingAtMe((EntityHuman)entityliving);
@@ -50,7 +50,7 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends PathfinderGoalN
 	   public void c() {
 	      this.k = 5;
 	      this.l = 0;
-	      this.i.eQ();
+	      this.i.eP();
 	   }
 	   
 	   @Override
@@ -123,7 +123,7 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends PathfinderGoalN
 	         if (this.c != null && !this.i.isPassenger()) {
 	            if (isLookingAtMe((EntityHuman)this.c)) {
 	               if (this.c.h(this.i) < 16.0D) {
-	            	   VSE.invoke(this.em, this.i, null);
+	            	   VSE.invoke(this.eL, this.i, null);
 	               }
 
 	               this.l = 0;

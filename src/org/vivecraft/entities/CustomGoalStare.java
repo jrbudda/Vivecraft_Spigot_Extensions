@@ -8,17 +8,17 @@ import org.bukkit.entity.Player;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 
-import net.minecraft.server.v1_16_R1.Blocks;
-import net.minecraft.server.v1_16_R1.Entity;
-import net.minecraft.server.v1_16_R1.EntityEnderman;
-import net.minecraft.server.v1_16_R1.EntityHuman;
-import net.minecraft.server.v1_16_R1.EntityLiving;
-import net.minecraft.server.v1_16_R1.EntityPlayer;
-import net.minecraft.server.v1_16_R1.ItemStack;
-import net.minecraft.server.v1_16_R1.MovingObjectPosition;
-import net.minecraft.server.v1_16_R1.PathfinderGoal;
-import net.minecraft.server.v1_16_R1.RayTrace;
-import net.minecraft.server.v1_16_R1.Vec3D;
+import net.minecraft.server.v1_16_R2.Blocks;
+import net.minecraft.server.v1_16_R2.Entity;
+import net.minecraft.server.v1_16_R2.EntityEnderman;
+import net.minecraft.server.v1_16_R2.EntityHuman;
+import net.minecraft.server.v1_16_R2.EntityLiving;
+import net.minecraft.server.v1_16_R2.EntityPlayer;
+import net.minecraft.server.v1_16_R2.ItemStack;
+import net.minecraft.server.v1_16_R2.MovingObjectPosition;
+import net.minecraft.server.v1_16_R2.PathfinderGoal;
+import net.minecraft.server.v1_16_R2.RayTrace;
+import net.minecraft.server.v1_16_R2.Vec3D;
 
 public class CustomGoalStare extends PathfinderGoal {
 	private final EntityEnderman i;
@@ -72,7 +72,7 @@ public class CustomGoalStare extends PathfinderGoal {
 			double d0 = vec3d1.f();
 			vec3d1 = vec3d1.d();
 			double d1 = vec3d.b(vec3d1);
-			if (!(d1 > 1.0 - 0.025 / d0)) return false;
+			if (!(d1 > 1.0 - 0.025 / d0)) return false; //TODO: consider changing angle requirements.
 			if (vr)
 				return hasLineOfSight(hmdpos, new Vec3D(i.locX(), i.getHeadY(), i.locZ()));
 			else

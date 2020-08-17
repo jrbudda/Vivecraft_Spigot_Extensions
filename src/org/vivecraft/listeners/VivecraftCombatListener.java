@@ -1,8 +1,8 @@
 package org.vivecraft.listeners;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R2.entity.CraftPlayer;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -21,10 +21,10 @@ import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 import org.vivecraft.utils.Headshot;
 
-import net.minecraft.server.v1_16_R1.EntityPlayer;
-import net.minecraft.server.v1_16_R1.EnumHand;
-import net.minecraft.server.v1_16_R1.MathHelper;
-import net.minecraft.server.v1_16_R1.Vec3D;
+import net.minecraft.server.v1_16_R2.EntityPlayer;
+import net.minecraft.server.v1_16_R2.EnumHand;
+import net.minecraft.server.v1_16_R2.MathHelper;
+import net.minecraft.server.v1_16_R2.Vec3D;
 
 
 public class VivecraftCombatListener implements Listener{

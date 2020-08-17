@@ -15,19 +15,17 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import net.minecraft.server.v1_16_R1.ChatMessage;
-import net.minecraft.server.v1_16_R1.NetworkManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R2.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_16_R2.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_16_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -59,12 +57,14 @@ import org.vivecraft.utils.AimFixHandler;
 import org.vivecraft.utils.Headshot;
 
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.v1_16_R1.EntityCreeper;
-import net.minecraft.server.v1_16_R1.EntityEnderman;
-import net.minecraft.server.v1_16_R1.IRegistry;
-import net.minecraft.server.v1_16_R1.MinecraftKey;
-import net.minecraft.server.v1_16_R1.PathfinderGoalSelector;
-import net.minecraft.server.v1_16_R1.PathfinderGoalWrapped;
+import net.minecraft.server.v1_16_R2.ChatMessage;
+import net.minecraft.server.v1_16_R2.EntityCreeper;
+import net.minecraft.server.v1_16_R2.EntityEnderman;
+import net.minecraft.server.v1_16_R2.IRegistry;
+import net.minecraft.server.v1_16_R2.MinecraftKey;
+import net.minecraft.server.v1_16_R2.NetworkManager;
+import net.minecraft.server.v1_16_R2.PathfinderGoalSelector;
+import net.minecraft.server.v1_16_R2.PathfinderGoalWrapped;
 
 
 public class VSE extends JavaPlugin implements Listener {
@@ -220,7 +220,7 @@ public class VSE extends JavaPlugin implements Listener {
 	}
 
 	public static ItemStack setLocalizedItemName(ItemStack stack, String key) {
-		net.minecraft.server.v1_16_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
+		net.minecraft.server.v1_16_R2.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
 		nmsStack.a(new ChatMessage(key));
 		return CraftItemStack.asBukkitCopy(nmsStack);
 	}
@@ -332,12 +332,12 @@ public class VSE extends JavaPlugin implements Listener {
 			EntityEnderman e = ((CraftEnderman) entity).getHandle();
 			LinkedHashSet<PathfinderGoalWrapped> targets = (LinkedHashSet<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.targetSelector);
 			for(PathfinderGoalWrapped b: targets){
-				if(b.h()==2){ //replace PlayerWhoLookedAt target. Verify priority on new version.
+				if(b.h()==1){ //replace PlayerWhoLookedAt target. Verify priority on new version.
 					targets.remove(b);
 					break;
 				}
 			}
-			e.targetSelector.a(2, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e));
+			e.targetSelector.a(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e));
 			
 			LinkedHashSet<PathfinderGoalWrapped> goals = (LinkedHashSet<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.goalSelector);
 			for(PathfinderGoalWrapped b: goals){
