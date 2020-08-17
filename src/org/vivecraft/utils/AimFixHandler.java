@@ -28,7 +28,7 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-		EntityPlayer player = ((PlayerConnection)netManager.i()).player;
+		EntityPlayer player = ((PlayerConnection)netManager.j()).player;
 		boolean isCapturedPacket = msg instanceof PacketPlayInBlockPlace || msg instanceof PacketPlayInUseItem || msg instanceof PacketPlayInBlockDig;
 		boolean useActiveHand = !(msg instanceof PacketPlayInBlockDig) || ((PacketPlayInBlockDig)msg).d() == PacketPlayInBlockDig.EnumPlayerDigType.RELEASE_USE_ITEM;
 
@@ -44,10 +44,10 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 			Vec3D oldPrevPos = new Vec3D(player.lastX, player.lastY, player.lastZ);
 			float oldPitch = player.pitch;
 			float oldYaw = player.yaw;
-			float oldYawHead = player.aJ; // field_70759_as
+			float oldYawHead = player.aC; // field_70759_as
 			float oldPrevPitch = player.lastPitch;
 			float oldPrevYaw = player.lastYaw;
-			float oldPrevYawHead = player.aK; // field_70758_at
+			float oldPrevYawHead = player.aD; // field_70758_at
 			float oldEyeHeight = player.getHeadHeight();
 
 			VivePlayer data = null;
@@ -64,7 +64,7 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 				player.pitch = (float)Math.toDegrees(Math.asin(-aim.y));
 				player.yaw = (float)Math.toDegrees(Math.atan2(-aim.x, aim.z));
 				player.lastPitch = player.pitch;
-				player.lastYaw = player.aJ = player.aK = player.yaw;
+				player.lastYaw = player.aC = player.aD = player.yaw;
 				VSE.setPrivateField("headHeight", Entity.class, player, 0);
 
 				// Set up offset to fix relative positions
@@ -77,7 +77,7 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 			try {
 				if (netManager.isConnected()) {
 					try {
-						((Packet<PacketListener>)msg).a(netManager.i());
+						((Packet<PacketListener>)msg).a(netManager.j());
 					} catch (CancelledPacketHandleException e) { // Apparently might get thrown and can be ignored
 					}
 				}
@@ -94,10 +94,10 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 			player.lastZ = oldPrevPos.z;
 			player.pitch = oldPitch;
 			player.yaw = oldYaw;
-			player.aJ = oldYawHead;
+			player.aC = oldYawHead;
 			player.lastPitch = oldPrevPitch;
 			player.lastYaw = oldPrevYaw;
-			player.aK = oldPrevYawHead;
+			player.aD = oldPrevYawHead;
 			VSE.setPrivateField("headHeight", Entity.class, player, oldEyeHeight);
 
 			// Reset offset
