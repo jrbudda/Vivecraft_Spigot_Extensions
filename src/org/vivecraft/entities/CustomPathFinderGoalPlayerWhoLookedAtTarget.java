@@ -1,6 +1,7 @@
 package org.vivecraft.entities;
 
 import java.lang.reflect.Method;
+import java.util.function.Predicate;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -31,7 +32,7 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends PathfinderGoalN
 	   private Method a_entity;
 		
 	   public CustomPathFinderGoalPlayerWhoLookedAtTarget(EntityEnderman entityenderman) {
-	      super(entityenderman, EntityHuman.class, false);
+	      super(entityenderman, EntityHuman.class, 10, false, false, entityenderman::a_);
 	      this.i = entityenderman;
 	      this.eL = VSE.getPrivateMethod("eL", EntityEnderman.class, null);
 	      this.a_entity = VSE.getPrivateMethod("a", EntityEnderman.class, Entity.class);
