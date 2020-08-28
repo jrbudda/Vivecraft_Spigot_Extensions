@@ -30,7 +30,6 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		EntityPlayer player = ((PlayerConnection)netManager.j()).player;
 		boolean isCapturedPacket = msg instanceof PacketPlayInBlockPlace || msg instanceof PacketPlayInUseItem || msg instanceof PacketPlayInBlockDig;
-		boolean useActiveHand = !(msg instanceof PacketPlayInBlockDig) || ((PacketPlayInBlockDig)msg).d() == PacketPlayInBlockDig.EnumPlayerDigType.RELEASE_USE_ITEM;
 
 		if (!VSE.vivePlayers.containsKey(player.getProfile().getId()) || !VSE.vivePlayers.get(player.getProfile().getId()).isVR() || !isCapturedPacket || player.getMinecraftServer() == null) {
 			// we don't need to handle this packet, just defer to the next handler in the pipeline
@@ -53,8 +52,8 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 			VivePlayer data = null;
 			if (VSE.vivePlayers.containsKey(player.getProfile().getId()) && VSE.vivePlayers.get(player.getProfile().getId()).isVR()) { // Check again in case of race condition
 				data = VSE.vivePlayers.get(player.getProfile().getId());
-				Location pos = data.getControllerPos(useActiveHand ? data.activeHand : 0);
-				Vec3D aim = data.getControllerDir(useActiveHand ? data.activeHand : 0);
+				Location pos = data.getControllerPos(0);
+				Vec3D aim = data.getControllerDir(0);
 
 				// Inject our custom orientation data
 				player.setPositionRaw(pos.getX(), pos.getY(), pos.getZ());
