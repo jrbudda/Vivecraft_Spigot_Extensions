@@ -73,11 +73,9 @@ public class VivecraftCombatListener implements Listener{
 		}
 
 		Location loc = new Location(proj.getWorld(), pos.getX() + aim.x*0.6f, pos.getY()+aim.y*0.6f, pos.getZ()+aim.z*0.6f);
-		double velo = proj.getVelocity().length();	
-
+		double velo = proj.getVelocity().length();		
+		proj.teleport(loc); //paper sets velocity to 0 on teleport.
 		proj.setVelocity(new Vector(aim.x*velo, aim.y*velo, aim.z*velo));
-		
-		proj.teleport(loc);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
