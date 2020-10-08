@@ -9,10 +9,10 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.AbstractCollection;
 import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
@@ -319,7 +319,7 @@ public class VSE extends JavaPlugin implements Listener {
 	public void EditEntity(Entity entity){
 		if(entity.getType() == EntityType.CREEPER){	
 			EntityCreeper e = ((CraftCreeper) entity).getHandle();
-			LinkedHashSet<PathfinderGoalWrapped> goalB = (LinkedHashSet<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.goalSelector);
+			AbstractCollection<PathfinderGoalWrapped> goalB = (AbstractCollection<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.goalSelector);
 			for(PathfinderGoalWrapped b: goalB){
 				if(b.h()==2){//replace swell goal. Verify priority on new version.
 					goalB.remove(b);
@@ -330,7 +330,7 @@ public class VSE extends JavaPlugin implements Listener {
 		}
 		else if(entity.getType() == EntityType.ENDERMAN && ((CraftEntity)entity).getHandle() instanceof EntityEnderman){			
 			EntityEnderman e = ((CraftEnderman) entity).getHandle();
-			LinkedHashSet<PathfinderGoalWrapped> targets = (LinkedHashSet<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.targetSelector);
+			AbstractCollection<PathfinderGoalWrapped> targets = (AbstractCollection<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.targetSelector);
 			for(PathfinderGoalWrapped b: targets){
 				if(b.h()==1){ //replace PlayerWhoLookedAt target. Verify priority on new version.
 					targets.remove(b);
@@ -338,8 +338,8 @@ public class VSE extends JavaPlugin implements Listener {
 				}
 			}
 			e.targetSelector.a(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e));
-			
-			LinkedHashSet<PathfinderGoalWrapped> goals = (LinkedHashSet<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.goalSelector);
+
+			AbstractCollection<PathfinderGoalWrapped> goals = (AbstractCollection<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.goalSelector);
 			for(PathfinderGoalWrapped b: goals){
 				if(b.h()==1){//replace Stare goal. Verify priority on new version.
 					goals.remove(b);
