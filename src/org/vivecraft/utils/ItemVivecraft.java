@@ -1,6 +1,6 @@
 package org.vivecraft.utils;
 
-import net.minecraft.server.v1_16_R2.Item;
+import net.minecraft.server.v1_16_R3.Item;
 
 public class ItemVivecraft extends Item{
 

@@ -4,10 +4,10 @@ import java.util.EnumSet;
 
 import org.vivecraft.VSE;
 
-import net.minecraft.server.v1_16_R2.Entity;
-import net.minecraft.server.v1_16_R2.EntityCreeper;
-import net.minecraft.server.v1_16_R2.EntityLiving;
-import net.minecraft.server.v1_16_R2.PathfinderGoal;
+import net.minecraft.server.v1_16_R3.Entity;
+import net.minecraft.server.v1_16_R3.EntityCreeper;
+import net.minecraft.server.v1_16_R3.EntityLiving;
+import net.minecraft.server.v1_16_R3.PathfinderGoal;
 
 public class CustomGoalSwell extends PathfinderGoal {
 

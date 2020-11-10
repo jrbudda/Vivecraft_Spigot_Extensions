@@ -21,11 +21,11 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_16_R2.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_16_R2.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_16_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_16_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -57,14 +57,14 @@ import org.vivecraft.utils.AimFixHandler;
 import org.vivecraft.utils.Headshot;
 
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.v1_16_R2.ChatMessage;
-import net.minecraft.server.v1_16_R2.EntityCreeper;
-import net.minecraft.server.v1_16_R2.EntityEnderman;
-import net.minecraft.server.v1_16_R2.IRegistry;
-import net.minecraft.server.v1_16_R2.MinecraftKey;
-import net.minecraft.server.v1_16_R2.NetworkManager;
-import net.minecraft.server.v1_16_R2.PathfinderGoalSelector;
-import net.minecraft.server.v1_16_R2.PathfinderGoalWrapped;
+import net.minecraft.server.v1_16_R3.ChatMessage;
+import net.minecraft.server.v1_16_R3.EntityCreeper;
+import net.minecraft.server.v1_16_R3.EntityEnderman;
+import net.minecraft.server.v1_16_R3.IRegistry;
+import net.minecraft.server.v1_16_R3.MinecraftKey;
+import net.minecraft.server.v1_16_R3.NetworkManager;
+import net.minecraft.server.v1_16_R3.PathfinderGoalSelector;
+import net.minecraft.server.v1_16_R3.PathfinderGoalWrapped;
 
 
 public class VSE extends JavaPlugin implements Listener {
@@ -220,7 +220,7 @@ public class VSE extends JavaPlugin implements Listener {
 	}
 
 	public static ItemStack setLocalizedItemName(ItemStack stack, String key) {
-		net.minecraft.server.v1_16_R2.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
+		net.minecraft.server.v1_16_R3.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
 		nmsStack.a(new ChatMessage(key));
 		return CraftItemStack.asBukkitCopy(nmsStack);
 	}
