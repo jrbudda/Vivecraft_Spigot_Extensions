@@ -456,9 +456,11 @@ public class VSE extends JavaPlugin implements Listener {
 	public void broadcastConfigString(String node, String playername){
 		String message = this.getConfig().getString(node);
 		if(message == null || message.isEmpty()) return;
-		String format = message.replace("&player", playername);
+		String[] formats = message.replace("&player", playername).split("\\n");
 		for(Player p : Bukkit.getOnlinePlayers()){
-			ViveCommand.sendMessage(format,p);
+			for String line : formats) {
+				ViveCommand.sendMessage(format,p);
+			}
 		}
 	}
 
