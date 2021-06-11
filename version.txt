@@ -2,6 +2,6 @@
 1.14.3-r1: An update is available!
 1.14.3-r2: An update is available!
 1.14.3-r3: An update is available!
-1.14.3-r4: An update is available!
+1.14.3-r4: VSE is up to date!
 1.14.4-r5: An update is available!
 1.14.4-r6: VSE is up to date!
