@@ -10,9 +10,8 @@ import org.bukkit.util.Vector;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 
-import net.minecraft.server.v1_16_R3.MathHelper;
-import net.minecraft.server.v1_16_R3.Vec3D;
-
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 
 public class VivecraftItemListener implements Listener{
 	VSE vse = null;
@@ -36,11 +35,11 @@ public class VivecraftItemListener implements Listener{
 		 	 Vector v = new Vector();
 			 float yaw = player.getLocation().getYaw();
 			 float pitch = -player.getLocation().getPitch();
-			 v.setX((double)(-MathHelper.sin(yaw * 0.017453292F) * MathHelper.cos(player.getLocation().getPitch() * 0.017453292F) * f2));
-			 v.setZ((double)(MathHelper.cos(yaw * 0.017453292F) * MathHelper.cos(player.getLocation().getPitch() * 0.017453292F) * f2));
-			 v.setY((double)(MathHelper.sin(pitch * 0.017453292F) * f2 + 0.1F));
+			 v.setX((double)(-Mth.sin(yaw * 0.017453292F) * Mth.cos(player.getLocation().getPitch() * 0.017453292F) * f2));
+			 v.setZ((double)(Mth.cos(yaw * 0.017453292F) * Mth.cos(player.getLocation().getPitch() * 0.017453292F) * f2));
+			 v.setY((double)(Mth.sin(pitch * 0.017453292F) * f2 + 0.1F));
 			 
-             Vec3D aim = vp.getControllerDir(0);
+             Vec3 aim = vp.getControllerDir(0);
 			 event.getItemDrop().teleport(vp.getControllerPos(0).add(0.2f*aim.x,0.25f*aim.y - 0.2f, 0.2f*aim.z));
 			 event.getItemDrop().setVelocity(v);
 		 }

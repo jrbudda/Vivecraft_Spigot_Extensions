@@ -2,12 +2,11 @@ package org.vivecraft.utils;
 
 import java.util.concurrent.Callable;
 
-import org.vivecraft.VSE;
-import org.vivecraft.VivePlayer;
-
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.LazyMetadataValue;
 import org.bukkit.metadata.MetadataValue;
+import org.vivecraft.VSE;
+import org.vivecraft.VivePlayer;
 
 public class MetadataHelper {
 	public static void updateMetdata(final VivePlayer data) {

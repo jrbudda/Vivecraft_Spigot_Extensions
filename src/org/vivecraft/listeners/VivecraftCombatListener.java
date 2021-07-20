@@ -1,8 +1,8 @@
 package org.vivecraft.listeners;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -21,10 +21,8 @@ import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 import org.vivecraft.utils.Headshot;
 
-import net.minecraft.server.v1_16_R3.EntityPlayer;
-import net.minecraft.server.v1_16_R3.EnumHand;
-import net.minecraft.server.v1_16_R3.MathHelper;
-import net.minecraft.server.v1_16_R3.Vec3D;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 
 
 public class VivecraftCombatListener implements Listener{
@@ -53,11 +51,10 @@ public class VivecraftCombatListener implements Listener{
 			vse.getLogger().warning(" Error on projectile launch!");
 		}
 		
-		EntityPlayer nsme = ((CraftPlayer)pl).getHandle();
-		EnumHand h = nsme.getRaisedHand();
+		ServerPlayer nsme = ((CraftPlayer)pl).getHandle();
 	
 		Location pos = vp.getControllerPos(vp.activeHand);
-		Vec3D aim = vp.getControllerDir(vp.activeHand);
+		Vec3 aim = vp.getControllerDir(vp.activeHand);
 
 		//this only works if the incoming speed is at max (based! on draw time)
 		//TODO: properly scale in all cases.
@@ -68,7 +65,7 @@ public class VivecraftCombatListener implements Listener{
 		    	pos = vp.getControllerPos(0);
 				Vector m = (vp.getControllerPos(1).subtract(vp.getControllerPos(0))).toVector();
 				m = m.normalize();
-				aim = new Vec3D(m.getX(),  m.getY(), m.getZ());
+				aim = new Vec3(m.getX(),  m.getY(), m.getZ());
 			}
 		}
 
@@ -152,14 +149,14 @@ public class VivecraftCombatListener implements Listener{
 			else if(damaged instanceof Fireball) {
 				VivePlayer vp = (VivePlayer)VSE.vivePlayers.get(damager.getUniqueId());
 				if(vp!=null && vp.isVR()) {
-					Vec3D dir = vp.getHMDDir();
+					Vec3 dir = vp.getHMDDir();
 					//Interesting experiment. 
 					//We know the player's look is read immediately after this event returns.
 					//Override it here. It should be set back to normal next tick.
 					//And ideally nothing weird happens because of it.
 
-					((CraftEntity) damager).getHandle().pitch = (float) Math.toDegrees(Math.asin(dir.y/dir.f())); 
-					((CraftEntity) damager).getHandle().yaw = 	(float) Math.toDegrees(Math.atan2(-dir.x, dir.z)); 
+					((CraftEntity) damager).getHandle().setXRot((float) Math.toDegrees(Math.asin(dir.y/dir.length()))); 
+					((CraftEntity) damager).getHandle().setYRot((float) Math.toDegrees(Math.atan2(-dir.x, dir.z))); 
 				}
 			}
 		}

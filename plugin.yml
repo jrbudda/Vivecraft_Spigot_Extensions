@@ -1,6 +1,6 @@
 name: Vivecraft-Spigot-Extensions
-version: '1.16.5-r1'
-api-version: 1.16
+version: '1.17.1-a1'
+api-version: 1.17
 main: org.vivecraft.VSE
 website: http://www.vivecraft.org/
 author: jrbudda, jaron780

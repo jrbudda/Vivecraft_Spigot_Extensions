@@ -1,88 +1,109 @@
 package org.vivecraft.entities;
 
-import java.lang.reflect.Method;
 import java.util.EnumSet;
 
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 
-import net.minecraft.server.v1_16_R3.Blocks;
-import net.minecraft.server.v1_16_R3.Entity;
-import net.minecraft.server.v1_16_R3.EntityEnderman;
-import net.minecraft.server.v1_16_R3.EntityHuman;
-import net.minecraft.server.v1_16_R3.EntityLiving;
-import net.minecraft.server.v1_16_R3.EntityPlayer;
-import net.minecraft.server.v1_16_R3.ItemStack;
-import net.minecraft.server.v1_16_R3.MovingObjectPosition;
-import net.minecraft.server.v1_16_R3.PathfinderGoal;
-import net.minecraft.server.v1_16_R3.RayTrace;
-import net.minecraft.server.v1_16_R3.Vec3D;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
-public class CustomGoalStare extends PathfinderGoal {
-	private final EntityEnderman i;
-	private EntityLiving b;
+public class CustomGoalStare extends Goal {
+    private final Entity enderman;
+    private Entity target;
 
-	public CustomGoalStare(EntityEnderman entityenderman) {
-		this.i = entityenderman;
-		this.a(EnumSet.of(PathfinderGoal.Type.JUMP, PathfinderGoal.Type.MOVE));
-	}
+    public CustomGoalStare(EnderMan p_32550_)
+    {
+        this.enderman = p_32550_;
+        this.setFlags(EnumSet.of(Goal.Flag.JUMP, Goal.Flag.MOVE));
+    }
 
-	public boolean a() {
-		this.b = this.i.getGoalTarget();
-		if (!(this.b instanceof EntityHuman)) {
+    public boolean canUse()
+    {
+        this.target = ((Mob)this.enderman).getTarget();
+
+        if (!(this.target instanceof Player))
+        {
+            return false;
+        }
+        else
+        {
+            double d0 = this.target.distanceToSqr(this.enderman);
+            return d0 > 256.0D ? false : isLookingAtMe((Player)this.target);
+        }
+    }
+
+    public void start()
+    {
+        ((Mob) this.enderman).getNavigation().stop();
+    }
+
+    public void tick()
+    {
+        ((Mob) this.enderman).getLookControl().setLookAt(this.target.getX(), this.target.getEyeY(), this.target.getZ());
+    }
+
+	//Vivecraft copy and modify from EnderMan
+	private boolean isLookingAtMe(Player pPlayer)
+	{
+		ItemStack itemstack = pPlayer.getInventory().armor.get(3);
+
+		if (itemstack.is(Blocks.CARVED_PUMPKIN.asItem()))
+		{
 			return false;
 		}
-		double d0 = this.b.h((Entity)this.i);
-		if (d0 > 256.0) {
-			return false;
-		}
-		boolean bl = isLookingAtMe((EntityHuman)((EntityHuman)this.b));
-		return bl;
-	}
-
-	public void c() {
-		this.i.getNavigation().o();
-	}
-
-	public void e() {
-		this.i.getControllerLook().a(this.b.locX(), this.b.getHeadY(), this.b.locZ());
-	}
-
-	private boolean isLookingAtMe(EntityHuman entityhuman) {
-		ItemStack itemstack = (ItemStack)entityhuman.inventory.armor.get(3);
-		if (itemstack.getItem() == Blocks.CARVED_PUMPKIN.getItem()) {
-			return false;
-		} else {
-			Vec3D vec3d = entityhuman.f(1.0F).d();
-			Vec3D vec3d1 = new Vec3D(i.locX() - entityhuman.locX(), i.getHeadY() - entityhuman.getHeadY(), i.locZ() - entityhuman.locZ());
+		else
+		{
+			Vec3 vec3 = pPlayer.getViewVector(1.0F).normalize();
+			Vec3 vec31 = new Vec3(enderman.getX() - pPlayer.getX(), enderman.getEyeY() - pPlayer.getEyeY(), enderman.getZ() - pPlayer.getZ());
 			//VSE MODIFICATION
-			boolean vr = entityhuman instanceof EntityPlayer && VSE.isVive((Player)entityhuman.getBukkitEntity());
+			boolean vr = pPlayer instanceof Player && VSE.isVive((org.bukkit.entity.Player) pPlayer.getBukkitEntity());
 			VivePlayer vp = null;
-			Vec3D hmdpos = null;
+			Vec3 hmdpos = null;
 			if(vr){
-				vp = VSE.vivePlayers.get(entityhuman.getBukkitEntity().getUniqueId());
-				vec3d = vp.getHMDDir();
+				vp = VSE.vivePlayers.get(pPlayer.getBukkitEntity().getUniqueId());
+				vec3 = vp.getHMDDir();
 				Location h = vp.getHMDPos();
-				hmdpos = new Vec3D(h.getX(), h.getY(), h.getZ());
-				vec3d1 = new Vec3D(i.locX() - hmdpos.getX(), i.getHeadY() - hmdpos.getY(), i.locZ() - hmdpos.getZ());
+				hmdpos = new Vec3(h.getX(), h.getY(), h.getZ());
+				vec31= new Vec3(enderman.getX() - hmdpos.x, enderman.getEyeY() - hmdpos.y, enderman.getZ() - hmdpos.z);
 			}
 			////
-			double d0 = vec3d1.f();
-			vec3d1 = vec3d1.d();
-			double d1 = vec3d.b(vec3d1);
-			if (!(d1 > 1.0 - 0.025 / d0)) return false; //TODO: consider changing angle requirements.
-			if (vr)
-				return hasLineOfSight(hmdpos, new Vec3D(i.locX(), i.getHeadY(), i.locZ()));
+			double d0 = vec31.length();
+			vec31 = vec31.normalize();
+			double d1 = vec3.dot(vec31);
+			//VSE MODIFICATION
+			if(! (d1 > 1.0D - 0.025D / d0)) return false; 			
+			if(vr)
+				return hasLineOfSight(hmdpos, enderman);
 			else
-				return entityhuman.hasLineOfSight((Entity)i);
+				return pPlayer.hasLineOfSight(enderman);
+			//
 		}
 	}
-	
-    private boolean hasLineOfSight(Vec3D source, Vec3D target) {
-        if (i.world.rayTrace(new RayTrace(source, target , RayTrace.BlockCollisionOption.COLLIDER, RayTrace.FluidCollisionOption.NONE, (Entity)i)).getType() != MovingObjectPosition.EnumMovingObjectType.MISS) return false;
-        return true;
+
+	//Vivecraft copy and modify from LivingEntity
+    public boolean hasLineOfSight(Vec3 source, Entity entity)
+    {
+     	Vec3 vec31 = new Vec3(entity.getX(), entity.getEyeY(), entity.getZ());
+
+    	if (vec31.distanceTo(source) > 128.0D)
+    	{
+    		return false;
+    	}
+    	else
+    	{
+    		return entity.level.clip(new ClipContext(source, vec31, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity)).getType() == HitResult.Type.MISS;
+    	}
     }
     
 }

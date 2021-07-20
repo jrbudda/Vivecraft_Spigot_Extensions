@@ -4,54 +4,65 @@ import java.util.EnumSet;
 
 import org.vivecraft.VSE;
 
-import net.minecraft.server.v1_16_R3.Entity;
-import net.minecraft.server.v1_16_R3.EntityCreeper;
-import net.minecraft.server.v1_16_R3.EntityLiving;
-import net.minecraft.server.v1_16_R3.PathfinderGoal;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.monster.Creeper;
 
-public class CustomGoalSwell extends PathfinderGoal {
+public class CustomGoalSwell extends Goal {
 
-	EntityCreeper a;
-	EntityLiving b;
+    private final Creeper creeper;
+    private LivingEntity target;
 
-	public CustomGoalSwell(EntityCreeper var0) {
-		this.a = var0;
-		this.a(EnumSet.of(Type.MOVE));
+	public CustomGoalSwell(Creeper var0) {
+        this.creeper = var0;
+        this.setFlags(EnumSet.of(Goal.Flag.MOVE));
 	}
 
 	public double creeperBlowyUppyRadius = 3.0f; //VIVE default is 3
-
-	public boolean a(){
+	
+    @Override
+	public boolean canUse(){
 		VSE vse = (VSE.getPlugin(VSE.class));
-		EntityLiving var0 = this.a.getGoalTarget();
+        LivingEntity livingentity = ((Mob)this.creeper).getTarget();
 		if(vse.getConfig().getBoolean("CreeperRadius.enabled") == true){
-			if(var0 != null && VSE.vivePlayers.containsKey(var0.getUniqueID()) && VSE.isVive(VSE.vivePlayers.get(var0.getUniqueID()).player))
+			if(livingentity != null && VSE.vivePlayers.containsKey(livingentity.getUUID()) && VSE.isVive(VSE.vivePlayers.get(livingentity.getUUID()).player))
 				creeperBlowyUppyRadius = vse.getConfig().getDouble("CreeperRadius.radius");
 		}
-	    return this.a.eK() > 0 || var0 != null && this.a.h(var0) < creeperBlowyUppyRadius*creeperBlowyUppyRadius;
+	    return this.creeper.getSwellDir() > 0 || livingentity != null && this.creeper.distanceToSqr(livingentity) < creeperBlowyUppyRadius*creeperBlowyUppyRadius;
 	}
-
-	public void c()
-	{
-		this.a.getNavigation().o();
-		this.b = this.a.getGoalTarget();
-	}
-
-	public void d()
-	{
-		this.b = null;
-	}
-
-	public void e() {
-		if (this.b == null) {
-			this.a.a(-1);
-		} else if (this.a.h(this.b) > 49.0D) {
-			this.a.a(-1);
-		} else if (!this.a.getEntitySenses().a(this.b)) {
-			this.a.a(-1);
-		} else {
-			this.a.a(1);
-		}
-	}
-
+	
+    @Override
+    public void start()
+    {
+        this.creeper.getNavigation().stop();
+        this.target = ((Mob)this.creeper).getTarget();
+    }
+    
+    @Override
+    public void stop()
+    {
+        this.target = null;
+    }
+    
+    @Override
+    public void tick()
+    {
+        if (this.target == null)
+        {
+            this.creeper.setSwellDir(-1);
+        }
+        else if (this.creeper.distanceToSqr(this.target) > 49.0D)
+        {
+            this.creeper.setSwellDir(-1);
+        }
+        else if (!this.creeper.getSensing().hasLineOfSight(this.target))
+        {
+            this.creeper.setSwellDir(-1);
+        }
+        else
+        {
+            this.creeper.setSwellDir(1);
+        }
+    }
 }

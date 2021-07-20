@@ -3,16 +3,13 @@ package org.vivecraft;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.AbstractCollection;
 import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
@@ -21,11 +18,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -57,21 +53,19 @@ import org.vivecraft.utils.AimFixHandler;
 import org.vivecraft.utils.Headshot;
 
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.v1_16_R3.ChatMessage;
-import net.minecraft.server.v1_16_R3.EntityCreeper;
-import net.minecraft.server.v1_16_R3.EntityEnderman;
-import net.minecraft.server.v1_16_R3.IRegistry;
-import net.minecraft.server.v1_16_R3.MinecraftKey;
-import net.minecraft.server.v1_16_R3.NetworkManager;
-import net.minecraft.server.v1_16_R3.PathfinderGoalSelector;
-import net.minecraft.server.v1_16_R3.PathfinderGoalWrapped;
-
+import net.minecraft.network.Connection;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.EnderMan;
 
 public class VSE extends JavaPlugin implements Listener {
 	FileConfiguration config = getConfig();
 
 	public final static String CHANNEL = "vivecraft:data";
-	private final static String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.16/version.txt";
+	private final static String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.17/version.txt";
 	private final static int bStatsId = 6931;
 
 	public static Map<UUID, VivePlayer> vivePlayers = new HashMap<UUID, VivePlayer>();
@@ -163,7 +157,8 @@ public class VSE extends JavaPlugin implements Listener {
 			//make an attempt to validate these on the server for debugging.
 			if(temp != null){
 				for (String string : temp) {
-					if (IRegistry.BLOCK.get(new MinecraftKey(string)) == null) {
+					
+					if (Reflector.invoke(Reflector.RegistryBlocks_get, net.minecraft.core.Registry.BLOCK, new ResourceLocation(string)) == null) {
 						getLogger().warning("Unknown climbey block name: " + string);
 						continue;
 					}
@@ -216,88 +211,15 @@ public class VSE extends JavaPlugin implements Listener {
 				startUpdateCheck();
 			}
 		}, 1);
-		
 	}
 
 	public static ItemStack setLocalizedItemName(ItemStack stack, String key) {
-		net.minecraft.server.v1_16_R3.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
-		nmsStack.a(new ChatMessage(key));
+		var nmsStack = CraftItemStack.asNMSCopy(stack);
+		nmsStack.setHoverName(new TextComponent(key));
 		return CraftItemStack.asBukkitCopy(nmsStack);
 	}
 		
-	public static Object getPrivateField(String fieldName, Class clazz, Object object)
-	{
-		Field field;
-		Object o = null;
-		try
-		{
-			field = clazz.getDeclaredField(fieldName);
-			field.setAccessible(true);
-			o = field.get(object);
-		}
-		catch(NoSuchFieldException e)
-		{
-			e.printStackTrace();
-		}
-		catch(IllegalAccessException e)
-		{
-			e.printStackTrace();
-		}
-		return o;
-	}
 
-	public static Object setPrivateField(String fieldName, Class clazz, Object object, Object value)
-	{
-		Field field;
-		Object o = null;
-		try
-		{
-			field = clazz.getDeclaredField(fieldName);
-			field.setAccessible(true);
-			field.set(object, value);
-		}
-		catch(NoSuchFieldException e)
-		{
-			e.printStackTrace();
-		}
-		catch(IllegalAccessException e)
-		{
-			e.printStackTrace();
-		}
-		return o;
-	}
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Method getPrivateMethod(String methodName, Class clazz, Class... param)
-	{
-		Method m = null;
-		try
-		{
-			if(param == null) {
-				m = clazz.getDeclaredMethod(methodName);
-			} else {
-				m = clazz.getDeclaredMethod(methodName, param);
-			}
-			m.setAccessible(true);
-		}
-		catch(NoSuchMethodException e)
-		{
-			e.printStackTrace();
-		}
-		return m;
-	}
-	
-	public static Object invoke(Method m, Object object, Object... param) {
-		try {
-			if(param == null) 
-				return  m.invoke(object);
-			else
-				return  m.invoke(object, param);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
     public void onEvent(CreatureSpawnEvent event) {
@@ -318,35 +240,35 @@ public class VSE extends JavaPlugin implements Listener {
 	@SuppressWarnings("unchecked" )
 	public void EditEntity(Entity entity){
 		if(entity.getType() == EntityType.CREEPER){	
-			EntityCreeper e = ((CraftCreeper) entity).getHandle();
-			AbstractCollection<PathfinderGoalWrapped> goalB = (AbstractCollection<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.goalSelector);
-			for(PathfinderGoalWrapped b: goalB){
-				if(b.h()==2){//replace swell goal. Verify priority on new version.
+			Creeper e = ((CraftCreeper) entity).getHandle();
+			AbstractCollection<WrappedGoal> goalB = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob)e).goalSelector);
+			for(WrappedGoal b: goalB){
+				if(b.getGoal() instanceof net.minecraft.world.entity.ai.goal.SwellGoal){//replace swell goal.
 					goalB.remove(b);
 					break;
 				}
 			}
-			e.goalSelector.a(2, new CustomGoalSwell(e));
+			((Mob)e).goalSelector.addGoal(2, new CustomGoalSwell(e));
 		}
-		else if(entity.getType() == EntityType.ENDERMAN && ((CraftEntity)entity).getHandle() instanceof EntityEnderman){			
-			EntityEnderman e = ((CraftEnderman) entity).getHandle();
-			AbstractCollection<PathfinderGoalWrapped> targets = (AbstractCollection<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.targetSelector);
-			for(PathfinderGoalWrapped b: targets){
-				if(b.h()==1){ //replace PlayerWhoLookedAt target. Verify priority on new version.
+		else if(entity.getType() == EntityType.ENDERMAN){			
+			EnderMan e = ((CraftEnderman) entity).getHandle();
+			AbstractCollection<WrappedGoal> targets = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob)e).targetSelector);
+			for(WrappedGoal b: targets){
+				if(b.getPriority() == 1){ //replace PlayerWhoLookedAt target. Class is private cant use instanceof, check priority on all new versions.
 					targets.remove(b);
 					break;
 				}
 			}
-			e.targetSelector.a(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e));
+			((Mob)e).targetSelector.addGoal(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e, e::isAngryAt));
 
-			AbstractCollection<PathfinderGoalWrapped> goals = (AbstractCollection<PathfinderGoalWrapped>)getPrivateField("d", PathfinderGoalSelector.class, e.goalSelector);
-			for(PathfinderGoalWrapped b: goals){
-				if(b.h()==1){//replace Stare goal. Verify priority on new version.
+			AbstractCollection<WrappedGoal> goals = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob)e).goalSelector);
+			for(WrappedGoal b: goals){
+				if(b.getPriority()==1){//replace EndermanFreezeWhenLookedAt goal. Verify priority on new version.
 					goals.remove(b);
 					break;
 				}
 			}
-			e.goalSelector.a(1, new CustomGoalStare(e));
+			((Mob)e).goalSelector.addGoal(1, new CustomGoalStare(e));
 		}
 	}
 
@@ -435,7 +357,7 @@ public class VSE extends JavaPlugin implements Listener {
 			}
 		}, t);
 
-		NetworkManager netManager = ((CraftPlayer)p).getHandle().playerConnection.networkManager;
+		Connection netManager = ((CraftPlayer)p).getHandle().connection.connection;
 		netManager.channel.pipeline().addBefore("packet_handler", "vr_aim_fix", new AimFixHandler(netManager));
 	}
 		

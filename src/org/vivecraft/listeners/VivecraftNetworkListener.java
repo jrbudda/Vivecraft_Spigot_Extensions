@@ -6,13 +6,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.util.Arrays;
 
-import net.minecraft.server.v1_16_R3.EntityPose;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.vivecraft.Reflector;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 import org.vivecraft.utils.MetadataHelper;
@@ -20,10 +19,9 @@ import org.vivecraft.utils.PoseOverrider;
 
 import com.google.common.base.Charsets;
 
-import net.minecraft.server.v1_16_R3.EntityPlayer;
-import net.minecraft.server.v1_16_R3.MathHelper;
-import net.minecraft.server.v1_16_R3.PlayerConnection;
-
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Pose;
 
 public class VivecraftNetworkListener implements PluginMessageListener {
 	public VSE vse;
@@ -50,13 +48,10 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		CRAWL
 	}
 	
-	Field floatingCount = null;
-	String floatinCountObf = "C";
-	
 	@Override
 	public void onPluginMessageReceived(String channel, Player sender, byte[] payload) {
 		
-		if(!channel.equalsIgnoreCase(vse.CHANNEL)) return;
+		if(!channel.equalsIgnoreCase(VSE.CHANNEL)) return;
 		
 		if(payload.length==0) return;
 
@@ -98,7 +93,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			BufferedReader br = new BufferedReader(is);
 			VSE.vivePlayers.put(sender.getUniqueId(), vp);
 
-			sender.sendPluginMessage(vse, vse.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getDescription().getFullName()));
+			sender.sendPluginMessage(vse, VSE.CHANNEL, StringToPayload(PacketDiscriminators.VERSION, vse.getDescription().getFullName()));
 
 			try {
 				String version = br.readLine();
@@ -112,10 +107,10 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 				}
 
 				if(vse.getConfig().getBoolean("SendPlayerData.enabled") == true)
-					sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});
+					sender.sendPluginMessage(vse, VSE.CHANNEL, new byte[]{(byte) PacketDiscriminators.REQUESTDATA.ordinal()});
 
 				if(vse.getConfig().getBoolean("crawling.enabled") == true)
-					sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.CRAWL.ordinal()});
+					sender.sendPluginMessage(vse, VSE.CHANNEL, new byte[]{(byte) PacketDiscriminators.CRAWL.ordinal()});
 
 				if(vse.getConfig().getBoolean("climbey.enabled") == true){
 
@@ -142,7 +137,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 					}
 
 					final byte[] p = byteArrayOutputStream.toByteArray();
-					sender.sendPluginMessage(vse, vse.CHANNEL, p);
+					sender.sendPluginMessage(vse, VSE.CHANNEL, p);
 				}
 
 				if (vse.getConfig().getBoolean("teleport.limitedsurvival")) {
@@ -151,12 +146,12 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 					baos.write(PacketDiscriminators.SETTING_OVERRIDE.ordinal());
 
 					writeSetting(baos, "limitedTeleport", true); // do it
-					writeSetting(baos, "teleportLimitUp", MathHelper.clamp(vse.getConfig().getInt("teleport.uplimit"), 0, 4));
-					writeSetting(baos, "teleportLimitDown", MathHelper.clamp(vse.getConfig().getInt("teleport.downlimit"), 0, 16));
-					writeSetting(baos, "teleportLimitHoriz", MathHelper.clamp(vse.getConfig().getInt("teleport.horizontallimit"), 0, 32));
+					writeSetting(baos, "teleportLimitUp", Mth.clamp(vse.getConfig().getInt("teleport.uplimit"), 0, 4));
+					writeSetting(baos, "teleportLimitDown", Mth.clamp(vse.getConfig().getInt("teleport.downlimit"), 0, 16));
+					writeSetting(baos, "teleportLimitHoriz", Mth.clamp(vse.getConfig().getInt("teleport.horizontallimit"), 0, 32));
 
 					final byte[] p = baos.toByteArray();
-					sender.sendPluginMessage(vse, vse.CHANNEL, p);
+					sender.sendPluginMessage(vse, VSE.CHANNEL, p);
 				}
 
 				if (vse.getConfig().getBoolean("worldscale.limitrange")) {
@@ -164,15 +159,15 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 
 					baos.write(PacketDiscriminators.SETTING_OVERRIDE.ordinal());
 
-					writeSetting(baos, "worldScale.min", MathHelper.a(vse.getConfig().getDouble("worldscale.min"), 0.1, 100));
-					writeSetting(baos, "worldScale.max", MathHelper.a(vse.getConfig().getDouble("worldscale.max"), 0.1, 100));
+					writeSetting(baos, "worldScale.min", Mth.clamp(vse.getConfig().getDouble("worldscale.min"), 0.1, 100));
+					writeSetting(baos, "worldScale.max", Mth.clamp(vse.getConfig().getDouble("worldscale.max"), 0.1, 100));
 
 					final byte[] p = baos.toByteArray();
-					sender.sendPluginMessage(vse, vse.CHANNEL, p);
+					sender.sendPluginMessage(vse, VSE.CHANNEL, p);
 				}
 
 				if (vse.getConfig().getBoolean("teleport.enabled"))
-					sender.sendPluginMessage(vse, vse.CHANNEL, new byte[]{(byte) PacketDiscriminators.TELEPORT.ordinal()});
+					sender.sendPluginMessage(vse, VSE.CHANNEL, new byte[]{(byte) PacketDiscriminators.TELEPORT.ordinal()});
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -206,32 +201,17 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 				float x = d.readFloat();
 				float y = d.readFloat();
 				float z = d.readFloat();
-				EntityPlayer nms = 	((CraftPlayer)sender).getHandle();
-				nms.setLocation(x, y, z, nms.pitch, nms.yaw);
+				ServerPlayer nms = 	((CraftPlayer)sender).getHandle();
+				nms.absMoveTo(x, y, z, nms.getXRot(), nms.getYRot());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 
 			break;
-		case CLIMBING:
-			
-			if(floatingCount == null) {
-				try {
-					floatingCount = PlayerConnection.class.getDeclaredField(floatinCountObf);
-				} catch (NoSuchFieldException e) {
-				} catch (SecurityException e) {
-				}
-				floatingCount.setAccessible(true);
-			}		
-			
-			EntityPlayer nms = 	((CraftPlayer)sender).getHandle();
+		case CLIMBING:			
+			ServerPlayer nms = ((CraftPlayer)sender).getHandle();
 			nms.fallDistance = 0;
-			
-			try {
-				floatingCount.setInt(nms.playerConnection, 0);
-			} catch (IllegalArgumentException e) {
-			} catch (IllegalAccessException e) {
-			}
+			Reflector.setFieldValue(Reflector.aboveGroundCount, nms.connection, 0);
 			break;
 		case ACTIVEHAND:
 			ByteArrayInputStream a2 = new ByteArrayInputStream(data);
@@ -251,7 +231,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			try {
 				vp.crawling = b3.readBoolean();
 				if (vp.crawling)
-					((CraftPlayer)sender).getHandle().setPose(EntityPose.SWIMMING);
+					((CraftPlayer)sender).getHandle().setPose(Pose.SWIMMING);
 			} catch (IOException e2) {
 				e2.printStackTrace();
 			}

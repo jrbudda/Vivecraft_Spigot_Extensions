@@ -1,42 +1,44 @@
 package org.vivecraft.utils;
 
+import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.vivecraft.Reflector;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 
-import net.minecraft.server.v1_16_R3.DataWatcher;
-import net.minecraft.server.v1_16_R3.DataWatcherObject;
-import net.minecraft.server.v1_16_R3.Entity;
-import net.minecraft.server.v1_16_R3.EntityPose;
-import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
-import org.bukkit.entity.Player;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.network.syncher.SynchedEntityData.DataItem;
+import net.minecraft.world.entity.Pose;
+
 
 public class PoseOverrider {
 	@SuppressWarnings("unchecked")
-	public static void injectPlayer(Player player) {
-		DataWatcherObject<EntityPose> poseObj = (DataWatcherObject<EntityPose>)VSE.getPrivateField("POSE", Entity.class, null);
-		DataWatcher dataWatcher = (DataWatcher)VSE.getPrivateField("datawatcher", Entity.class, ((CraftPlayer)player).getHandle());
-		Int2ObjectOpenHashMap<DataWatcher.Item<?>> entries = (Int2ObjectOpenHashMap<DataWatcher.Item<?>>)VSE.getPrivateField("entries", DataWatcher.class, dataWatcher);
-
-		InjectedDataWatcherItem item = new InjectedDataWatcherItem(poseObj, EntityPose.STANDING, player);
-		entries.put(poseObj.a(), item);
+	public static void injectPlayer(Entity player) {
+		EntityDataAccessor<Pose> poseObj = (EntityDataAccessor<Pose>) Reflector.getFieldValue(Reflector.Entity_Data_Pose, player);
+		SynchedEntityData dataWatcher = ((CraftEntity) player).getHandle().getEntityData();
+		Int2ObjectOpenHashMap<SynchedEntityData.DataItem<?>> entries = (Int2ObjectOpenHashMap<DataItem<?>>) Reflector.getFieldValue(Reflector.SynchedEntityData_itemsById, dataWatcher);
+		InjectedDataWatcherItem item = new InjectedDataWatcherItem(poseObj, Pose.STANDING, (Player)player);
+		entries.put(poseObj.getId(), item);
 	}
 
-	public static class InjectedDataWatcherItem extends DataWatcher.Item<EntityPose> {
+	public static class InjectedDataWatcherItem extends SynchedEntityData.DataItem<Pose> {
 		protected final Player player;
 
-		public InjectedDataWatcherItem(DataWatcherObject<EntityPose> datawatcherobject, EntityPose t0, Player player) {
+		public InjectedDataWatcherItem(EntityDataAccessor<Pose> datawatcherobject, Pose t0, Player player) {
 			super(datawatcherobject, t0);
 			this.player = player;
 		}
 
 		@Override
-		public void a(EntityPose pose) {
+		public void setValue(Pose pose) {
 			VivePlayer vp = VSE.vivePlayers.get(player.getUniqueId());
 			if (vp != null && vp.isVR() && vp.crawling)
-				super.a(EntityPose.SWIMMING);
+				super.setValue(Pose.SWIMMING);
 			else
-				super.a(pose);
+				super.setValue(pose);
 		}
 	}
 }
