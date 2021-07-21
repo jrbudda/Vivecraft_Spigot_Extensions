@@ -2,7 +2,6 @@ package org.vivecraft.utils;
 
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.vivecraft.Reflector;
 import org.vivecraft.VSE;
@@ -16,11 +15,11 @@ import net.minecraft.world.entity.Pose;
 
 public class PoseOverrider {
 	@SuppressWarnings("unchecked")
-	public static void injectPlayer(Entity player) {
+	public static void injectPlayer(Player player) {
 		EntityDataAccessor<Pose> poseObj = (EntityDataAccessor<Pose>) Reflector.getFieldValue(Reflector.Entity_Data_Pose, player);
 		SynchedEntityData dataWatcher = ((CraftEntity) player).getHandle().getEntityData();
 		Int2ObjectOpenHashMap<SynchedEntityData.DataItem<?>> entries = (Int2ObjectOpenHashMap<DataItem<?>>) Reflector.getFieldValue(Reflector.SynchedEntityData_itemsById, dataWatcher);
-		InjectedDataWatcherItem item = new InjectedDataWatcherItem(poseObj, Pose.STANDING, (Player)player);
+		InjectedDataWatcherItem item = new InjectedDataWatcherItem(poseObj, Pose.STANDING, player);
 		entries.put(poseObj.getId(), item);
 	}
 

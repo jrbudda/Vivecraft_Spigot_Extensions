@@ -4,9 +4,7 @@ import java.util.EnumSet;
 
 import org.vivecraft.VSE;
 
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.monster.Creeper;
 
@@ -25,7 +23,7 @@ public class CustomGoalSwell extends Goal {
     @Override
 	public boolean canUse(){
 		VSE vse = (VSE.getPlugin(VSE.class));
-        LivingEntity livingentity = ((Mob)this.creeper).getTarget();
+        LivingEntity livingentity = this.creeper.getTarget();
 		if(vse.getConfig().getBoolean("CreeperRadius.enabled") == true){
 			if(livingentity != null && VSE.vivePlayers.containsKey(livingentity.getBukkitEntity().getUniqueId()) && VSE.isVive(VSE.vivePlayers.get(livingentity.getBukkitEntity().getUniqueId()).player))
 				creeperBlowyUppyRadius = vse.getConfig().getDouble("CreeperRadius.radius");
@@ -37,7 +35,7 @@ public class CustomGoalSwell extends Goal {
     public void start()
     {
         this.creeper.getNavigation().stop();
-        this.target = ((Mob)this.creeper).getTarget();
+        this.target = this.creeper.getTarget();
     }
     
     @Override

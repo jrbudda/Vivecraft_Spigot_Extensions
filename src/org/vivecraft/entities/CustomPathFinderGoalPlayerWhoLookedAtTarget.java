@@ -9,22 +9,19 @@ import org.vivecraft.VivePlayer;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.level.EntityGetter;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends NearestAttackableTargetGoal<Player> {
-	private final Entity enderman;
-	private Entity pendingTarget;
+	private final EnderMan enderman;
+	private Player pendingTarget;
 	private int aggroTime;
 	private int teleportTime;
 	private final TargetingConditions startAggroTargetConditions;
@@ -33,7 +30,7 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends NearestAttackab
 	public CustomPathFinderGoalPlayerWhoLookedAtTarget(EnderMan entityenderman, Predicate<LivingEntity> p) {
 		super(entityenderman, Player.class, 10, false, false, p);
 		this.enderman = entityenderman;
-		this.startAggroTargetConditions = TargetingConditions.forCombat().range((double) Reflector.invoke(Reflector.TargetGoal_getFollowingDistance, this)).selector((player) ->
+		this.startAggroTargetConditions = TargetingConditions.forCombat().range(this.getFollowDistance()).selector((player) ->
 		{
 			return isLookingAtMe((Player)player);
 		});
@@ -42,7 +39,7 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends NearestAttackab
 	@Override
 	public boolean canUse()
 	{
-		this.pendingTarget = ((EntityGetter)((Entity)this.enderman).level).getNearestPlayer(this.startAggroTargetConditions, (LivingEntity)this.enderman);
+		this.pendingTarget = this.enderman.level.getNearestPlayer(this.startAggroTargetConditions, this.enderman);
 		return this.pendingTarget != null;
 	}
 
@@ -51,7 +48,7 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends NearestAttackab
 	{
 		this.aggroTime = 5;
 		this.teleportTime = 0;
-		((EnderMan) this.enderman).setBeingStaredAt();
+		this.enderman.setBeingStaredAt();
 	}
 
 	@Override
@@ -62,11 +59,11 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends NearestAttackab
 	}
 
 	//Vivecraft copy and modify from EnderMan
-	private boolean isLookingAtMe(Entity pPlayer)
+	private boolean isLookingAtMe(Player pPlayer)
 	{
-		ItemStack itemstack = ((Player) pPlayer).getInventory().armor.get(3);
+		ItemStack itemstack = pPlayer.getInventory().armor.get(3);
 
-		if (itemstack.is(((Block)Blocks.CARVED_PUMPKIN).asItem()))
+		if (itemstack.is(Blocks.CARVED_PUMPKIN.asItem()))
 		{
 			return false;
 		}
@@ -94,7 +91,7 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends NearestAttackab
 			if(vr)
 				return hasLineOfSight(hmdpos, enderman);
 			else
-				return ((LivingEntity) pPlayer).hasLineOfSight(enderman);
+				return pPlayer.hasLineOfSight(enderman);
 			//
 		}
 	}
@@ -126,7 +123,7 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends NearestAttackab
 			}
 			else
 			{
-				((EnderMan)this.enderman).lookAt(this.pendingTarget, 10.0F, 10.0F);
+				this.enderman.lookAt(this.pendingTarget, 10.0F, 10.0F);
 				return true;
 			}
 		}
@@ -139,7 +136,7 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends NearestAttackab
 	@Override
 	public void tick()
 	{
-		if (((Mob)this.enderman).getTarget() == null)
+		if (this.enderman.getTarget() == null)
 		{
 			super.setTarget((LivingEntity)null);
 		}

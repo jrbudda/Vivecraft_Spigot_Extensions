@@ -75,8 +75,7 @@ public class VivePlayer {
 			    Vector3 forward = new Vector3(0,0,-1);
 				Quaternion q = new Quaternion(w, x, y, z);
 				Vector3 out = q.multiply(forward);
-	
-				
+
 				//System.out.println("("+out.getX()+","+out.getY()+","+out.getZ()+")" + " : W:" + w + " X: "+x + " Y:" + y+ " Z:" + z);
 				da.close(); //needed?
 				return new Vec3(out.getX(), out.getY(), out.getZ());

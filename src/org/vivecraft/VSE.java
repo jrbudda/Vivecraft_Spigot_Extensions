@@ -143,7 +143,6 @@ public class VSE extends JavaPlugin implements Listener {
 	    } catch (Exception e) {
 			getLogger().warning("Could not start bStats metrics");
 	    }
-
 		
 		// Config Part
 		config.options().copyDefaults(true);
@@ -156,18 +155,15 @@ public class VSE extends JavaPlugin implements Listener {
 			List<String> temp = sec.getStringList("blocklist");
 			//make an attempt to validate these on the server for debugging.
 			if(temp != null){
-				for (String string : temp) {
-					
-					if (Reflector.invoke(Reflector.RegistryBlocks_get, net.minecraft.core.Registry.BLOCK, new ResourceLocation(string)) == null) {
+				for (String string : temp) {					
+					if (net.minecraft.core.Registry.BLOCK.get(new ResourceLocation(string)) == null) {
 						getLogger().warning("Unknown climbey block name: " + string);
 						continue;
 					}
-
 					blocklist.add(string);
 				}
 			}
-		}
-					
+		}				
 		// end Config part
 		
 		getCommand("vive").setExecutor(new ViveCommand(this));
@@ -218,9 +214,7 @@ public class VSE extends JavaPlugin implements Listener {
 		nmsStack.setHoverName(new TextComponent(key));
 		return CraftItemStack.asBukkitCopy(nmsStack);
 	}
-		
 
-	
 	@EventHandler(priority = EventPriority.MONITOR)
     public void onEvent(CreatureSpawnEvent event) {
 		if(!event.isCancelled()){
@@ -248,7 +242,7 @@ public class VSE extends JavaPlugin implements Listener {
 					break;
 				}
 			}
-			((Mob)e).goalSelector.addGoal(2, new CustomGoalSwell(e));
+			e.goalSelector.addGoal(2, new CustomGoalSwell(e));
 		}
 		else if(entity.getType() == EntityType.ENDERMAN){			
 			EnderMan e = ((CraftEnderman) entity).getHandle();
@@ -259,7 +253,7 @@ public class VSE extends JavaPlugin implements Listener {
 					break;
 				}
 			}
-			((Mob)e).targetSelector.addGoal(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e, e::isAngryAt));
+			e.targetSelector.addGoal(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e, e::isAngryAt));
 
 			AbstractCollection<WrappedGoal> goals = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob)e).goalSelector);
 			for(WrappedGoal b: goals){
@@ -268,7 +262,7 @@ public class VSE extends JavaPlugin implements Listener {
 					break;
 				}
 			}
-			((Mob)e).goalSelector.addGoal(1, new CustomGoalStare(e));
+			e.goalSelector.addGoal(1, new CustomGoalStare(e));
 		}
 	}
 
