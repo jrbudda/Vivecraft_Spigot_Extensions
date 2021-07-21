@@ -1,5 +1,7 @@
 package org.vivecraft.utils;
 
+import java.util.UUID;
+
 import org.bukkit.Location;
 import org.vivecraft.Reflector;
 import org.vivecraft.VSE;
@@ -15,6 +17,9 @@ import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
 import net.minecraft.server.RunningOnDifferentThreadException;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.util.thread.BlockableEventLoop;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
@@ -27,30 +32,30 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-		Player player = ((ServerGamePacketListenerImpl)netManager.getPacketListener()).player;
+		Entity player = ((ServerGamePacketListenerImpl)netManager.getPacketListener()).player;
 		boolean isCapturedPacket = msg instanceof ServerboundUseItemPacket || msg instanceof ServerboundUseItemOnPacket || msg instanceof ServerboundPlayerActionPacket;
-
-		if (!VSE.vivePlayers.containsKey(player.getGameProfile().getId()) || !VSE.vivePlayers.get(player.getGameProfile().getId()).isVR() || !isCapturedPacket || player.getServer() == null) {
+		UUID uuid = ((Player) player).getGameProfile().getId();
+		if (!VSE.vivePlayers.containsKey(uuid) || !VSE.vivePlayers.get(uuid).isVR() || !isCapturedPacket || player.getServer() == null) {
 			// we don't need to handle this packet, just defer to the next handler in the pipeline
 			ctx.fireChannelRead(msg);
 			return;
 		}
 
-		player.getServer().submit(() -> {
+		((BlockableEventLoop)player.getServer()).submit(() -> {
 			// Save all the current orientation data
 			Vec3 oldPos = player.position();
 			Vec3 oldPrevPos = new Vec3(player.xo, player.yo, player.zo);
 			float oldPitch = player.getXRot();
 			float oldYaw = player.getYRot();
-			float oldYawHead = player.yHeadRot; // field_70759_as
+			float oldYawHead = ((LivingEntity)player).yHeadRot; // field_70759_as
 			float oldPrevPitch = player.xRotO;
 			float oldPrevYaw = player.yRotO;
-			float oldPrevYawHead = player.yHeadRotO; // field_70758_at
+			float oldPrevYawHead = ((LivingEntity)player).yHeadRotO; // field_70758_at
 			float oldEyeHeight = player.getEyeHeight();
 
 			VivePlayer data = null;
-			if (VSE.vivePlayers.containsKey(player.getGameProfile().getId()) && VSE.vivePlayers.get(player.getGameProfile().getId()).isVR()) { // Check again in case of race condition
-				data = VSE.vivePlayers.get(player.getGameProfile().getId());
+			if (VSE.vivePlayers.containsKey(uuid) && VSE.vivePlayers.get(uuid).isVR()) { // Check again in case of race condition
+				data = VSE.vivePlayers.get(uuid);
 				Location pos = data.getControllerPos(0);
 				Vec3 aim = data.getControllerDir(0);
 
@@ -62,7 +67,7 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 				player.setXRot((float)Math.toDegrees(Math.asin(-aim.y)));
 				player.setYRot((float)Math.toDegrees(Math.atan2(-aim.x, aim.z)));
 				player.xRotO = player.getXRot();
-				player.yRotO = player.yHeadRotO = player.yHeadRot = player.getYRot();
+				player.yRotO = ((LivingEntity)player).yHeadRotO = ((LivingEntity)player).yHeadRot = player.getYRot();
 				Reflector.setFieldValue(Reflector.Entity_eyesHeight, player, 0);
 
 				// Set up offset to fix relative positions
@@ -94,10 +99,10 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 			player.zo = oldPrevPos.z;
 			player.setXRot(oldPitch);
 			player.setYRot(oldYaw);
-			player.yHeadRot = oldYawHead;
+			((LivingEntity)player).yHeadRot = oldYawHead;
 			player.xRotO = oldPrevPitch;
 			player.yRotO = oldPrevYaw;
-			player.yHeadRotO = oldPrevYawHead;
+			((LivingEntity)player).yHeadRotO = oldPrevYawHead;
 			Reflector.setFieldValue(Reflector.Entity_eyesHeight, player, oldEyeHeight);
 
 			// Reset offset
