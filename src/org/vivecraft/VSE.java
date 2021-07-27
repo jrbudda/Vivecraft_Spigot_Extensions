@@ -54,7 +54,7 @@ import org.vivecraft.utils.Headshot;
 
 import net.milkbowl.vault.permission.Permission;
 import net.minecraft.network.Connection;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
@@ -108,19 +108,6 @@ public class VSE extends JavaPlugin implements Listener {
 				recipe.setIngredient('E', Material.SPIDER_EYE);
 				recipe.setIngredient('S', Material.SHEARS);
 				Bukkit.addRecipe(recipe);
-			}
-			{
-				ItemStack is = new ItemStack(Material.ENDER_EYE);
-				ItemMeta meta = is.getItemMeta();
-				meta.setUnbreakable(true);
-				meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-				is.setItemMeta(meta);
-				is = setLocalizedItemName(is, "vivecraft.item.telescope");
-				ShapedRecipe recipe3 = new ShapedRecipe(new NamespacedKey(this, "telescope"), is);
-				recipe3.shape("DED");
-				recipe3.setIngredient('D', Material.DIAMOND);
-				recipe3.setIngredient('E', Material.ENDER_EYE);
-				Bukkit.addRecipe(recipe3);
 			}
 		}
 		try {
@@ -211,7 +198,7 @@ public class VSE extends JavaPlugin implements Listener {
 
 	public static ItemStack setLocalizedItemName(ItemStack stack, String key) {
 		var nmsStack = CraftItemStack.asNMSCopy(stack);
-		nmsStack.setHoverName(new TextComponent(key));
+		nmsStack.setHoverName(new TranslatableComponent(key));
 		return CraftItemStack.asBukkitCopy(nmsStack);
 	}
 

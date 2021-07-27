@@ -1,3 +1,4 @@
 #this file is used to check for updates
 1.17.1-a1: VSE has a new version available.
-1.17.1-b1: VSE is up to date.
+1.17.1-b1: VSE has a new version available.
+1.17.1-b2: VSE is up to date.
