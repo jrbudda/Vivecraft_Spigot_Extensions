@@ -25,9 +25,9 @@ Every player has a head and two hands (obviously), each of which have a 6DOF pos
 
 Key(s) | Value
 --- | -----
-`head.pos`, `righthand.pos`, `lefthand.pos` | `Location` representing the absolute position in the world of the VR object.
-`head.aim`, `righthand.aim`, `lefthand.aim` | `Vec3` representing the forward unit vector of the VR object. This is provided for convenience; if you want up or right vectors, use the `rot` value below.
-`head.rot`, `righthand.rot`, `lefthand.rot` | Array of 4 floats, representing a quaternion with the order `w,x,y,z`. You’ll need a `Quaternion` class to deal with this properly, but it’s much more flexible than the `aim` value. Feel free to use the one in this repository.
+`head.pos`, `righthand.pos`, `lefthand.pos` | `Location` representing the absolute position in the world of the VR object. Also includes the direction for convenience.
+`head.dir`, `righthand.dir`, `lefthand.dir` | `Vector` representing the forward direction of the VR object. This is gimbal locked; if you want up or right vectors, use the `rot` value below.
+`head.rot`, `righthand.rot`, `lefthand.rot` | Array of 4 floats, representing a quaternion with the order `w,x,y,z`. You’ll need a `Quaternion` class to deal with this properly, but it’s much more flexible than the `dir` value. Feel free to use the one in this repository.
 `seated` | `Boolean` representing the player is in seated mode. This mode disables hand tracking and places the VR hands to the sides of the head, to allow for keyboard and mouse play in VR.
 `height` | `Float` representing whether the player's calibrated height, which mainly affects how tall they appear to other players.
 `activehand` | `String` representing which hand (left or right) last performed some actions. Currently throwing projectiles such as snowballs.
