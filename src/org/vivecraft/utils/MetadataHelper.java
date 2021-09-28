@@ -8,6 +8,7 @@ import org.bukkit.metadata.MetadataValue;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 import org.bukkit.util.Vector;
+import org.bukkit.Location;
 import net.minecraft.world.phys.Vec3;
 
 public class MetadataHelper {
