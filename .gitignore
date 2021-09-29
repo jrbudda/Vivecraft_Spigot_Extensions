@@ -33,3 +33,6 @@ build/
 # Misc project things
 setup/
 lib/
+
+# Maven
+target/
