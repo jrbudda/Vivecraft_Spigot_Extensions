@@ -51,6 +51,7 @@ import org.vivecraft.listeners.VivecraftNetworkListener;
 import org.vivecraft.metrics.Metrics;
 import org.vivecraft.utils.AimFixHandler;
 import org.vivecraft.utils.Headshot;
+import org.vivecraft.utils.MetadataHelper;
 
 import net.milkbowl.vault.permission.Permission;
 import net.minecraft.network.Connection;
@@ -284,6 +285,7 @@ public class VSE extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		vivePlayers.remove(event.getPlayer().getUniqueId());
+		MetadataHelper.cleanupMetadata(event.getPlayer());
 		
 		if(getConfig().getBoolean("welcomemsg.enabled"))
 			broadcastConfigString("welcomemsg.leaveMessage", event.getPlayer().getDisplayName());

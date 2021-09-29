@@ -42,6 +42,24 @@ public class MetadataHelper {
 		addOrInvalidateKey(data.player, "activehand", () -> data.activeHand == 0 ? "right" : "left");
 	}
 
+	public static void cleanupMetadata(Player player) {
+		player.removeMetadata("head.pos", VSE.me);
+		player.removeMetadata("head.aim", VSE.me);
+		player.removeMetadata("head.dir", VSE.me);
+		player.removeMetadata("head.rot", VSE.me);
+		player.removeMetadata("righthand.pos", VSE.me);
+		player.removeMetadata("righthand.aim", VSE.me);
+		player.removeMetadata("righthand.dir", VSE.me);
+		player.removeMetadata("righthand.rot", VSE.me);
+		player.removeMetadata("lefthand.pos", VSE.me);
+		player.removeMetadata("lefthand.aim", VSE.me);
+		player.removeMetadata("lefthand.dir", VSE.me);
+		player.removeMetadata("lefthand.rot", VSE.me);
+		player.removeMetadata("seated", VSE.me);
+		player.removeMetadata("height", VSE.me);
+		player.removeMetadata("activehand", VSE.me);
+	}
+
 	private static void addOrInvalidateKey(Player player, String key, Callable<Object> lazyValue) {
 		if (!player.hasMetadata(key)) {
 			player.setMetadata(key, new LazyMetadataValue(VSE.me, lazyValue));
