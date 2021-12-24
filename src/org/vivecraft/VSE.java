@@ -18,10 +18,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_18_R1.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_18_R1.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -66,7 +66,7 @@ public class VSE extends JavaPlugin implements Listener {
 	FileConfiguration config = getConfig();
 
 	public final static String CHANNEL = "vivecraft:data";
-	private final static String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.17/version.txt";
+	private final static String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.18/version.txt";
 	private final static int bStatsId = 6931;
 
 	public static Map<UUID, VivePlayer> vivePlayers = new HashMap<UUID, VivePlayer>();

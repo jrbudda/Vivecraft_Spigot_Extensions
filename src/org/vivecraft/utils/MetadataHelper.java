@@ -2,6 +2,7 @@ package org.vivecraft.utils;
 
 import java.util.concurrent.Callable;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.LazyMetadataValue;
 import org.bukkit.metadata.MetadataValue;
