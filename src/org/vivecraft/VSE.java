@@ -382,6 +382,14 @@ public class VSE extends JavaPlugin implements Listener {
 			}
 		return false;
 	}
+	
+	public static boolean isCompanion(Player p){
+		if(p == null) return false;
+			if(vivePlayers.containsKey(p.getUniqueId())){
+				return !vivePlayers.get(p.getUniqueId()).isVR();
+			}
+		return false;
+	}
 
 	public void setPermissionsGroup(Player p) {
 		if(!vault) return;	
@@ -390,13 +398,14 @@ public class VSE extends JavaPlugin implements Listener {
 		Map<String, Boolean> groups = new HashMap<String, Boolean>();
 
 		boolean isvive = isVive(p);
+		boolean iscompanion = isCompanion(p);
 
 		String g_vive = getConfig().getString("permissions.vivegroup");
 		String g_classic = getConfig().getString("permissions.non-vivegroup");
 		if (g_vive != null && !g_vive.trim().isEmpty())
 			groups.put(g_vive, isvive);
 		if (g_classic != null && !g_classic.trim().isEmpty())
-			groups.put(g_classic, !isvive);
+			groups.put(g_classic, iscompanion);
 
 		if (isvive) {
 			String g_freemove = getConfig().getString("permissions.freemovegroup");
