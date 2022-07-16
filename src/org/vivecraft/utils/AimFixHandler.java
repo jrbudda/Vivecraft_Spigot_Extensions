@@ -65,7 +65,7 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 				player.setYRot((float)Math.toDegrees(Math.atan2(-aim.x, aim.z)));
 				player.xRotO = player.getXRot();
 				player.yRotO = player.yHeadRotO = player.yHeadRot = player.getYRot();
-				Reflector.setFieldValue(Reflector.Entity_eyesHeight, player, 0);
+				Reflector.setFieldValue(Reflector.Entity_eyeHeight, player, 0);
 
 				// Set up offset to fix relative positions
 				// P.S. Spigot mappings are stupid
@@ -100,7 +100,7 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 			player.xRotO = oldPrevPitch;
 			player.yRotO = oldPrevYaw;
 			player.yHeadRotO = oldPrevYawHead;
-			Reflector.setFieldValue(Reflector.Entity_eyesHeight, player, oldEyeHeight);
+			Reflector.setFieldValue(Reflector.Entity_eyeHeight, player, oldEyeHeight);
 
 			// Reset offset
 			if (data != null)

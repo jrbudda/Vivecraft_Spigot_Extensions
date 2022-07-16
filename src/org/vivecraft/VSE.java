@@ -18,10 +18,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -53,9 +53,10 @@ import org.vivecraft.utils.AimFixHandler;
 import org.vivecraft.utils.Headshot;
 import org.vivecraft.utils.MetadataHelper;
 
+import net.md_5.bungee.api.chat.TranslatableComponent;
 import net.milkbowl.vault.permission.Permission;
 import net.minecraft.network.Connection;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
@@ -66,7 +67,7 @@ public class VSE extends JavaPlugin implements Listener {
 	FileConfiguration config = getConfig();
 
 	public final static String CHANNEL = "vivecraft:data";
-	private final static String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.18/version.txt";
+	private final static String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.19/version.txt";
 	private final static int bStatsId = 6931;
 
 	public static Map<UUID, VivePlayer> vivePlayers = new HashMap<UUID, VivePlayer>();
@@ -199,7 +200,7 @@ public class VSE extends JavaPlugin implements Listener {
 
 	public static ItemStack setLocalizedItemName(ItemStack stack, String key) {
 		var nmsStack = CraftItemStack.asNMSCopy(stack);
-		nmsStack.setHoverName(new TranslatableComponent(key));
+		nmsStack.setHoverName(Component.translatable(key));
 		return CraftItemStack.asBukkitCopy(nmsStack);
 	}
 

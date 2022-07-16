@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.vivecraft.Reflector;
@@ -211,7 +211,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		case CLIMBING:			
 			ServerPlayer nms = ((CraftPlayer)sender).getHandle();
 			nms.fallDistance = 0;
-			Reflector.setFieldValue(Reflector.aboveGroundCount, nms.connection, 0);
+			Reflector.setFieldValue(Reflector.aboveGroundTickCount, nms.connection, 0);
 			break;
 		case ACTIVEHAND:
 			ByteArrayInputStream a2 = new ByteArrayInputStream(data);
