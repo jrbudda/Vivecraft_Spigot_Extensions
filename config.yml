@@ -26,7 +26,7 @@ setSpigotConfig:
   movedTooQuickly: 64
 pvp:
   #Allows Standing VR players to Attack other Standing VR Players
-  VRvsVR: true 
+  VRvsVR: true
   #Allows Standing VR Players to attack Non VR players
   VRvsNONVR: true
   #Allows  Seated VR Players to attack normal players.
@@ -60,8 +60,8 @@ welcomemsg:
   #Remove message to not send or set to nothing. ex: leaveMessage:
   welcomeVR: '&player has joined with standing VR!'
   welcomenonVR: '&player has joined with Non-VR companion!'
-  welcomeSeated: '&player has joined with seated VR!' 
-  welcomeVanilla: '&player has joined as a Muggle!' 
+  welcomeSeated: '&player has joined with seated VR!'
+  welcomeVanilla: '&player has joined as a Muggle!'
   leaveMessage: '&player has disconnected from the server!'
 climbey:
   #Allows use of jump_boots and climb_claws. Provide with /give (player) climb_claws | jump_boots

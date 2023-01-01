@@ -11,37 +11,37 @@ import org.vivecraft.VSE;
 public class Headshot {
     private static VSE vse;
 
-    public static void init(VSE plugin){
+    public static void init(VSE plugin) {
         vse = plugin;
     }
 
-    public static boolean isHeadshot(Entity target, Arrow arrow){
+    public static boolean isHeadshot(Entity target, Arrow arrow) {
         boolean headshot = false;
 
-        if(target.isInsideVehicle())
+        if (target.isInsideVehicle())
             return false;
 
-        if(target instanceof Player){
+        if (target instanceof Player) {
             Player player = (Player) target;
-            if(player.isSneaking()){
+            if (player.isSneaking()) {
                 //totalHeight = 1.65;
                 //bodyHeight = 1.20;
                 //headHeight = 0.45;
-                if(arrow.getLocation().getY() >= player.getLocation().getY() + 1.20)
+                if (arrow.getLocation().getY() >= player.getLocation().getY() + 1.20)
                     headshot = true;
 
-            }else if(!player.isGliding()){
+            } else if (!player.isGliding()) {
                 //This means they must be standing normally (I can't calculate it for gliding players)
                 //totalHeight = 1.80;
                 //bodyHeight = 1.35;
                 //headHeight = 0.45;
-                if(arrow.getLocation().getY() >= player.getLocation().getY() + 1.35)
+                if (arrow.getLocation().getY() >= player.getLocation().getY() + 1.35)
                     headshot = true;
             }
 
-        }else if(!vse.getConfig().getBoolean("bow.headshotmobs")){
+        } else if (!vse.getConfig().getBoolean("bow.headshotmobs")) {
             return false;
-        //TODO: Mobs
+            //TODO: Mobs
         /*}else if(target instanceof Zombie){
             Zombie zombie = (Zombie) target;
             if(zombie.isBaby()){
