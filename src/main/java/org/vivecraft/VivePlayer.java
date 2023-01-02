@@ -1,9 +1,8 @@
 package org.vivecraft;
 
-import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 import org.vivecraft.utils.Quaternion;
 import org.vivecraft.utils.Vector3;
@@ -23,7 +22,7 @@ public class VivePlayer {
     public float heightScale = 1f;
     public byte activeHand;
     public boolean crawling;
-    public Vec3 offset = new Vec3(0, 0, 0);
+    public Vector3 offset = new Vector3(0, 0, 0);
     public Player player;
     public String version;
     boolean isTeleportMode;
@@ -54,7 +53,7 @@ public class VivePlayer {
     }
 
     @SuppressWarnings("unused")
-    public Vec3 getHMDDir() {
+    public Vector getHMDDir() {
         try {
             if (hmdData != null) {
 
@@ -76,14 +75,14 @@ public class VivePlayer {
 
                 //System.out.println("("+out.getX()+","+out.getY()+","+out.getZ()+")" + " : W:" + w + " X: "+x + " Y:" + y+ " Z:" + z);
                 da.close(); //needed?
-                return new Vec3(out.getX(), out.getY(), out.getZ());
+                return new Vector(out.getX(), out.getY(), out.getZ());
             } else {
             }
         } catch (IOException e) {
 
         }
 
-        return ((CraftEntity) player).getHandle().getViewVector(1.0f);
+        return player.getLocation().getDirection();
     }
 
     @SuppressWarnings("unused")
@@ -115,7 +114,7 @@ public class VivePlayer {
     }
 
     @SuppressWarnings("unused")
-    public Vec3 getControllerDir(int controller) {
+    public Vector getControllerDir(int controller) {
         byte[] data = controller0data;
         if (controller == 1) data = controller1data;
         if (this.isSeated()) controller = 0;
@@ -141,14 +140,13 @@ public class VivePlayer {
                 Vector3 out = q.multiply(forward);
 
                 da.close(); //needed?
-                return new Vec3(out.getX(), out.getY(), out.getZ());
+                return new Vector(out.getX(), out.getY(), out.getZ());
             } catch (IOException e) {
             }
         } else {
         }
 
-        return ((CraftEntity) player).getHandle().getViewVector(1.0f);
-
+        return player.getLocation().getDirection();
     }
 
     @SuppressWarnings("unused")
@@ -181,7 +179,6 @@ public class VivePlayer {
         }
 
         return new Quaternion();
-
     }
 
     public Location getHMDPos() {
@@ -198,7 +195,7 @@ public class VivePlayer {
 
                 da.close(); //needed?
 
-                return player.getLocation().add(lx, ly, lz).add(offset.x, offset.y, offset.z);
+                return player.getLocation().add(lx, ly, lz).add(offset.getX(), offset.getY(), offset.getZ());
             } else {
             }
         } catch (IOException e) {
@@ -224,15 +221,20 @@ public class VivePlayer {
                 da.close(); //needed?
 
                 if (this.isSeated()) {
-                    Vec3 dir = this.getHMDDir();
-                    dir = dir.yRot((float) Math.toRadians(c == 0 ? -35 : 35));
-                    dir = new Vec3(dir.x, 0, dir.z);
+                    Vector dir = this.getHMDDir();
+
+                    double angle = Math.toRadians(c == 0 ? -35 : 35);
+                    double cos = Math.cos(angle);
+                    double sin = Math.sin(angle);
+                    double newX = dir.getX() * cos + dir.getZ() * sin;
+                    double newZ = dir.getZ() * cos - dir.getY() * sin;
+
+                    dir = new Vector(newX, 0, newZ);
                     dir = dir.normalize();
-                    Location out = this.getHMDPos().add(dir.x * 0.3 * worldScale, -0.4 * worldScale, dir.z * 0.3 * worldScale);
-                    return out;
+                    return this.getHMDPos().add(dir.getX() * 0.3 * worldScale, -0.4 * worldScale, dir.getZ() * 0.3 * worldScale);
                 }
 
-                return player.getLocation().add(x, y, z).add(offset.x, offset.y, offset.z);
+                return player.getLocation().add(x, y, z).add(offset.getX(), offset.getY(), offset.getZ());
             } else {
             }
         } catch (IOException e) {

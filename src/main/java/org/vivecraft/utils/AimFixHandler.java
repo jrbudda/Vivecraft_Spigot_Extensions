@@ -13,6 +13,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
+import org.bukkit.util.Vector;
 import org.vivecraft.Reflector;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
@@ -101,7 +102,7 @@ public class AimFixHandler extends ChannelInboundHandlerAdapter {
 
             // Reset offset
             if (data != null)
-                data.offset = new Vec3(0, 0, 0);
+                data.offset = new Vector3(0, 0, 0);
         });
     }
 }

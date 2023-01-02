@@ -40,9 +40,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.SpigotConfig;
 import org.vivecraft.command.ConstructTabCompleter;
 import org.vivecraft.command.ViveCommand;
-import org.vivecraft.entities.CustomGoalStare;
-import org.vivecraft.entities.CustomGoalSwell;
-import org.vivecraft.entities.CustomPathFinderGoalPlayerWhoLookedAtTarget;
 import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
@@ -243,17 +240,7 @@ public class VSE extends JavaPlugin implements Listener {
 
     @SuppressWarnings("unchecked")
     public void EditEntity(Entity entity) {
-        if (entity.getType() == EntityType.CREEPER) {
-            Creeper e = ((CraftCreeper) entity).getHandle();
-            AbstractCollection<WrappedGoal> goalB = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob) e).goalSelector);
-            for (WrappedGoal b : goalB) {
-                if (b.getGoal() instanceof net.minecraft.world.entity.ai.goal.SwellGoal) {//replace swell goal.
-                    goalB.remove(b);
-                    break;
-                }
-            }
-            e.goalSelector.addGoal(2, new CustomGoalSwell(e));
-        } else if (entity.getType() == EntityType.ENDERMAN) {
+        if (entity.getType() == EntityType.ENDERMAN) {
             EnderMan e = ((CraftEnderman) entity).getHandle();
             AbstractCollection<WrappedGoal> targets = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob) e).targetSelector);
             for (WrappedGoal b : targets) {
