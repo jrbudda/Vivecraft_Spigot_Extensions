@@ -1,6 +1,5 @@
 package org.vivecraft.utils;
 
-import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.LazyMetadataValue;
@@ -14,24 +13,21 @@ import java.util.concurrent.Callable;
 public class MetadataHelper {
     public static void updateMetdata(final VivePlayer data) {
         addOrInvalidateKey(data.player, "head.pos", () -> getPos(data.getHMDPos(), data.getHMDDir()));
-        addOrInvalidateKey(data.player, "head.aim", data::getHMDDir); // God forbid someone is using this...
-        addOrInvalidateKey(data.player, "head.dir", () -> getAim(data.getHMDDir()));
+        addOrInvalidateKey(data.player, "head.dir", data::getHMDDir);
         addOrInvalidateKey(data.player, "head.rot", () -> {
             Quaternion quat = data.getHMDRot();
             return new float[]{quat.w, quat.x, quat.y, quat.z};
         });
 
         addOrInvalidateKey(data.player, "righthand.pos", () -> getPos(data.getControllerPos(0), data.getControllerDir(0)));
-        addOrInvalidateKey(data.player, "righthand.aim", () -> data.getControllerDir(0)); // Really seriously don't use this one.
-        addOrInvalidateKey(data.player, "righthand.dir", () -> getAim(data.getControllerDir(0)));
+        addOrInvalidateKey(data.player, "righthand.dir", () -> data.getControllerDir(0));
         addOrInvalidateKey(data.player, "righthand.rot", () -> {
             Quaternion quat = data.getControllerRot(0);
             return new float[]{quat.w, quat.x, quat.y, quat.z};
         });
 
         addOrInvalidateKey(data.player, "lefthand.pos", () -> getPos(data.getControllerPos(1), data.getControllerDir(1)));
-        addOrInvalidateKey(data.player, "lefthand.aim", () -> data.getControllerDir(1)); // It's an nms class, don't use it, use the other one.
-        addOrInvalidateKey(data.player, "lefthand.dir", () -> getAim(data.getControllerDir(1)));
+        addOrInvalidateKey(data.player, "lefthand.dir", () -> data.getControllerDir(1));
         addOrInvalidateKey(data.player, "lefthand.rot", () -> {
             Quaternion quat = data.getControllerRot(1);
             return new float[]{quat.w, quat.x, quat.y, quat.z};
@@ -69,11 +65,7 @@ public class MetadataHelper {
         }
     }
 
-    private static Location getPos(Location pos, Vec3 dir) {
-        return pos.setDirection(getAim(dir));
-    }
-
-    private static Vector getAim(Vec3 dir) {
-        return new Vector(dir.x, dir.y, dir.z);
+    private static Location getPos(Location pos, Vector dir) {
+        return pos.setDirection(dir);
     }
 }

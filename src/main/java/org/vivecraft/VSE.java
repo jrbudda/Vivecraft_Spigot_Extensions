@@ -40,6 +40,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.SpigotConfig;
 import org.vivecraft.command.ConstructTabCompleter;
 import org.vivecraft.command.ViveCommand;
+import org.vivecraft.listeners.CreatureSpawnListener;
 import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
@@ -187,7 +188,7 @@ public class VSE extends JavaPlugin implements Listener {
         getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, new VivecraftNetworkListener(this));
         getServer().getMessenger().registerOutgoingPluginChannel(this, CHANNEL);
 
-        getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(new CreatureSpawnListener(), this);
         getServer().getPluginManager().registerEvents(new VivecraftCombatListener(this), this);
         getServer().getPluginManager().registerEvents(new VivecraftItemListener(this), this);
 
@@ -206,8 +207,6 @@ public class VSE extends JavaPlugin implements Listener {
             }
         }, 20, 1);
 
-        //check for any creepers and modify the fuse radius
-        CheckAllEntities();
 
         vault = true;
         if (getServer().getPluginManager().getPlugin("Vault") == null || getServer().getPluginManager().getPlugin("Vault").isEnabled() == false) {
@@ -220,46 +219,6 @@ public class VSE extends JavaPlugin implements Listener {
                 startUpdateCheck();
             }
         }, 1);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onEvent(CreatureSpawnEvent event) {
-        if (!event.isCancelled()) {
-            EditEntity(event.getEntity());
-        }
-    }
-
-    public void CheckAllEntities() {
-        List<World> wrl = this.getServer().getWorlds();
-        for (World world : wrl) {
-            for (Entity e : world.getLivingEntities()) {
-                EditEntity(e);
-            }
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public void EditEntity(Entity entity) {
-        if (entity.getType() == EntityType.ENDERMAN) {
-            EnderMan e = ((CraftEnderman) entity).getHandle();
-            AbstractCollection<WrappedGoal> targets = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob) e).targetSelector);
-            for (WrappedGoal b : targets) {
-                if (b.getPriority() == 1) { //replace PlayerWhoLookedAt target. Class is private cant use instanceof, check priority on all new versions.
-                    targets.remove(b);
-                    break;
-                }
-            }
-            e.targetSelector.addGoal(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e, e::isAngryAt));
-
-            AbstractCollection<WrappedGoal> goals = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob) e).goalSelector);
-            for (WrappedGoal b : goals) {
-                if (b.getPriority() == 1) {//replace EndermanFreezeWhenLookedAt goal. Verify priority on new version.
-                    goals.remove(b);
-                    break;
-                }
-            }
-            e.goalSelector.addGoal(1, new CustomGoalStare(e));
-        }
     }
 
     public void sendPosData() {
@@ -331,7 +290,7 @@ public class VSE extends JavaPlugin implements Listener {
 
                     if (kick) {
                         if (getConfig().getBoolean("general.vive-only")) {
-                            if (getConfig().getBoolean("general.allow-op") == false || !p.isOp()) {
+                            if (!getConfig().getBoolean("general.allow-op") || !p.isOp()) {
                                 getLogger().info(p.getName() + " " + "got kicked for not using Vivecraft");
                                 p.kickPlayer(getConfig().getString("general.vive-only-kickmessage"));
                             }

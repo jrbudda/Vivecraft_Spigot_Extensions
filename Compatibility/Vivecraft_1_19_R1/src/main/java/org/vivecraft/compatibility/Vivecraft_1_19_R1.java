@@ -32,7 +32,7 @@ import java.util.function.Predicate;
 public class Vivecraft_1_19_R1 implements VivecraftCompatibility {
 
     @Override
-    public void editCreeper(Creeper creeper, int radius) {
+    public void editCreeper(Creeper creeper, double radius) {
         net.minecraft.world.entity.monster.Creeper e = ((CraftCreeper) creeper).getHandle();
         AbstractCollection<WrappedGoal> goalB = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob) e).goalSelector);
         for (WrappedGoal b : goalB) {
