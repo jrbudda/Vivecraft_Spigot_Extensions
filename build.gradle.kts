@@ -33,12 +33,22 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT")
+    implementation("org.bstats:bstats-bukkit:3.0.0")
 }
 
+// The shadowJar task builds a "fat jar" (a jar with all dependencies built in).
 tasks.named<ShadowJar>("shadowJar") {
     classifier = null
     archiveFileName.set("Vivecraft_Spigot_Extensions-${project.version}.jar")
     configurations = listOf(project.configurations["shadeOnly"], project.configurations["runtimeClasspath"])
+
+    // This automatically "shades" (adds to jar) the bstats libs into the
+    // org.vivecraft.bstats package.
+    dependencies {
+        relocate("org.bstats", "org.vivecraft.bstats") {
+            include(dependency("org.bstats:"))
+        }
+    }
 }
 
 tasks.named("assemble").configure {

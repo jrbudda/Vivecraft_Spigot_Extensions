@@ -8,6 +8,8 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.EnderMan;
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.AdvancedPie;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -44,7 +46,6 @@ import org.vivecraft.entities.CustomPathFinderGoalPlayerWhoLookedAtTarget;
 import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
-import org.vivecraft.metrics.Metrics;
 import org.vivecraft.utils.AimFixHandler;
 import org.vivecraft.utils.Headshot;
 import org.vivecraft.utils.MetadataHelper;
@@ -140,7 +141,7 @@ public class VSE extends JavaPlugin implements Listener {
         }
         try {
             Metrics metrics = new Metrics(this, bStatsId);
-            metrics.addCustomChart(new Metrics.AdvancedPie("vrplayers", new Callable<Map<String, Integer>>() {
+            metrics.addCustomChart(new AdvancedPie("vrplayers", new Callable<Map<String, Integer>>() {
                 @Override
                 public Map<String, Integer> call() throws Exception {
                     int out = 0;
