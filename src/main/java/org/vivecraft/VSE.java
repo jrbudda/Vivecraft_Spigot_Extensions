@@ -1,34 +1,15 @@
 package org.vivecraft;
 
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.network.Connection;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.goal.WrappedGoal;
-import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.EnderMan;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.AdvancedPie;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
@@ -40,13 +21,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.SpigotConfig;
 import org.vivecraft.command.ConstructTabCompleter;
 import org.vivecraft.command.ViveCommand;
+import org.vivecraft.compatibility.CompatibilityAPI;
 import org.vivecraft.listeners.CreatureSpawnListener;
 import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
-import org.vivecraft.utils.AimFixHandler;
 import org.vivecraft.utils.Headshot;
-import org.vivecraft.utils.MetadataHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -66,12 +46,6 @@ public class VSE extends JavaPlugin implements Listener {
     public boolean vault;
     FileConfiguration config = getConfig();
     private int sendPosDataTask = 0;
-
-    public static ItemStack setLocalizedItemName(ItemStack stack, String key) {
-        var nmsStack = CraftItemStack.asNMSCopy(stack);
-        nmsStack.setHoverName(Component.translatable(key));
-        return CraftItemStack.asBukkitCopy(nmsStack);
-    }
 
     public static boolean isVive(Player p) {
         if (p == null) return false;
@@ -116,7 +90,7 @@ public class VSE extends JavaPlugin implements Listener {
                 meta.setUnbreakable(true);
                 meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
                 is.setItemMeta(meta);
-                is = setLocalizedItemName(is, "vivecraft.item.jumpboots");
+                is = CompatibilityAPI.getCompatibility().setLocalizedName(is, "vivecraft.item.jumpboots");
                 ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(this, "jump_boots"), is);
                 recipe.shape("B", "S");
                 recipe.setIngredient('B', Material.LEATHER_BOOTS);
@@ -129,7 +103,7 @@ public class VSE extends JavaPlugin implements Listener {
                 meta.setUnbreakable(true);
                 meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
                 is.setItemMeta(meta);
-                is = setLocalizedItemName(is, "vivecraft.item.climbclaws");
+                is = CompatibilityAPI.getCompatibility().setLocalizedName(is, "vivecraft.item.climbclaws");
                 ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(this, "climb_claws"), is);
                 recipe.shape("E E", "S S");
                 recipe.setIngredient('E', Material.SPIDER_EYE);
@@ -169,10 +143,7 @@ public class VSE extends JavaPlugin implements Listener {
             List<String> temp = sec.getStringList("blocklist");
             //make an attempt to validate these on the server for debugging.
             for (String string : temp) {
-                if (net.minecraft.core.Registry.BLOCK.get(new ResourceLocation(string)) == null) {
-                    getLogger().warning("Unknown climbey block name: " + string);
-                    continue;
-                }
+                // todo add validation
                 blocklist.add(string);
             }
         }
@@ -188,7 +159,7 @@ public class VSE extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents(new CreatureSpawnListener(), this);
         getServer().getPluginManager().registerEvents(new VivecraftCombatListener(this), this);
-        getServer().getPluginManager().registerEvents(new VivecraftItemListener(this), this);
+        getServer().getPluginManager().registerEvents(new VivecraftItemListener(), this);
 
         Headshot.init(this);
 

@@ -1,15 +1,11 @@
 package org.vivecraft.listeners;
 
 import com.google.common.base.Charsets;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Pose;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
-import org.vivecraft.Reflector;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
+import org.vivecraft.compatibility.CompatibilityAPI;
 import org.vivecraft.utils.MetadataHelper;
 
 import java.io.*;
@@ -118,7 +114,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
                         vp.setVR(false);
                     } else {
                         vp.setVR(true);
-                        PoseOverrider.injectPlayer(sender);
+                        CompatibilityAPI.getCompatibility().injectPoseOverrider(sender);
                     }
 
                     if (vse.getConfig().getBoolean("SendPlayerData.enabled") == true)
@@ -216,17 +212,14 @@ public class VivecraftNetworkListener implements PluginMessageListener {
                     float x = d.readFloat();
                     float y = d.readFloat();
                     float z = d.readFloat();
-                    ServerPlayer nms = ((CraftPlayer) sender).getHandle();
-                    nms.absMoveTo(x, y, z, nms.getXRot(), nms.getYRot());
+                    CompatibilityAPI.getCompatibility().absMoveTo(sender, x, y, z);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
                 break;
             case CLIMBING:
-                ServerPlayer nms = ((CraftPlayer) sender).getHandle();
-                nms.fallDistance = 0;
-                Reflector.setFieldValue(Reflector.aboveGroundTickCount, nms.connection, 0);
+                CompatibilityAPI.getCompatibility().resetFall(sender);
                 break;
             case ACTIVEHAND:
                 ByteArrayInputStream a2 = new ByteArrayInputStream(data);
@@ -246,7 +239,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
                 try {
                     vp.crawling = b3.readBoolean();
                     if (vp.crawling)
-                        ((CraftPlayer) sender).getHandle().setPose(Pose.SWIMMING);
+                        CompatibilityAPI.getCompatibility().setSwimming(sender);
                 } catch (IOException e2) {
                     e2.printStackTrace();
                 }

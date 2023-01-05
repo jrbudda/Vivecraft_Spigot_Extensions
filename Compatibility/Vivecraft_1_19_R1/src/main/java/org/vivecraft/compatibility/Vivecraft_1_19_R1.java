@@ -2,13 +2,20 @@ package org.vivecraft.compatibility;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.ReferenceCountUtil;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.network.Connection;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.RunningOnDifferentThreadException;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -29,6 +36,7 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftCreeper;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEnderman;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Player;
@@ -36,64 +44,94 @@ import org.bukkit.util.Vector;
 import org.vivecraft.Reflector;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
-import org.vivecraft.utils.AimFixHandler;
-import org.vivecraft.utils.Vector3;
 
-import java.util.AbstractCollection;
-import java.util.EnumSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class Vivecraft_1_19_R1 implements VivecraftCompatibility {
 
+    private static Class<?> classEndermanFreezeWhenLookedAt;
+    private static Class<?> classEndermanLookForPlayerGoal;
+    private static Reflector.FieldAccessor poseAccessor;
+    private static Reflector.FieldAccessor itemsByIdAccessor;
+    private static Reflector.FieldAccessor eyeHeightAccessor;
+    private static Reflector.FieldAccessor fallFlyTicksAccessor;
+    private static Reflector.MethodAccessor teleportAccessor;
+    private static Reflector.MethodAccessor teleportTowardsAccessor;
+
+
+    public Vivecraft_1_19_R1() {
+        classEndermanFreezeWhenLookedAt = Reflector.getNMSClass("net.minecraft.world.entity.monster", "EntityEnderman$a");
+        classEndermanLookForPlayerGoal = Reflector.getNMSClass("net.minecraft.world.entity.monster", "EntityEnderman$PathfinderGoalPlayerWhoLookedAtTarget");
+        poseAccessor = Reflector.getField(Entity.class, EntityDataAccessor.class, 5);
+        itemsByIdAccessor = Reflector.getField(SynchedEntityData.class, Int2ObjectMap.class, 0);
+        eyeHeightAccessor = Reflector.getField(Entity.class, "ba");  // https://nms.screamingsandals.org/1.19.3/net/minecraft/world/entity/Entity.html
+        fallFlyTicksAccessor = Reflector.getField(LivingEntity.class,  "bB");  // https://nms.screamingsandals.org/1.19.3/net/minecraft/world/entity/LivingEntity.html
+        teleportAccessor = Reflector.getMethod(EnderMan.class, "t");  // https://nms.screamingsandals.org/1.19.3/net/minecraft/world/entity/monster/EnderMan.html
+        teleportTowardsAccessor = Reflector.getMethod(Enderman.class, "a", Entity.class);
+    }
+
     @Override
     public void injectCreeper(Creeper creeper, double radius) {
         net.minecraft.world.entity.monster.Creeper e = ((CraftCreeper) creeper).getHandle();
-        AbstractCollection<WrappedGoal> goalB = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob) e).goalSelector);
-        for (WrappedGoal b : goalB) {
-            if (b.getGoal() instanceof net.minecraft.world.entity.ai.goal.SwellGoal) {//replace swell goal.
-                goalB.remove(b);
-                break;
-            }
-        }
+        Set<WrappedGoal> goals = e.goalSelector.getAvailableGoals();
+        goals.removeIf(SwellGoal.class::isInstance);
         e.goalSelector.addGoal(2, new CustomGoalSwell(e, radius));
     }
 
     @Override
     public void injectEnderman(Enderman enderman) {
         EnderMan e = ((CraftEnderman) enderman).getHandle();
-        AbstractCollection<WrappedGoal> targets = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob) e).targetSelector);
-        for (WrappedGoal b : targets) {
-            if (b.getPriority() == 1) { //replace PlayerWhoLookedAt target. Class is private cant use instanceof, check priority on all new versions.
-                targets.remove(b);
-                break;
-            }
-        }
+        Collection<WrappedGoal> targets = e.targetSelector.getAvailableGoals();
+        targets.removeIf(classEndermanLookForPlayerGoal::isInstance);
         e.targetSelector.addGoal(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e, e::isAngryAt));
 
-        AbstractCollection<WrappedGoal> goals = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob) e).goalSelector);
-        for (WrappedGoal b : goals) {
-            if (b.getPriority() == 1) {//replace EndermanFreezeWhenLookedAt goal. Verify priority on new version.
-                goals.remove(b);
-                break;
-            }
-        }
+        Collection<WrappedGoal> goals = e.goalSelector.getAvailableGoals();
+        goals.removeIf(classEndermanFreezeWhenLookedAt::isInstance);
         e.goalSelector.addGoal(1, new CustomGoalStare(e));
     }
 
-    public void injectPlayer(Player player) {
-        EntityDataAccessor<Pose> poseObj = (EntityDataAccessor<Pose>) Reflector.getFieldValue(Reflector.Entity_Data_Pose, player);
-        SynchedEntityData dataWatcher = ((CraftPlayer) player).getHandle().getEntityData();
-        Int2ObjectOpenHashMap<SynchedEntityData.DataItem<?>> entries = (Int2ObjectOpenHashMap<SynchedEntityData.DataItem<?>>) Reflector.getFieldValue(Reflector.SynchedEntityData_itemsById, dataWatcher);
-        InjectedDataWatcherItem item = new InjectedDataWatcherItem(poseObj, Pose.STANDING, player);
-        entries.put(poseObj.getId(), item);
-
-        Connection netManager = ((CraftPlayer) player).getHandle().connection.connection;
-        netManager.channel.pipeline().addBefore("packet_handler", "vr_aim_fix", new AimFixHandler(netManager));
+    @Override
+    public void injectPlayer(Player bukkit) {
+        ServerPlayer player = ((CraftPlayer) bukkit).getHandle();
+        player.networkManager.channel.pipeline().addBefore("packet_handler", "vr_aim_fix", new AimFixHandler(player.networkManager));
     }
 
+    @Override
+    public void injectPoseOverrider(Player bukkit) {
+        ServerPlayer player = ((CraftPlayer) bukkit).getHandle();
+        EntityDataAccessor<Pose> poseObj = (EntityDataAccessor<Pose>) poseAccessor.get(player);
+        Int2ObjectOpenHashMap<SynchedEntityData.DataItem<?>> entries = (Int2ObjectOpenHashMap<SynchedEntityData.DataItem<?>>) itemsByIdAccessor.get(player.getEntityData());
+        InjectedDataWatcherItem item = new InjectedDataWatcherItem(poseObj, Pose.STANDING, bukkit);
+        entries.put(poseObj.getId(), item);
+    }
 
-    public class AimFixHandler extends ChannelInboundHandlerAdapter {
+    @Override
+    public void resetFall(Player bukkit) {
+        net.minecraft.world.entity.player.Player player = ((CraftPlayer) bukkit).getHandle();
+        player.fallDistance = 0f;
+        fallFlyTicksAccessor.set(player, 0);
+    }
+
+    @Override
+    public org.bukkit.inventory.ItemStack setLocalizedName(org.bukkit.inventory.ItemStack item, String key) {
+        var nmsStack = CraftItemStack.asNMSCopy(item);
+        nmsStack.setHoverName(Component.translatable(key));
+        return CraftItemStack.asBukkitCopy(nmsStack);
+    }
+
+    @Override
+    public void setSwimming(Player player) {
+        ((CraftPlayer) player).getHandle().setPose(Pose.SWIMMING);
+    }
+
+    @Override
+    public void absMoveTo(Player bukkit, double x, double y, double z) {
+        ServerPlayer player = ((CraftPlayer) bukkit).getHandle();
+        player.absMoveTo(x, y, z);
+    }
+
+    public static class AimFixHandler extends ChannelInboundHandlerAdapter {
         private final Connection netManager;
 
         public AimFixHandler(Connection netManager) {
@@ -138,11 +176,12 @@ public class Vivecraft_1_19_R1 implements VivecraftCompatibility {
                     player.setYRot((float) Math.toDegrees(Math.atan2(-aim.getX(), aim.getZ())));
                     player.xRotO = player.getXRot();
                     player.yRotO = player.yHeadRotO = player.yHeadRot = player.getYRot();
-                    Reflector.setFieldValue(Reflector.Entity_eyeHeight, player, 0);
+                    eyeHeightAccessor.set(player, 0f);
 
                     // Set up offset to fix relative positions
                     // P.S. Spigot mappings are stupid
-                    data.offset = oldPos.add(-pos.getX(), -pos.getY(), -pos.getZ());
+                    Vec3 nms =  oldPos.add(-pos.getX(), -pos.getY(), -pos.getZ());
+                    data.offset = new Vector(nms.x, nms.y, nms.z);
                 }
 
                 // Call the packet handler directly
@@ -171,11 +210,11 @@ public class Vivecraft_1_19_R1 implements VivecraftCompatibility {
                 player.xRotO = oldPrevPitch;
                 player.yRotO = oldPrevYaw;
                 player.yHeadRotO = oldPrevYawHead;
-                Reflector.setFieldValue(Reflector.Entity_eyeHeight, player, oldEyeHeight);
+                eyeHeightAccessor.set(player, 0f);
 
                 // Reset offset
                 if (data != null)
-                    data.offset = new Vector3(0, 0, 0);
+                    data.offset = new Vector(0, 0, 0);
             });
         }
     }
@@ -223,7 +262,7 @@ public class Vivecraft_1_19_R1 implements VivecraftCompatibility {
                 distance = radiusSqr;
             }
 
-            return this.creeper.getSwellDir() > 0 || livingEntity != null && this.creeper.distanceToSqr(livingEntity) < 9.0D;
+            return this.creeper.getSwellDir() > 0 || livingEntity != null && this.creeper.distanceToSqr(livingEntity) < distance;
         }
     }
 
@@ -341,13 +380,11 @@ public class Vivecraft_1_19_R1 implements VivecraftCompatibility {
                 if (this.target != null && !this.enderman.isPassenger()) {
                     if (isLookingAtMe((net.minecraft.world.entity.player.Player) this.target)) {
                         if (this.target.distanceToSqr(this.enderman) < 16.0D) {
-                            Reflector.invoke(Reflector.Entity_teleport, enderman);
+                            teleportAccessor.invoke(enderman);
                         }
 
                         this.teleportTime = 0;
-                    } else if (this.target.distanceToSqr(this.enderman) > 256.0D && this.teleportTime++ >= 30 && (boolean) Reflector.invoke(Reflector.Entity_teleportTowards, enderman, pendingTarget))
-                        ;
-                    {
+                    } else if (this.target.distanceToSqr(this.enderman) > 256.0D && this.teleportTime++ >= 30 && (boolean) teleportTowardsAccessor.invoke(enderman, pendingTarget)) {
                         this.teleportTime = 0;
                     }
                 }

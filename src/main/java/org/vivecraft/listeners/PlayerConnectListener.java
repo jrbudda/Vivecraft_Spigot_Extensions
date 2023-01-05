@@ -7,7 +7,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
-import org.vivecraft.utils.AimFixHandler;
 import org.vivecraft.utils.MetadataHelper;
 
 public class PlayerConnectListener implements Listener {
