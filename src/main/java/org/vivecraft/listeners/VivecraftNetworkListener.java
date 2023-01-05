@@ -11,7 +11,6 @@ import org.vivecraft.Reflector;
 import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 import org.vivecraft.utils.MetadataHelper;
-import org.vivecraft.utils.PoseOverrider;
 
 import java.io.*;
 import java.util.Arrays;
@@ -162,9 +161,9 @@ public class VivecraftNetworkListener implements PluginMessageListener {
                         baos.write(PacketDiscriminators.SETTING_OVERRIDE.ordinal());
 
                         writeSetting(baos, "limitedTeleport", true); // do it
-                        writeSetting(baos, "teleportLimitUp", Mth.clamp(vse.getConfig().getInt("teleport.uplimit"), 0, 4));
-                        writeSetting(baos, "teleportLimitDown", Mth.clamp(vse.getConfig().getInt("teleport.downlimit"), 0, 16));
-                        writeSetting(baos, "teleportLimitHoriz", Mth.clamp(vse.getConfig().getInt("teleport.horizontallimit"), 0, 32));
+                        writeSetting(baos, "teleportLimitUp", clamp(vse.getConfig().getInt("teleport.uplimit"), 0, 4));
+                        writeSetting(baos, "teleportLimitDown", clamp(vse.getConfig().getInt("teleport.downlimit"), 0, 16));
+                        writeSetting(baos, "teleportLimitHoriz", clamp(vse.getConfig().getInt("teleport.horizontallimit"), 0, 32));
 
                         final byte[] p = baos.toByteArray();
                         sender.sendPluginMessage(vse, VSE.CHANNEL, p);
@@ -175,8 +174,8 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 
                         baos.write(PacketDiscriminators.SETTING_OVERRIDE.ordinal());
 
-                        writeSetting(baos, "worldScale.min", Mth.clamp(vse.getConfig().getDouble("worldscale.min"), 0.1, 100));
-                        writeSetting(baos, "worldScale.max", Mth.clamp(vse.getConfig().getDouble("worldscale.max"), 0.1, 100));
+                        writeSetting(baos, "worldScale.min", clamp(vse.getConfig().getDouble("worldscale.min"), 0.1, 100));
+                        writeSetting(baos, "worldScale.max", clamp(vse.getConfig().getDouble("worldscale.max"), 0.1, 100));
 
                         final byte[] p = baos.toByteArray();
                         sender.sendPluginMessage(vse, VSE.CHANNEL, p);
@@ -266,6 +265,14 @@ public class VivecraftNetworkListener implements PluginMessageListener {
             vse.getLogger().warning("Setting value too long: " + value);
             writeString(output, "");
         }
+    }
+
+    private static int clamp(int value, int min, int max) {
+        return Math.min(Math.max(value, min), max);
+    }
+
+    private static double clamp(double value, double min, double max) {
+        return Math.min(Math.max(value, min), max);
     }
 
     public enum PacketDiscriminators {

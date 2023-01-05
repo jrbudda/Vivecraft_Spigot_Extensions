@@ -1,9 +1,8 @@
 package org.vivecraft.utils;
 
-import net.minecraft.world.phys.Vec3;
+import org.bukkit.util.Vector;
 import org.vivecraft.utils.lwjgl.Matrix3f;
 import org.vivecraft.utils.lwjgl.Matrix4f;
-
 
 /**
  * @author Techjar
@@ -297,9 +296,9 @@ public class Quaternion {
         return result;
     }
 
-    public Vec3 multiply(Vec3 vec) {
-        Vector3 result = multiply(new Vector3((float) vec.x, (float) vec.y, (float) vec.z));
-        return new Vec3(result.x, result.y, result.z);
+    public Vector multiply(Vector vec) {
+        Vector3 result = multiply(new Vector3((float) vec.getX(), (float) vec.getY(), (float) vec.getZ()));
+        return new Vector(result.x, result.y, result.z);
     }
 
     @Override

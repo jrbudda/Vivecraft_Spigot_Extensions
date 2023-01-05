@@ -29,7 +29,7 @@ public class CreatureSpawnListener implements Listener {
         // We need to modify ALL endermen to make sure that VR players make
         // them angry properly
         if (event.getEntityType() == EntityType.ENDERMAN) {
-            CompatibilityAPI.getCompatibility().editEnderman((Enderman) event.getEntity());
+            CompatibilityAPI.getCompatibility().injectEnderman((Enderman) event.getEntity());
             return;
         }
 
@@ -41,6 +41,6 @@ public class CreatureSpawnListener implements Listener {
             return;
 
         double newRadius = VSE.me.getConfig().getDouble("CreeperRadius.radius", 3.0);
-        CompatibilityAPI.getCompatibility().editCreeper((Creeper) event.getEntity(), newRadius);
+        CompatibilityAPI.getCompatibility().injectCreeper((Creeper) event.getEntity(), newRadius);
     }
 }

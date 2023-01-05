@@ -59,7 +59,7 @@ public class VSE extends JavaPlugin implements Listener {
     public final static String CHANNEL = "vivecraft:data";
     private final static String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.19/version.txt";
     private final static int bStatsId = 6931;
-    public static Map<UUID, VivePlayer> vivePlayers = new HashMap<UUID, VivePlayer>();
+    public static Map<UUID, VivePlayer> vivePlayers = new HashMap<>();
     public static VSE me;
     public List<String> blocklist = new ArrayList<>();
     public boolean debug = false;
@@ -168,14 +168,12 @@ public class VSE extends JavaPlugin implements Listener {
         if (sec != null) {
             List<String> temp = sec.getStringList("blocklist");
             //make an attempt to validate these on the server for debugging.
-            if (temp != null) {
-                for (String string : temp) {
-                    if (net.minecraft.core.Registry.BLOCK.get(new ResourceLocation(string)) == null) {
-                        getLogger().warning("Unknown climbey block name: " + string);
-                        continue;
-                    }
-                    blocklist.add(string);
+            for (String string : temp) {
+                if (net.minecraft.core.Registry.BLOCK.get(new ResourceLocation(string)) == null) {
+                    getLogger().warning("Unknown climbey block name: " + string);
+                    continue;
                 }
+                blocklist.add(string);
             }
         }
         // end Config part
@@ -247,68 +245,6 @@ public class VSE extends JavaPlugin implements Listener {
     public void onDisable() {
         getServer().getScheduler().cancelTask(sendPosDataTask);
         super.onDisable();
-    }
-
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        vivePlayers.remove(event.getPlayer().getUniqueId());
-        MetadataHelper.cleanupMetadata(event.getPlayer());
-
-        if (getConfig().getBoolean("welcomemsg.enabled"))
-            broadcastConfigString("welcomemsg.leaveMessage", event.getPlayer().getDisplayName());
-    }
-
-    @EventHandler
-    public void onPlayerConnect(PlayerJoinEvent event) {
-        final Player p = event.getPlayer();
-
-        if (debug) getLogger().info(p.getName() + " Has joined the server");
-
-        int t = getConfig().getInt("general.vive-only-kickwaittime", 200);
-        if (t < 100) t = 100;
-        if (t > 1000) t = 1000;
-
-        if (debug)
-            getLogger().info("Checking " + event.getPlayer().getName() + " for Vivecraft");
-
-        getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-            @Override
-            public void run() {
-                if (p.isOnline()) {
-                    boolean kick = false;
-
-                    if (vivePlayers.containsKey(p.getUniqueId())) {
-                        VivePlayer vp = VSE.vivePlayers.get(p.getUniqueId());
-                        if (debug)
-                            getLogger().info(p.getName() + " using: " + vp.version + " " + (vp.isVR() ? "VR" : "NONVR") + " " + (vp.isSeated() ? "SEATED" : ""));
-                        if (!vp.isVR()) kick = true;
-                    } else {
-                        kick = true;
-                        if (debug)
-                            getLogger().info(p.getName() + " Vivecraft not detected");
-                    }
-
-                    if (kick) {
-                        if (getConfig().getBoolean("general.vive-only")) {
-                            if (!getConfig().getBoolean("general.allow-op") || !p.isOp()) {
-                                getLogger().info(p.getName() + " " + "got kicked for not using Vivecraft");
-                                p.kickPlayer(getConfig().getString("general.vive-only-kickmessage"));
-                            }
-                            return;
-                        }
-                    }
-
-                    sendWelcomeMessage(p);
-                    setPermissionsGroup(p);
-                } else {
-                    if (debug)
-                        getLogger().info(p.getName() + " no longer online! ");
-                }
-            }
-        }, t);
-
-        Connection netManager = ((CraftPlayer) p).getHandle().connection.connection;
-        netManager.channel.pipeline().addBefore("packet_handler", "vr_aim_fix", new AimFixHandler(netManager));
     }
 
     public void startUpdateCheck() {

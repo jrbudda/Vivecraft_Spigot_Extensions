@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 import org.vivecraft.utils.Quaternion;
-import org.vivecraft.utils.Vector3;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -22,7 +21,7 @@ public class VivePlayer {
     public float heightScale = 1f;
     public byte activeHand;
     public boolean crawling;
-    public Vector3 offset = new Vector3(0, 0, 0);
+    public Vector offset = new Vector(0, 0, 0);
     public Player player;
     public String version;
     boolean isTeleportMode;
@@ -69,9 +68,9 @@ public class VivePlayer {
                 float x = da.readFloat();
                 float y = da.readFloat();
                 float z = da.readFloat();
-                Vector3 forward = new Vector3(0, 0, -1);
+                Vector forward = new Vector(0, 0, -1);
                 Quaternion q = new Quaternion(w, x, y, z);
-                Vector3 out = q.multiply(forward);
+                Vector out = q.multiply(forward);
 
                 //System.out.println("("+out.getX()+","+out.getY()+","+out.getZ()+")" + " : W:" + w + " X: "+x + " Y:" + y+ " Z:" + z);
                 da.close(); //needed?
@@ -135,9 +134,9 @@ public class VivePlayer {
                 float x = da.readFloat();
                 float y = da.readFloat();
                 float z = da.readFloat();
-                Vector3 forward = new Vector3(0, 0, -1);
+                Vector forward = new Vector(0, 0, -1);
                 Quaternion q = new Quaternion(w, x, y, z);
-                Vector3 out = q.multiply(forward);
+                Vector out = q.multiply(forward);
 
                 da.close(); //needed?
                 return new Vector(out.getX(), out.getY(), out.getZ());
