@@ -32,6 +32,10 @@ bukkit {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     implementation(project(":")) // base project
     implementation(project(":Vivecraft_1_19_R1", "reobf"))
