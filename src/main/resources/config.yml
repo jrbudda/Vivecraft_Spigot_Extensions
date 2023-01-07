@@ -1,4 +1,4 @@
-general:
+eneral:
   debug: false
   #will check for a newer version and alert any OP when they login to the server
   checkforupdate: true
