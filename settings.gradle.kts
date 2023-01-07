@@ -15,5 +15,7 @@ rootProject.name = "Vivecraft_Spigot_Extensions"
 include(":BuildVivecraftSpigotExtensions")
 
 include(":Vivecraft_1_19_R1")
+include(":Vivecraft_1_19_R2")
 
 project(":Vivecraft_1_19_R1").projectDir = file("Compatibility/Vivecraft_1_19_R1")
+project(":Vivecraft_1_19_R2").projectDir = file("Compatibility/Vivecraft_1_19_R2")

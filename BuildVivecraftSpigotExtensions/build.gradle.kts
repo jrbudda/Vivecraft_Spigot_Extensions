@@ -32,17 +32,10 @@ bukkit {
     }
 }
 
-repositories {
-    mavenCentral()
-
-    maven {
-        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    }
-}
-
 dependencies {
     implementation(project(":")) // base project
     implementation(project(":Vivecraft_1_19_R1", "reobf"))
+    implementation(project(":Vivecraft_1_19_R2", "reobf"))
 }
 
 tasks {
@@ -63,6 +56,7 @@ tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         include(project(":")) // base project
         include(project(":Vivecraft_1_19_R1"))
+        include(project(":Vivecraft_1_19_R2"))
 
         relocate("org.bstats", "org.vivecraft.bstats") {
             include(dependency("org.bstats:"))
