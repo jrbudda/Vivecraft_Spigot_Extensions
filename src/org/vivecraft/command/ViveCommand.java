@@ -36,7 +36,7 @@ public class ViveCommand implements CommandExecutor {
 	}
 
 	private boolean hasCommandPermission(CommandSender sender) {
-		return sender.isOp() || sender.hasPermission("vivecraft.command.permission");
+		return sender.isOp() || sender.hasPermission("vive.command");
 	}
 
 	@SuppressWarnings("rawtypes")
