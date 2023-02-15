@@ -196,10 +196,15 @@ public class VivePlayer {
 				float lx = da.readFloat();
 				float ly = da.readFloat();
 				float lz = da.readFloat();
+
+				float w = da.readFloat();
+				float x = da.readFloat();
+				float y = da.readFloat();
+				float z = da.readFloat();
 				
 				da.close(); //needed?
 								
-				return player.getLocation().add(lx, ly, lz).add(offset.x, offset.y, offset.z);
+				return applyRot(player.getLocation().add(lx, ly, lz).add(offset.x, offset.y, offset.z), w, x, y, z);
 			}else{
 			}
 		} catch (IOException e) {
@@ -218,6 +223,11 @@ public class VivePlayer {
 				DataInputStream da = new DataInputStream(byin);
 		
 				this.isReverseHands = da.readBoolean();
+				float lx = da.readFloat();
+				float ly = da.readFloat();
+				float lz = da.readFloat();
+
+				float w = da.readFloat();
 				float x = da.readFloat();
 				float y = da.readFloat();
 				float z = da.readFloat();
@@ -230,10 +240,10 @@ public class VivePlayer {
 					dir = new Vec3(dir.x, 0, dir.z);
 					dir = dir.normalize();
 					Location out = this.getHMDPos().add(dir.x * 0.3 * worldScale, -0.4* worldScale ,dir.z*0.3* worldScale);
-					return out;
+					return applyRot(out, w, x, y, z);
 				}
 				
-				return player.getLocation().add(x, y, z).add(offset.x, offset.y, offset.z);
+				return applyRot(player.getLocation().add(lx, ly, lz).add(offset.x, offset.y, offset.z), w, x, y, z);
 			}else{
 			}
 		} catch (IOException e) {
@@ -292,4 +302,27 @@ public class VivePlayer {
 
 	}
 
+	/**
+	 * Adds the yaw/pitch to the given Location. Takes quaternion angle inputs
+	 * and converts them to euler angles.
+	 *
+	 * @param location The location to modify.
+	 * @param w        The quaternion 'w' value.
+	 * @param x        The quaternion 'x' value.
+	 * @param y        The quaternion 'y' value.
+	 * @param z        The quaternion 'z' value.
+	 * @return A non-null reference to the passed location.
+	 */
+	private static Location applyRot(Location location, double w, double x, double y, double z) {
+		double t0 = -2.0 * (y * y + z * z) + 1.0;
+		double t1 = +2.0 * (x * y + w * z);
+		double t2 = -2.0 * (x * z - w * y);
+
+		t2 = Math.min(t2, 1.0);
+		t2 = Math.max(t2, -1.0);
+
+		location.setPitch((float) Math.asin(t2));
+		location.setYaw((float) Math.atan2(t1, t0));
+		return location;
+	}
 }
