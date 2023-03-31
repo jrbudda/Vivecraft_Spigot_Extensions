@@ -18,10 +18,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -55,6 +55,7 @@ import org.vivecraft.utils.MetadataHelper;
 
 import net.md_5.bungee.api.chat.TranslatableComponent;
 import net.milkbowl.vault.permission.Permission;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -144,8 +145,8 @@ public class VSE extends JavaPlugin implements Listener {
 			List<String> temp = sec.getStringList("blocklist");
 			//make an attempt to validate these on the server for debugging.
 			if(temp != null){
-				for (String string : temp) {					
-					if (net.minecraft.core.Registry.BLOCK.get(new ResourceLocation(string)) == null) {
+				for (String string : temp) {		
+					if (BuiltInRegistries.BLOCK.get(new ResourceLocation(string)) == null) {
 						getLogger().warning("Unknown climbey block name: " + string);
 						continue;
 					}
