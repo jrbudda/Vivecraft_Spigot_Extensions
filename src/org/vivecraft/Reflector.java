@@ -11,7 +11,7 @@ import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.monster.EnderMan;
 
 public class Reflector {
-	//last checked 1.19.4
+	//last checked 1.19.3
 	public static Field Entity_Data_Pose= getPrivateField("ad", Entity.class);
 	public static Field Entity_eyeHeight = getPrivateField("ba", Entity.class);
 	public static Field SynchedEntityData_itemsById = getPrivateField("e", SynchedEntityData.class);

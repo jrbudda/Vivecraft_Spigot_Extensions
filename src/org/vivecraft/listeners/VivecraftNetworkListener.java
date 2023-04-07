@@ -6,9 +6,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.vivecraft.Reflector;
@@ -16,8 +17,6 @@ import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 import org.vivecraft.utils.MetadataHelper;
 import org.vivecraft.utils.PoseOverrider;
-
-import com.google.common.base.Charsets;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -266,7 +265,7 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 	}
 
 	public static boolean writeString(ByteArrayOutputStream output, String str) {
-		byte[] bytes = str.getBytes(Charsets.UTF_8);
+		byte[] bytes = str.getBytes(Charset.forName("UTF-8"));
 		int len = bytes.length;
 		try {
 			if(!writeVarInt(output, len, 2))

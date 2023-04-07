@@ -18,10 +18,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -53,7 +53,6 @@ import org.vivecraft.utils.AimFixHandler;
 import org.vivecraft.utils.Headshot;
 import org.vivecraft.utils.MetadataHelper;
 
-import net.md_5.bungee.api.chat.TranslatableComponent;
 import net.milkbowl.vault.permission.Permission;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.Connection;
@@ -342,7 +341,7 @@ public class VSE extends JavaPlugin implements Listener {
 			}
 		}, t);
 
-		Connection netManager = ((CraftPlayer)p).getHandle().connection.connection;
+		Connection netManager = (Connection) Reflector.getFieldValue(Reflector.connection, ((CraftPlayer)p).getHandle().connection); 
 		netManager.channel.pipeline().addBefore("packet_handler", "vr_aim_fix", new AimFixHandler(netManager));
 	}
 		
@@ -363,7 +362,6 @@ public class VSE extends JavaPlugin implements Listener {
 					if(bits[0].trim().equalsIgnoreCase(version)){
 						updatemsg = bits[1].trim();
 						getLogger().info(updatemsg);
-						//ViveCommand.sendMessage(updatemsg, p);
 						break;
 					}
 				}
