@@ -418,7 +418,7 @@ public class VSE extends JavaPlugin implements Listener {
 
 					if(kick) {
 						if (getConfig().getBoolean("general.vive-only")) {
-							if (getConfig().getBoolean("general.allow-op") == false || !p.isOp()) {
+							if (!getConfig().getBoolean("general.allow-op") || !p.isOp() || !p.hasPermission("vivecraft.bypass")) {
 								getLogger().info(p.getName() + " " + "got kicked for not using Vivecraft");
 								p.kickPlayer(getConfig().getString("general.vive-only-kickmessage"));
 							}						
