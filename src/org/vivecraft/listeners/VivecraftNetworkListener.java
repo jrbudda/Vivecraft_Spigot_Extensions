@@ -9,8 +9,8 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-import net.minecraft.server.v1_16_R2.EntityPose;
-import org.bukkit.craftbukkit.v1_16_R2.entity.CraftPlayer;
+import net.minecraft.server.v1_16_R3.EntityPose;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.vivecraft.VSE;
@@ -20,9 +20,9 @@ import org.vivecraft.utils.PoseOverrider;
 
 import com.google.common.base.Charsets;
 
-import net.minecraft.server.v1_16_R2.EntityPlayer;
-import net.minecraft.server.v1_16_R2.MathHelper;
-import net.minecraft.server.v1_16_R2.PlayerConnection;
+import net.minecraft.server.v1_16_R3.EntityPlayer;
+import net.minecraft.server.v1_16_R3.MathHelper;
+import net.minecraft.server.v1_16_R3.PlayerConnection;
 
 
 public class VivecraftNetworkListener implements PluginMessageListener {

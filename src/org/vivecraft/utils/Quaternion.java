@@ -3,7 +3,7 @@ package org.vivecraft.utils;
 import org.vivecraft.utils.lwjgl.Matrix3f;
 import org.vivecraft.utils.lwjgl.Matrix4f;
 
-import net.minecraft.server.v1_16_R2.Vec3D;
+import net.minecraft.server.v1_16_R3.Vec3D;
 
 /**
  *

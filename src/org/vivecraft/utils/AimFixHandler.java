@@ -6,17 +6,17 @@ import org.vivecraft.VivePlayer;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
-import net.minecraft.server.v1_16_R2.CancelledPacketHandleException;
-import net.minecraft.server.v1_16_R2.Entity;
-import net.minecraft.server.v1_16_R2.EntityPlayer;
-import net.minecraft.server.v1_16_R2.NetworkManager;
-import net.minecraft.server.v1_16_R2.Packet;
-import net.minecraft.server.v1_16_R2.PacketListener;
-import net.minecraft.server.v1_16_R2.PacketPlayInBlockDig;
-import net.minecraft.server.v1_16_R2.PacketPlayInBlockPlace;
-import net.minecraft.server.v1_16_R2.PacketPlayInUseItem;
-import net.minecraft.server.v1_16_R2.PlayerConnection;
-import net.minecraft.server.v1_16_R2.Vec3D;
+import net.minecraft.server.v1_16_R3.CancelledPacketHandleException;
+import net.minecraft.server.v1_16_R3.Entity;
+import net.minecraft.server.v1_16_R3.EntityPlayer;
+import net.minecraft.server.v1_16_R3.NetworkManager;
+import net.minecraft.server.v1_16_R3.Packet;
+import net.minecraft.server.v1_16_R3.PacketListener;
+import net.minecraft.server.v1_16_R3.PacketPlayInBlockDig;
+import net.minecraft.server.v1_16_R3.PacketPlayInBlockPlace;
+import net.minecraft.server.v1_16_R3.PacketPlayInUseItem;
+import net.minecraft.server.v1_16_R3.PlayerConnection;
+import net.minecraft.server.v1_16_R3.Vec3D;
 import org.bukkit.Location;
 
 public class AimFixHandler extends ChannelInboundHandlerAdapter {
