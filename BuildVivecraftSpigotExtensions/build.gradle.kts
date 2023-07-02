@@ -19,7 +19,7 @@ bukkit {
     main = "org.vivecraft.VSE"
     apiVersion = "1.19"
     website = "https://www.vivecraft.org"
-    authors = listOf("jrbudda", "jaron780")
+    authors = listOf("jrbudda", "jaron780", "CJCrafter")
     prefix = "Vivecraft"
     softDepend = listOf("Vault")
 
