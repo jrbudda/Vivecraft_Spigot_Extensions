@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-    id("io.papermc.paperweight.userdev") version "1.3.9"
+    id("io.papermc.paperweight.userdev")
 }
 
 repositories {
@@ -12,9 +12,9 @@ repositories {
 }
 
 dependencies {
-    paperDevBundle("1.19.3-R0.1-SNAPSHOT")
+    paperDevBundle("1.19.4-R0.1-SNAPSHOT")
     implementation(project(":"))
-    compileOnly("org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
 }
 
 tasks {

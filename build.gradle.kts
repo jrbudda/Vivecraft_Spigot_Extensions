@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    id("io.papermc.paperweight.userdev") version "1.5.5" apply false
 }
 
 repositories {
@@ -10,9 +11,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
-    implementation("org.bstats:bstats-bukkit:3.0.0")
+    implementation("org.bstats:bstats-bukkit:3.0.1")
 }
 
 java {

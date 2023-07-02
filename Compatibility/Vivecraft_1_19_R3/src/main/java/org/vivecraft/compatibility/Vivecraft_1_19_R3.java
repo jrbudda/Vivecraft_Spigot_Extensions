@@ -32,10 +32,10 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Player;
@@ -47,7 +47,7 @@ import org.vivecraft.VivePlayer;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class Vivecraft_1_19_R1 implements VivecraftCompatibility {
+public class Vivecraft_1_19_R3 implements VivecraftCompatibility {
 
     private static Class<?> classEndermanFreezeWhenLookedAt;
     private static Class<?> classEndermanLookForPlayerGoal;
@@ -59,14 +59,14 @@ public class Vivecraft_1_19_R1 implements VivecraftCompatibility {
     private static Reflector.MethodAccessor teleportTowardsAccessor;
 
 
-    public Vivecraft_1_19_R1() {
+    public Vivecraft_1_19_R3() {
         classEndermanFreezeWhenLookedAt = Reflector.getNMSClass("net.minecraft.world.entity.monster", "EntityEnderman$a");
         classEndermanLookForPlayerGoal = Reflector.getNMSClass("net.minecraft.world.entity.monster", "EntityEnderman$PathfinderGoalPlayerWhoLookedAtTarget");
         poseAccessor = Reflector.getField(Entity.class, EntityDataAccessor.class, 5);
         itemsByIdAccessor = Reflector.getField(SynchedEntityData.class, Int2ObjectMap.class, 0);
-        eyeHeightAccessor = Reflector.getField(Entity.class, "ba");  // https://nms.screamingsandals.org/1.19.2/net/minecraft/world/entity/Entity.html
-        fallFlyTicksAccessor = Reflector.getField(LivingEntity.class,  "bB");  // https://nms.screamingsandals.org/1.19.2/net/minecraft/world/entity/LivingEntity.html
-        teleportAccessor = Reflector.getMethod(EnderMan.class, "t");  // https://nms.screamingsandals.org/1.19.2/net/minecraft/world/entity/monster/EnderMan.html
+        eyeHeightAccessor = Reflector.getField(Entity.class, "bf");  // https://nms.screamingsandals.org/1.19.4/net/minecraft/world/entity/Entity.html
+        fallFlyTicksAccessor = Reflector.getField(LivingEntity.class, "bw");  // https://nms.screamingsandals.org/1.19.4/net/minecraft/world/entity/LivingEntity.html
+        teleportAccessor = Reflector.getMethod(EnderMan.class, "w");  // https://nms.screamingsandals.org/1.19.4/net/minecraft/world/entity/monster/EnderMan.html
         teleportTowardsAccessor = Reflector.getMethod(Enderman.class, "a", Entity.class);
     }
 

@@ -38,8 +38,10 @@ repositories {
 
 dependencies {
     implementation(project(":")) // base project
-    implementation(project(":Vivecraft_1_19_R1", "reobf"))
-    implementation(project(":Vivecraft_1_19_R2", "reobf"))
+
+    listOf("19_R3", "20_R1").forEach {
+        implementation(project(":Vivecraft_1_$it", "reobf"))
+    }
 }
 
 tasks {
@@ -59,8 +61,10 @@ tasks.named<ShadowJar>("shadowJar") {
     // org.vivecraft.bstats package.
     dependencies {
         include(project(":")) // base project
-        include(project(":Vivecraft_1_19_R1"))
-        include(project(":Vivecraft_1_19_R2"))
+
+        listOf("19_R3", "20_R1").forEach {
+            include(dependency(":Vivecraft_1_$it"))
+        }
 
         relocate("org.bstats", "org.vivecraft.bstats") {
             include(dependency("org.bstats:"))
