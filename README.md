@@ -3,9 +3,8 @@
 ![Image](https://i0.wp.com/www.vivecraft.org/wp-content/uploads/2016/07/wesYwME.png?w=650&ssl=1)
 
 [![Spigot](https://img.shields.io/badge/-Spigot-orange?logo=data%3Aimage%2Fx-icon%3Bbase64%2CAAABAAEAEBAQAAAAAAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAND%2FAOhGOgA%2F6OIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAiAAAAAAAAACIAAAAAAAAAIgAAAAAAAAAAAAAAAAAAABEAAAAzMQABEQAAARMzEBERARERETMxERAAAAARMzEAAAAAAAETMwAAAAAAABEwAAAAAAAAERAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAD%2F%2BQAA%2F%2FkAAP%2F5AAD%2F8AAA%2BDAAAPAgAAAAAAAAAAEAAAADAADwDwAA%2FB8AAPwfAAD8HwAA%2Fj8AAP4%2FAADwBwAA)](https://www.spigotmc.org/resources/33166/)
-[![Discord](https://img.shields.io/discord/178567952780623872.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/2x3QCk8qa9)
-[![Download](https://img.shields.io/github/downloads/jrbudda/Vivecraft_Spigot_Extensions/total?color=green)](https://github.com/jrbudda/Vivecraft_Spigot_Extensions/releases/latest)
-[![Version](https://img.shields.io/github/v/release/jrbudda/Vivecraft_Spigot_Extensions?include_prereleases&label=version)](https://github.com/jrbudda/Vivecraft_Spigot_Extensions/releases/latest)
+[![Download](https://img.shields.io/github/downloads/CJCrafter/Vivecraft_Spigot_Extensions/total?color=green)](https://github.com/CJCrafter/Vivecraft_Spigot_Extensions/releases/latest)
+[![Version](https://img.shields.io/github/v/release/CJCrafter/Vivecraft_Spigot_Extensions?include_prereleases&label=version)](https://github.com/CJCrafter/Vivecraft_Spigot_Extensions/releases/latest)
 </div>
 
 # Vivecraft Spigot Extensions
@@ -13,27 +12,50 @@
 VSE is a companion plugin for [Vivecraft](http://www.vivecraft.org), the VR mod for Java Minecraft.  
 VSE is for [Spigot](https://www.spigotmc.org/) servers and adds several enhancements for VR players.
 
-# Features
+# Disclaimer
+This is NOT the original version of VSE. This is a modified version of the original
+to fix various issues, add a working API, and *attempts* to *partially* fix some of the worst 
+Spigot code I have ever seen. I intended for my code to merged into the original
+project, but the developers have not responded to my multiple requests in 6 months.
+So I created this project to add VR support to [WeaponMechanics](https://www.spigotmc.org/resources/99913/). 
+Any other developers are free to use this plugin to add their own VR support.
 
-- Vivecraft players will see other Vivecraft players head and arm movements.
-- Support for Vivecraft 2-handed archery.
-- Assign permission groups for VR players.
-- Fixes projectiles and dropped items from VR players.
-- Shrinks Creeper explosion radius for VR players from 3 to 1.75m (Configurable)
-- Option to limit server to Vivecraft players only.
+I do **NOT**:
+ * provide support for this plugin
+ * have any plans to add any new features
+ * have any associations with the original plugin
 
-See the config.yml for all available configuration options.
-
-# Installation
-
-Download from the [Releases](https://github.com/jrbudda/Vivecraft_Spigot_Extensions/releases) page. Please ensure you
-download the correct version of the plugin as they are not backwards compatible.
-
-Install as you would any other Spigot/Bukkit plugin by placing the jar in the /plugins folder.
+Please consider downloading the [original version](https://www.spigotmc.org/resources/33166/) instead.
 
 # Developer Information
 
+Due to the Metadata system not working when multiple worlds are involved (such as Multiverse), 
+it is recommended to depend on the jar directly. Use `VSE.vivePlayers.get(UUID)`
+
+Here is an example from WeaponMechanics which gets the location of the VR hand (and direction):
+```java
+        if (Bukkit.getPluginManager().getPlugin("Vivecraft-Spigot-Extensions") != null
+                && livingEntity.getType() == EntityType.PLAYER) {
+            // Vivecraft support for VR players
+
+            VivePlayer vive = VSE.vivePlayers.get(livingEntity.getUniqueId());
+            if (vive != null && vive.isVR()) {
+                // Now we know it's actually VR player
+
+                // Get the position and direction from player metadata
+                Location location = vive.getControllerPos(mainhand ? 0 : 1);
+                location.setDirection(vive.getControllerDir(mainhand ? 0 : 1));
+                return location;
+            }
+
+            // Not VR player, let pass to these normal location finders
+        }
+```
+
 ## Metadata
+
+The following information is from the legacy API and original version. Expect it to not work randomly.
+
 
 VSE provides Spigot metadata on `Player` objects so other plugins can provide special support for handed interactions or
 somesuch. If you aren’t sure what metadata is, check
