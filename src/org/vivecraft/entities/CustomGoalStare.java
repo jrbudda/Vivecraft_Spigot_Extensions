@@ -101,7 +101,7 @@ public class CustomGoalStare extends Goal {
     	}
     	else
     	{
-    		return entity.level.clip(new ClipContext(source, vec31, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity)).getType() == HitResult.Type.MISS;
+    		return entity.level().clip(new ClipContext(source, vec31, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity)).getType() == HitResult.Type.MISS;
     	}
     }
     

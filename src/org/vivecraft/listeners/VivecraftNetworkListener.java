@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.vivecraft.Reflector;
@@ -44,7 +44,11 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 		SETTING_OVERRIDE,
 		HEIGHT,
 		ACTIVEHAND,
-		CRAWL
+		CRAWL,
+        NETWORK_VERSION,
+        VR_SWITCHING,
+        IS_VR_ACTIVE,
+        VR_PLAYER_STATE
 	}
 	
 	@Override
@@ -111,6 +115,9 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 				if(vse.getConfig().getBoolean("crawling.enabled") == true)
 					sender.sendPluginMessage(vse, VSE.CHANNEL, new byte[]{(byte) PacketDiscriminators.CRAWL.ordinal()});
 
+				if(vse.getConfig().getBoolean("general.vive-only") == false)
+					sender.sendPluginMessage(vse, VSE.CHANNEL, new byte[]{(byte) PacketDiscriminators.VR_SWITCHING.ordinal(), 1});
+			
 				if(vse.getConfig().getBoolean("climbey.enabled") == true){
 
 					final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -234,6 +241,24 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 			} catch (IOException e2) {
 				e2.printStackTrace();
 			}
+			break;
+		case IS_VR_ACTIVE:
+			ByteArrayInputStream vrb = new ByteArrayInputStream(data);
+			DataInputStream vrd = new DataInputStream(vrb);
+			boolean vr;
+			try {
+				vr = vrd.readBoolean();
+				if(vp.isVR()==vr) break;
+				vp.setVR(vr);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			break;
+		case NETWORK_VERSION:
+			//don't care yet.
+			break;
+		case VR_PLAYER_STATE:
+			//todo.
 			break;
 		default:
 			break;

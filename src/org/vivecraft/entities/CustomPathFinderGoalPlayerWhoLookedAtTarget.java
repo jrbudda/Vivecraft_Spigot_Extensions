@@ -39,7 +39,7 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends NearestAttackab
 	@Override
 	public boolean canUse()
 	{
-		this.pendingTarget = this.enderman.level.getNearestPlayer(this.startAggroTargetConditions, this.enderman);
+		this.pendingTarget = this.enderman.level().getNearestPlayer(this.startAggroTargetConditions, this.enderman);
 		return this.pendingTarget != null;
 	}
 
@@ -107,7 +107,7 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends NearestAttackab
     	}
     	else
     	{
-    		return entity.level.clip(new ClipContext(source, vec31, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity)).getType() == HitResult.Type.MISS;
+    		return entity.level().clip(new ClipContext(source, vec31, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity)).getType() == HitResult.Type.MISS;
     	}
     }
 	

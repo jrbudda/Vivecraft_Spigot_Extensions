@@ -1,8 +1,8 @@
 package org.vivecraft.listeners;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -115,7 +115,7 @@ public class VivecraftCombatListener implements Listener{
 		if (damager instanceof Player) {
 			if (damaged instanceof Player) {
 				Player attacker = (Player) damager;
-				Player victim = (Player) damager;
+				Player victim = (Player) damaged;
 
 				if (!vse.getConfig().getBoolean("pvp.VRvsVR",true)) {
 					if (VSE.isVive(attacker) && VSE.isVive(victim)) {
