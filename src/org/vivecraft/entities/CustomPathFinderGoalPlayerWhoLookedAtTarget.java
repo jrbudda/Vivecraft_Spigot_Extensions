@@ -1,141 +1,177 @@
 package org.vivecraft.entities;
 
-import java.lang.reflect.Method;
+import java.util.function.Predicate;
 
-import javax.annotation.Nullable;
-
-import org.bukkit.entity.Player;
+import org.bukkit.Location;
+import org.vivecraft.Reflector;
 import org.vivecraft.VSE;
+import org.vivecraft.VivePlayer;
 
-import com.google.common.base.Predicate;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
-import net.minecraft.server.v1_12_R1.Blocks;
-import net.minecraft.server.v1_12_R1.EntityEnderman;
-import net.minecraft.server.v1_12_R1.EntityHuman;
-import net.minecraft.server.v1_12_R1.Item;
-import net.minecraft.server.v1_12_R1.ItemStack;
-import net.minecraft.server.v1_12_R1.PathfinderGoalNearestAttackableTarget;
-import net.minecraft.server.v1_12_R1.Vec3D;
+public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends NearestAttackableTargetGoal<Player> {
+	private final EnderMan enderman;
+	private Player pendingTarget;
+	private int aggroTime;
+	private int teleportTime;
+	private final TargetingConditions startAggroTargetConditions;
+	private final TargetingConditions continueAggroTargetConditions = TargetingConditions.forCombat().ignoreLineOfSight();
 
-public class CustomPathFinderGoalPlayerWhoLookedAtTarget 
- extends PathfinderGoalNearestAttackableTarget<EntityHuman>
-{
-	private final EntityEnderman i;
-	private EntityHuman j;
-	private int k;
-	private int l;
-
-	private Method di;
-	
-	public CustomPathFinderGoalPlayerWhoLookedAtTarget(EntityEnderman entityenderman)
-	{
-		super(entityenderman, EntityHuman.class, false);
-		this.i = entityenderman;
-		this.di = VSE.getPrivateMethod("dm", EntityEnderman.class);
-	}
-
-	public boolean a()
-	{
-		double d0 = i();
-
-		this.j = this.i.world.a(this.i.locX, this.i.locY, this.i.locZ, d0, d0, null, new Predicate<EntityHuman>()
+	public CustomPathFinderGoalPlayerWhoLookedAtTarget(EnderMan entityenderman, Predicate<LivingEntity> p) {
+		super(entityenderman, Player.class, 10, false, false, p);
+		this.enderman = entityenderman;
+		this.startAggroTargetConditions = TargetingConditions.forCombat().range(this.getFollowDistance()).selector((player) ->
 		{
-			public boolean a(@Nullable EntityHuman entityhuman)
-			{
-				return (entityhuman != null) && isLookingAtMe((entityhuman));
-			}
-
-			public boolean apply(EntityHuman object)
-			{
-				return a((EntityHuman)object);
-			}
-
+			return isLookingAtMe((Player)player);
 		});
-		return this.j != null;
 	}
 
-	 private boolean isLookingAtMe(EntityHuman entityhuman)
-	  {
-	    ItemStack itemstack = (ItemStack)entityhuman.inventory.armor.get(3);
-	    if (itemstack.getItem() == Item.getItemOf(Blocks.PUMPKIN)) {
-	      return false;
-	    }
-	    
-	    //VSE MODIFICATION
-	    Vec3D vec3d;
-	    if(VSE.isVive((Player) entityhuman.getBukkitEntity())){
-	        vec3d = VSE.vivePlayers.get(entityhuman.getBukkitEntity().getUniqueId()).getHMDDir();
-	    } else {
-	        vec3d = entityhuman.f(1.0F).a();
-	    }
-	    ////
-
-	    Vec3D vec3d1 = new Vec3D(i.locX - entityhuman.locX, i.getBoundingBox().b + i.getHeadHeight() - (entityhuman.locY + entityhuman.getHeadHeight()), i.locZ - entityhuman.locZ);
-	    double d0 = vec3d1.b();
-	    
-	    vec3d1 = vec3d1.a();
-	    double d1 = vec3d.b(vec3d1);
-	    
-	    return d1 > 1.0D - 0.025D / d0 ? entityhuman.hasLineOfSight(i) : false;
-	  }
-	
-	
-	public void c()
+	@Override
+	public boolean canUse()
 	{
-		this.k = 5;
-		this.l = 0;
+		this.pendingTarget = this.enderman.level.getNearestPlayer(this.startAggroTargetConditions, this.enderman);
+		return this.pendingTarget != null;
 	}
 
-	public void d()
+	@Override
+	public void start()
 	{
-		this.j = null;
-		super.d();
+		this.aggroTime = 5;
+		this.teleportTime = 0;
+		this.enderman.setBeingStaredAt();
 	}
 
-	public boolean b()
+	@Override
+	public void stop()
 	{
-		if (this.j != null)
+		this.pendingTarget = null;
+		super.stop();
+	}
+
+	//Vivecraft copy and modify from EnderMan
+	private boolean isLookingAtMe(Player pPlayer)
+	{
+		ItemStack itemstack = pPlayer.getInventory().armor.get(3);
+
+		if (itemstack.is(Blocks.CARVED_PUMPKIN.asItem()))
 		{
-			if (!isLookingAtMe(this.j)) {
+			return false;
+		}
+		else
+		{
+			Vec3 vec3 = pPlayer.getViewVector(1.0F).normalize();
+			Vec3 vec31 = new Vec3(enderman.getX() - pPlayer.getX(), enderman.getEyeY() - pPlayer.getEyeY(), enderman.getZ() - pPlayer.getZ());
+			//VSE MODIFICATION
+			boolean vr = pPlayer instanceof Player && VSE.isVive((org.bukkit.entity.Player) pPlayer.getBukkitEntity());
+			VivePlayer vp = null;
+			Vec3 hmdpos = null;
+			if(vr){
+				vp = VSE.vivePlayers.get(pPlayer.getBukkitEntity().getUniqueId());
+				vec3 = vp.getHMDDir();
+				Location h = vp.getHMDPos();
+				hmdpos = new Vec3(h.getX(), h.getY(), h.getZ());
+				vec31= new Vec3(enderman.getX() - hmdpos.x, enderman.getEyeY() - hmdpos.y, enderman.getZ() - hmdpos.z);
+			}
+			////
+			double d0 = vec31.length();
+			vec31 = vec31.normalize();
+			double d1 = vec3.dot(vec31);
+			//VSE MODIFICATION
+			if(! (d1 > 1.0D - 0.025D / d0)) return false; 			
+			if(vr)
+				return hasLineOfSight(hmdpos, enderman);
+			else
+				return pPlayer.hasLineOfSight(enderman);
+			//
+		}
+	}
+
+	//Vivecraft copy and modify from LivingEntity
+    public boolean hasLineOfSight(Vec3 source, Entity entity)
+    {
+     	Vec3 vec31 = new Vec3(entity.getX(), entity.getEyeY(), entity.getZ());
+
+    	if (vec31.distanceTo(source) > 128.0D)
+    	{
+    		return false;
+    	}
+    	else
+    	{
+    		return entity.level.clip(new ClipContext(source, vec31, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity)).getType() == HitResult.Type.MISS;
+    	}
+    }
+	
+	
+	@Override
+	public boolean canContinueToUse()
+	{
+		if (this.pendingTarget != null)
+		{
+			if (!isLookingAtMe(this.pendingTarget))
+			{
 				return false;
 			}
-			this.i.a(this.j, 10.0F, 10.0F);
-			return true;
-		}
-		return (this.d != null) && (((EntityHuman)this.d).isAlive()) ? true : super.b();
-	}
-
-	public void e()
-	{
-		if (this.j != null)
-		{
-			if (--this.k <= 0)
+			else
 			{
-				this.d = this.j;
-				this.j = null;
-				super.c();
+				this.enderman.lookAt(this.pendingTarget, 10.0F, 10.0F);
+				return true;
 			}
 		}
 		else
 		{
-			if (this.d != null) {
-				if (isLookingAtMe(this.d))
+			return this.target != null && this.continueAggroTargetConditions.test((EnderMan)this.enderman, this.target) ? true : super.canContinueToUse();
+		}
+	}
+
+	@Override
+	public void tick()
+	{
+		if (this.enderman.getTarget() == null)
+		{
+			super.setTarget((LivingEntity)null);
+		}
+
+		if (this.pendingTarget != null)
+		{
+			if (--this.aggroTime <= 0)
+			{
+				this.target = (LivingEntity) this.pendingTarget;
+				this.pendingTarget = null;
+				super.start();
+			}
+		}
+		else
+		{
+			if (this.target != null && !this.enderman.isPassenger())
+			{
+				if (isLookingAtMe((Player)this.target))
 				{
-					if (((EntityHuman)this.d).h(this.i) < 16.0D) {
-						try {
-							di.invoke(this.i, (Object[]) null);
-						} catch (Exception e1) {
-						}
+					if (this.target.distanceToSqr(this.enderman) < 16.0D)
+					{
+						Reflector.invoke(Reflector.Entity_teleport, enderman);
 					}
-					this.l = 0;
+
+					this.teleportTime = 0;
 				}
-				else if ((((EntityHuman)this.d).h(this.i) > 256.0D) && (this.l++ >= 30) && (this.i.a(this.d)))
+				else if (this.target.distanceToSqr(this.enderman) > 256.0D && this.teleportTime++ >= 30 && (boolean)Reflector.invoke(Reflector.Entity_teleportTowards, enderman, pendingTarget));
 				{
-					this.l = 0;
+					this.teleportTime = 0;
 				}
 			}
-			super.e();
+
+			super.tick();
 		}
 	}
 }
+
 

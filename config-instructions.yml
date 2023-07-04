@@ -1,13 +1,18 @@
+#This file is for instructions only. Make any changes to config.yml.
 general:
   debug: false
   #will check for a newer version and alert any OP when they login to the server
   checkforupdate: true
-  #Set to true to only allow Vivecraft players to play.
+  #Set to true to only allow VR players to play.
   vive-only: false
+  #If true, creates an exclusion for vive-only for opped players. No effect if vive-only is false.
+  allow-op: true
   #The message to show kicked non-vive players.
-  vive-only-kickmessage: This server is configured for Vivecraft players only.
+  vive-only-kickmessage: This server is configured for Vivecraft VR players only.
   #Ticks to wait before kicking a player. The player's client must send a Vivecraft VERSION info in that time.
-  vive-only-kickwaittime: 100
+  vive-only-kickwaittime: 200
+  #Set to false to disable registering Vivecraft-specific crafting recipes.
+  vive-crafting: true
 SendPlayerData:
   #Send player data to all clients with Vivecraft
   enabled: true
@@ -41,6 +46,8 @@ bow:
   #Set if players can headshot mobs (only horizontal mobs)
   headshotmobs: true
 permissions:
+  #enable setting player groups for vive users.
+  enabled: false
   #Permission group for Vive users
   vivegroup: vive.vivegroup
   #Permission group for non-Vive users
@@ -62,8 +69,29 @@ climbey:
   enabled: false
   #Sets which blocks are climb-able. Options are 'None': List ignored. All blocks are climbable. 'Include': Only blocks on the list are climbable. 'Exclude': All blocks are climbable except those on the list
   blockmode: None
-  #The list of blocks for use with include/exclude block mode. use name or id. Specify data with :data. i.e. red wool is 'wool:14' or '35:14'. uses mojang block names, not spigot materials.
+  #The list of block names for use with include/exclude block mode.
   blocklist:
-   - wool:0
-   - dirt
-   - grass
+    - white_wool
+    - dirt
+    - grass_block
+crawling:
+  #Allows use of roomscale crawling. Disabling does not prevent vanilla crawling.
+  enabled: false
+teleport:
+  #Whether direct teleport is enabled. It is recommended to leave this enabled for players prone to VR sickness.
+  enable: true
+  #Limit teleport range and frequency in survival
+  limitedsurvival: false
+  #Maximum blocks players can teleport up. Set to 0 to disable. Max: 4
+  uplimit: 1
+  #Maximum blocks players can teleport down. Set to 0 to disable. Max: 16
+  downlimit: 4
+  #Maximum blocks players can teleport horizontally. Set to 0 to disable. Max: 32
+  horizontallimit: 16
+worldscale:
+  #Limit the range of world scale players can use
+  limitrange: false
+  #Upper limit of range
+  max: 2
+  #Lower limit of range
+  min: 0.5

@@ -4,14 +4,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
 import org.bukkit.entity.Player;
 import org.vivecraft.listeners.VivecraftNetworkListener;
 import org.vivecraft.utils.Quaternion;
 import org.vivecraft.utils.Vector3;
 
-import net.minecraft.server.v1_12_R1.Vec3D;
+import net.minecraft.world.phys.Vec3;
 
 public class VivePlayer {
 
@@ -19,13 +20,17 @@ public class VivePlayer {
 	public byte[] controller0data;
 	public byte[] controller1data;
 	public byte[] draw;
+	public float worldScale;
+	public float heightScale = 1f;
 	boolean isTeleportMode;
 	boolean isReverseHands;
-	boolean isSeated;
-	float worldScale;
 	boolean isVR;
+	public byte activeHand;
+	public boolean crawling;
 
+	public Vec3 offset = new Vec3(0, 0, 0);
 	public Player player;
+	public String version;
 
 	public VivePlayer(Player player) {
 		this.player = player;	
@@ -51,14 +56,14 @@ public class VivePlayer {
 	}
 	
 	@SuppressWarnings("unused")
-	public Vec3D getHMDDir(){
+	public Vec3 getHMDDir(){
 		try {
 			if(hmdData != null){
 				
 				ByteArrayInputStream byin = new ByteArrayInputStream(hmdData);
 				DataInputStream da = new DataInputStream(byin);
 		
-				this.isSeated = da.readBoolean();
+				boolean isSeated = da.readBoolean();
 				float lx = da.readFloat();
 				float ly = da.readFloat();
 				float lz = da.readFloat();
@@ -70,25 +75,52 @@ public class VivePlayer {
 			    Vector3 forward = new Vector3(0,0,-1);
 				Quaternion q = new Quaternion(w, x, y, z);
 				Vector3 out = q.multiply(forward);
-	
-				
+
 				//System.out.println("("+out.getX()+","+out.getY()+","+out.getZ()+")" + " : W:" + w + " X: "+x + " Y:" + y+ " Z:" + z);
 				da.close(); //needed?
-				return new Vec3D(out.getX(), out.getY(), out.getZ());
+				return new Vec3(out.getX(), out.getY(), out.getZ());
 			}else{
 			}
 		} catch (IOException e) {
 
 		}
-	 
-		return ((CraftPlayer)player).getHandle().f(1.0f);
+
+		return ((CraftEntity)player).getHandle().getViewVector(1.0f);
+	}
+
+	@SuppressWarnings("unused")
+	public Quaternion getHMDRot(){
+		try {
+			if(hmdData != null){
+
+				ByteArrayInputStream byin = new ByteArrayInputStream(hmdData);
+				DataInputStream da = new DataInputStream(byin);
+
+				boolean isSeated = da.readBoolean();
+				float lx = da.readFloat();
+				float ly = da.readFloat();
+				float lz = da.readFloat();
+
+				float w = da.readFloat();
+				float x = da.readFloat();
+				float y = da.readFloat();
+				float z = da.readFloat();
+				da.close(); //needed?
+				return new Quaternion(w, x, y, z);
+			}else{
+			}
+		} catch (IOException e) {
+
+		}
+
+		return new Quaternion();
 	}
 	
 	@SuppressWarnings("unused")
-	public Vec3D getControllerDir(int controller){
+	public Vec3 getControllerDir(int controller){
 		byte[] data = controller0data;
 		if(controller == 1) data = controller1data;
-		if(this.isSeated) controller = 0;
+		if(this.isSeated()) controller = 0;
 		if(data != null){
 
 			ByteArrayInputStream byin = new ByteArrayInputStream(data);
@@ -111,13 +143,46 @@ public class VivePlayer {
 				Vector3 out = q.multiply(forward);
 
 				da.close(); //needed?
-				return new Vec3D(out.getX(), out.getY(), out.getZ());
+				return new Vec3(out.getX(), out.getY(), out.getZ());
 			} catch (IOException e) {
 			}
 		}else{
 		}
 		
-		return ((CraftPlayer)player).getHandle().f(1.0f);
+		return ((CraftEntity)player).getHandle().getViewVector(1.0f);
+
+	}
+
+	@SuppressWarnings("unused")
+	public Quaternion getControllerRot(int controller){
+		byte[] data = controller0data;
+		if(controller == 1) data = controller1data;
+		if(this.isSeated()) controller = 0;
+		if(data != null){
+
+			ByteArrayInputStream byin = new ByteArrayInputStream(data);
+			DataInputStream da = new DataInputStream(byin);
+
+			try {
+
+				this.isReverseHands = da.readBoolean();
+
+				float lx = da.readFloat();
+				float ly = da.readFloat();
+				float lz = da.readFloat();
+
+				float w = da.readFloat();
+				float x = da.readFloat();
+				float y = da.readFloat();
+				float z = da.readFloat();
+				da.close(); //needed?
+				return new Quaternion(w, x, y, z);
+			} catch (IOException e) {
+			}
+		}else{
+		}
+
+		return new Quaternion();
 
 	}
 	public Location getHMDPos() {
@@ -127,14 +192,14 @@ public class VivePlayer {
 				ByteArrayInputStream byin = new ByteArrayInputStream(hmdData);
 				DataInputStream da = new DataInputStream(byin);
 		
-				this.isSeated= da.readBoolean();
+				boolean isSeated= da.readBoolean();
 				float lx = da.readFloat();
 				float ly = da.readFloat();
 				float lz = da.readFloat();
 				
 				da.close(); //needed?
 								
-				return new Location(player.getWorld(), lx, ly, lz);
+				return player.getLocation().add(lx, ly, lz).add(offset.x, offset.y, offset.z);
 			}else{
 			}
 		} catch (IOException e) {
@@ -158,19 +223,17 @@ public class VivePlayer {
 				float z = da.readFloat();
 				
 				da.close(); //needed?
-				
-				if (this.isSeated){
-					Vec3D dir = this.getHMDDir();
-					dir = dir.b((float) Math.toRadians(c==0?-35:35));
-					dir = new Vec3D(dir.x, 0, dir.z);
-					dir = dir.a();
+	
+				if (this.isSeated()){
+					Vec3 dir = this.getHMDDir();
+					dir = dir.yRot((float) Math.toRadians(c==0?-35:35));
+					dir = new Vec3(dir.x, 0, dir.z);
+					dir = dir.normalize();
 					Location out = this.getHMDPos().add(dir.x * 0.3 * worldScale, -0.4* worldScale ,dir.z*0.3* worldScale);
-					x = (float) out.getX();
-					y = (float) out.getY();
-					z = (float) out.getZ();
+					return out;
 				}
 				
-				return new Location(player.getWorld(), x, y, z);
+				return player.getLocation().add(x, y, z).add(offset.x, offset.y, offset.z);
 			}else{
 			}
 		} catch (IOException e) {
@@ -219,6 +282,8 @@ public class VivePlayer {
 			output.write(hmdData);
 			output.write(controller0data);
 			output.write(controller1data);
+			output.write(java.nio.ByteBuffer.allocate(4).putFloat(worldScale).array());
+			output.write(java.nio.ByteBuffer.allocate(4).putFloat(heightScale).array());
 		} catch (IOException e) {
 
 		}

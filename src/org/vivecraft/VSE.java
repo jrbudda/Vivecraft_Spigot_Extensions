@@ -3,15 +3,14 @@ package org.vivecraft;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -19,9 +18,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftCreeper;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEnderman;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftCreeper;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -35,77 +35,102 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.v1_12_R1.Block;
-import net.minecraft.server.v1_12_R1.EntityCreeper;
-import net.minecraft.server.v1_12_R1.EntityEnderman;
-import net.minecraft.server.v1_12_R1.PathfinderGoalSelector;
-
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.mcstats.Metrics;
 import org.spigotmc.SpigotConfig;
 import org.vivecraft.command.ConstructTabCompleter;
 import org.vivecraft.command.ViveCommand;
+import org.vivecraft.entities.CustomGoalStare;
 import org.vivecraft.entities.CustomGoalSwell;
 import org.vivecraft.entities.CustomPathFinderGoalPlayerWhoLookedAtTarget;
 import org.vivecraft.listeners.VivecraftCombatListener;
 import org.vivecraft.listeners.VivecraftItemListener;
 import org.vivecraft.listeners.VivecraftNetworkListener;
+import org.vivecraft.metrics.Metrics;
+import org.vivecraft.utils.AimFixHandler;
 import org.vivecraft.utils.Headshot;
+import org.vivecraft.utils.MetadataHelper;
+
+import net.milkbowl.vault.permission.Permission;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.Connection;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.EnderMan;
 
 public class VSE extends JavaPlugin implements Listener {
 	FileConfiguration config = getConfig();
 
-	public final String CHANNEL = "Vivecraft";
+	public final static String CHANNEL = "vivecraft:data";
+	private final static String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/1.19/version.txt";
+	private final static int bStatsId = 6931;
 
 	public static Map<UUID, VivePlayer> vivePlayers = new HashMap<UUID, VivePlayer>();
 	public static VSE me;
 	
-	int task = 0;
-	private String readurl = "https://raw.githubusercontent.com/jrbudda/Vivecraft_Spigot_Extensions/master/version.txt";
-	
+	private int sendPosDataTask = 0;
 	public List<String> blocklist = new ArrayList<>();
+	
+	public boolean debug = false;
 	
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onEnable() {
-		super.onEnable();
-		
+		super.onEnable();		
 		me = this;
 		
-		ItemStack is = new ItemStack(Material.LEATHER_BOOTS);
-		ItemMeta meta = is.getItemMeta();
-		meta.setDisplayName("Jump Boots");
-		meta.setUnbreakable(true);
-		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-		is.setItemMeta(meta);
-		ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(this, "jump_boots"),is);
-		recipe.shape("B", "S");
-		recipe.setIngredient('B', Material.LEATHER_BOOTS);
-		recipe.setIngredient('S', Material.SLIME_BLOCK);
-		Bukkit.addRecipe(recipe);
-		
-		ItemStack is2 = new ItemStack(Material.SHEARS);
-		ItemMeta meta2 = is2.getItemMeta();
-		meta2.setDisplayName("Climb Claws");
-		meta2.setUnbreakable(true);
-		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-		is2.setItemMeta(meta2);
-		ShapedRecipe recipe2 = new ShapedRecipe( new NamespacedKey(this, "climb_claws"), is2);
-		recipe2.shape("E E", "S S");
-		recipe2.setIngredient('E', Material.SPIDER_EYE);
-		recipe2.setIngredient('S', Material.SHEARS);
-		Bukkit.addRecipe(recipe2);
-		
+		if(getConfig().getBoolean("general.vive-crafting", true)){
+			{
+				ItemStack is = new ItemStack(Material.LEATHER_BOOTS);
+				ItemMeta meta = is.getItemMeta();
+				meta.setUnbreakable(true);
+				meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+				is.setItemMeta(meta);
+				is = setLocalizedItemName(is, "vivecraft.item.jumpboots");
+				ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(this, "jump_boots"),is);
+				recipe.shape("B", "S");
+				recipe.setIngredient('B', Material.LEATHER_BOOTS);
+				recipe.setIngredient('S', Material.SLIME_BLOCK);
+				Bukkit.addRecipe(recipe);
+			}
+			{
+				ItemStack is = new ItemStack(Material.SHEARS);
+				ItemMeta meta = is.getItemMeta();
+				meta.setUnbreakable(true);
+				meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+				is.setItemMeta(meta);
+				is = setLocalizedItemName(is, "vivecraft.item.climbclaws");
+				ShapedRecipe recipe = new ShapedRecipe( new NamespacedKey(this, "climb_claws"), is);
+				recipe.shape("E E", "S S");
+				recipe.setIngredient('E', Material.SPIDER_EYE);
+				recipe.setIngredient('S', Material.SHEARS);
+				Bukkit.addRecipe(recipe);
+			}
+		}
 		try {
-	        Metrics metrics = new Metrics(this);
-	        metrics.start();
-	    } catch (IOException e) {
-	        // Failed to submit the stats :-(
+	        Metrics metrics = new Metrics(this, bStatsId);    
+	        metrics.addCustomChart(new Metrics.AdvancedPie("vrplayers", new Callable<Map<String, Integer>>() {
+	            @Override
+	            public Map<String, Integer> call() throws Exception {
+	            	int out = 0;
+	            	for (Player p : Bukkit.getOnlinePlayers()) {
+	            		//counts standing or seated players using VR
+						if(isVive(p)) out++;
+					} 	            	            	
+	                Map<String, Integer> valueMap = new HashMap<>();
+	                valueMap.put("VR", out);
+	                valueMap.put("NonVR", vivePlayers.size() - out);
+	                valueMap.put("Vanilla", Bukkit.getOnlinePlayers().size() - vivePlayers.size());
+	                return valueMap;
+	            }
+	        }));
+	    } catch (Exception e) {
+			getLogger().warning("Could not start bStats metrics");
 	    }
 		
 		// Config Part
@@ -119,45 +144,15 @@ public class VSE extends JavaPlugin implements Listener {
 			List<String> temp = sec.getStringList("blocklist");
 			//make an attempt to validate these on the server for debugging.
 			if(temp != null){
-				for (String string : temp) {
-					String[] parts = string.split(":");
-					String id, data = null;
-					if(parts.length == 1){
-						id = string;
-					} else if(parts.length ==2){
-						id = parts[0];
-						data = parts[1];
-					} else {
-						//wut
-						getLogger().warning("invalid climbey item " + string);
+				for (String string : temp) {		
+					if (BuiltInRegistries.BLOCK.get(new ResourceLocation(string)) == null) {
+						getLogger().warning("Unknown climbey block name: " + string);
 						continue;
 					}
-					
-					if(data != null && !tryParseInt(data)){
-						getLogger().warning("invalid climbey item data " + string);
-						continue;
-					}
-					
-					Block test;
-					if(tryParseInt(id)){
-						test = Block.getById(Integer.parseInt(id));
-					} else {
-						test = Block.getByName(id);
-					}
-					
-					if(test == null){
-						getLogger().warning("unknown climbey item id " + string);
-						continue;
-					}
-					
-					String f = id + ((data != null)?":"+data:"");
-					
-					blocklist.add(f);
-	
+					blocklist.add(string);
 				}
 			}
-		}
-					
+		}				
 		// end Config part
 		
 		getCommand("vive").setExecutor(new ViveCommand(this));
@@ -179,12 +174,14 @@ public class VSE extends JavaPlugin implements Listener {
 			SpigotConfig.movedTooQuicklyMultiplier = getConfig().getDouble("setSpigotConfig.movedTooQuickly");
         }
         
-		task = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+		debug = (getConfig().getBoolean("general.debug", false));
+        
+		sendPosDataTask = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
 				sendPosData();
 			}
 		}, 20, 1);
-		
+
 		//check for any creepers and modify the fuse radius
 		CheckAllEntities();
 		
@@ -199,46 +196,14 @@ public class VSE extends JavaPlugin implements Listener {
 				startUpdateCheck();
 			}
 		}, 1);
-		
 	}
-		
-	public static Object getPrivateField(String fieldName, Class<PathfinderGoalSelector> clazz, Object object)
-	{
-		Field field;
-		Object o = null;
-		try
-		{
-			field = clazz.getDeclaredField(fieldName);
-			field.setAccessible(true);
-			o = field.get(object);
-		}
-		catch(NoSuchFieldException e)
-		{
-			e.printStackTrace();
-		}
-		catch(IllegalAccessException e)
-		{
-			e.printStackTrace();
-		}
-		return o;
+
+	public static ItemStack setLocalizedItemName(ItemStack stack, String key) {
+		var nmsStack = CraftItemStack.asNMSCopy(stack);
+		nmsStack.setHoverName(Component.translatable(key));
+		return CraftItemStack.asBukkitCopy(nmsStack);
 	}
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Method getPrivateMethod(String methodName, Class clazz)
-	{
-		Method m = null;
-		try
-		{
-			m = clazz.getDeclaredMethod(methodName);
-			m.setAccessible(true);
-		}
-		catch(NoSuchMethodException e)
-		{
-			e.printStackTrace();
-		}
-		return m;
-	}
-	
+
 	@EventHandler(priority = EventPriority.MONITOR)
     public void onEvent(CreatureSpawnEvent event) {
 		if(!event.isCancelled()){
@@ -255,34 +220,38 @@ public class VSE extends JavaPlugin implements Listener {
 		}
 	}
 	
+	@SuppressWarnings("unchecked" )
 	public void EditEntity(Entity entity){
 		if(entity.getType() == EntityType.CREEPER){	
-			EntityCreeper e = ((CraftCreeper) entity).getHandle();
-			@SuppressWarnings("rawtypes")
-			LinkedHashSet goalB = (LinkedHashSet )getPrivateField("b", PathfinderGoalSelector.class, e.goalSelector);
-			int x = 0;
-			for(Object b: goalB){
-				if(x==1){
+			Creeper e = ((CraftCreeper) entity).getHandle();
+			AbstractCollection<WrappedGoal> goalB = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob)e).goalSelector);
+			for(WrappedGoal b: goalB){
+				if(b.getGoal() instanceof net.minecraft.world.entity.ai.goal.SwellGoal){//replace swell goal.
 					goalB.remove(b);
 					break;
 				}
-				x+=1;
 			}
-			e.goalSelector.a(2, new CustomGoalSwell(e));
+			e.goalSelector.addGoal(2, new CustomGoalSwell(e));
 		}
-		else if(entity.getType() == EntityType.ENDERMAN && ((CraftEntity)entity).getHandle() instanceof EntityEnderman){			
-			EntityEnderman e = ((CraftEnderman) entity).getHandle();
-			@SuppressWarnings("rawtypes")
-			LinkedHashSet goalB = (LinkedHashSet )getPrivateField("b", PathfinderGoalSelector.class, e.targetSelector);
-			int x = 0;
-			for(Object b: goalB){
-				if(x==0){
-					goalB.remove(b);
+		else if(entity.getType() == EntityType.ENDERMAN){			
+			EnderMan e = ((CraftEnderman) entity).getHandle();
+			AbstractCollection<WrappedGoal> targets = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob)e).targetSelector);
+			for(WrappedGoal b: targets){
+				if(b.getPriority() == 1){ //replace PlayerWhoLookedAt target. Class is private cant use instanceof, check priority on all new versions.
+					targets.remove(b);
 					break;
 				}
-				x+=1;
 			}
-			e.targetSelector.a(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e));
+			e.targetSelector.addGoal(1, new CustomPathFinderGoalPlayerWhoLookedAtTarget(e, e::isAngryAt));
+
+			AbstractCollection<WrappedGoal> goals = (AbstractCollection<WrappedGoal>) Reflector.getFieldValue(Reflector.availableGoals, ((Mob)e).goalSelector);
+			for(WrappedGoal b: goals){
+				if(b.getPriority()==1){//replace EndermanFreezeWhenLookedAt goal. Verify priority on new version.
+					goals.remove(b);
+					break;
+				}
+			}
+			e.goalSelector.addGoal(1, new CustomGoalStare(e));
 		}
 	}
 
@@ -310,13 +279,14 @@ public class VSE extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onDisable() {
-		getServer().getScheduler().cancelTask(task);
+		getServer().getScheduler().cancelTask(sendPosDataTask);
 		super.onDisable();
 	}
 
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		vivePlayers.remove(event.getPlayer().getUniqueId());
+		MetadataHelper.cleanupMetadata(event.getPlayer());
 		
 		if(getConfig().getBoolean("welcomemsg.enabled"))
 			broadcastConfigString("welcomemsg.leaveMessage", event.getPlayer().getDisplayName());
@@ -326,37 +296,53 @@ public class VSE extends JavaPlugin implements Listener {
 	public void onPlayerConnect(PlayerJoinEvent event) {
 		final Player p = event.getPlayer();
 
-		if (getConfig().getBoolean("general.debug")) {
-			getLogger().info(p.getName() + " Has joined the server");
-		}
-		
-		int t = getConfig().getInt("general.vive-only-kickwaittime",100);
+		if (debug) getLogger().info(p.getName() + " Has joined the server");
+			
+		int t = getConfig().getInt("general.vive-only-kickwaittime", 200);
 		if(t < 100) t = 100;
 		if(t > 1000) t = 1000;
 		
+		if (debug) 
+			getLogger().info("Checking " + event.getPlayer().getName() + " for Vivecraft");
+
 		getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			@Override
-			public void run() {
-				
-				if (VSE.this.getConfig().getBoolean("general.debug")) 
-					VSE.this.getLogger().info("Checking player for ViveCraft");
-				
-				
-				if (getConfig().getBoolean("general.vive-only")) {
-					if ((p.isOnline()) && (!isVive(p))) {
-						VSE.this.getLogger().info(p.getName() + " " + "got kicked for not using Vivecraft");
-						p.kickPlayer(VSE.this.getConfig().getString("general.vive-only-kickmessage"));
-					}		
-				}
-				
-				if (p.isOnline()) {
+			public void run() {		
+				if (p.isOnline()) {	
+					boolean kick = false;
+					
+					if(vivePlayers.containsKey(p.getUniqueId())) {
+						VivePlayer vp = VSE.vivePlayers.get(p.getUniqueId());
+						if(debug)
+							getLogger().info(p.getName() + " using: " + vp.version + " " + (vp.isVR() ? "VR" : "NONVR")  + " " + (vp.isSeated() ? "SEATED" : ""));
+						if(!vp.isVR()) kick = true;
+					} else {
+						kick = true;
+						if(debug)
+							getLogger().info(p.getName() + " Vivecraft not detected");
+					}	
+
+					if(kick) {
+						if (getConfig().getBoolean("general.vive-only")) {
+							if (getConfig().getBoolean("general.allow-op") == false || !p.isOp()) {
+								getLogger().info(p.getName() + " " + "got kicked for not using Vivecraft");
+								p.kickPlayer(getConfig().getString("general.vive-only-kickmessage"));
+							}						
+							return;
+						}
+					}
+
 					sendWelcomeMessage(p);
 					setPermissionsGroup(p);
-				}	
-				
+				} else {
+					if (debug) 
+						getLogger().info(p.getName() + " no longer online! ");
+				}		
 			}
 		}, t);
-		
+
+		Connection netManager = (Connection) Reflector.getFieldValue(Reflector.connection, ((CraftPlayer)p).getHandle().connection); 
+		netManager.channel.pipeline().addBefore("packet_handler", "vr_aim_fix", new AimFixHandler(netManager));
 	}
 		
 	public void startUpdateCheck() {
@@ -376,7 +362,6 @@ public class VSE extends JavaPlugin implements Listener {
 					if(bits[0].trim().equalsIgnoreCase(version)){
 						updatemsg = bits[1].trim();
 						getLogger().info(updatemsg);
-						//ViveCommand.sendMessage(updatemsg, p);
 						break;
 					}
 				}
@@ -397,26 +382,37 @@ public class VSE extends JavaPlugin implements Listener {
 			}
 		return false;
 	}
+	
+	public static boolean isCompanion(Player p){
+		if(p == null) return false;
+			if(vivePlayers.containsKey(p.getUniqueId())){
+				return !vivePlayers.get(p.getUniqueId()).isVR();
+			}
+		return false;
+	}
 
 	public void setPermissionsGroup(Player p) {
-
+		if(!vault) return;	
+		if(!getConfig().getBoolean("permissions.enabled")) return;
+		
 		Map<String, Boolean> groups = new HashMap<String, Boolean>();
 
 		boolean isvive = isVive(p);
+		boolean iscompanion = isCompanion(p);
 
 		String g_vive = getConfig().getString("permissions.vivegroup");
 		String g_classic = getConfig().getString("permissions.non-vivegroup");
-		if (g_vive != null)
+		if (g_vive != null && !g_vive.trim().isEmpty())
 			groups.put(g_vive, isvive);
-		if (g_classic != null)
-			groups.put(g_classic, !isvive);
+		if (g_classic != null && !g_classic.trim().isEmpty())
+			groups.put(g_classic, iscompanion);
 
 		if (isvive) {
 			String g_freemove = getConfig().getString("permissions.freemovegroup");
-			if (g_freemove != null)
+			if (g_freemove != null && !g_freemove.trim().isEmpty())
 				groups.put(g_freemove, !vivePlayers.get(p.getUniqueId()).isTeleportMode);
 		}
-
+		
 		updatePlayerPermissionGroup(p, groups);
 
 	}
@@ -425,20 +421,41 @@ public class VSE extends JavaPlugin implements Listener {
 	
 	public void updatePlayerPermissionGroup(Player p, Map<String, Boolean> groups) {
 		try {	
-			if(!vault) return;			
+
 			RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
 			Permission perm = rsp.getProvider();
-			if (perm != null) {
-				for (Map.Entry<String, Boolean> entry : groups.entrySet()) {
-					if (entry.getValue()) {
-						if (!perm.playerInGroup(p, entry.getKey()))
-							perm.playerAddGroup(p, entry.getKey());
-					} else {
-						if (perm.playerInGroup(p, entry.getKey()))
-							perm.playerRemoveGroup(p, entry.getKey());
+
+			if (perm == null) {
+				getLogger().info("Permissions error: Registered permissions provider is null!");
+				return;
+			}			
+			if(!perm.hasGroupSupport()) {
+				getLogger().info("Permissions error: Permission plugin does not support groups.");
+				return;
+			}
+
+			for (Map.Entry<String, Boolean> entry : groups.entrySet()) {
+				if (entry.getValue()) {
+					
+					if (!perm.playerInGroup(null, p, entry.getKey())) {
+						if (debug) 
+							getLogger().info("Adding " + p.getName() + " to " + entry.getKey());
+						boolean ret = perm.playerAddGroup(null, p, entry.getKey());
+						if(!ret)
+							getLogger().info("Failed adding " + p.getName() + " to " + entry.getKey() + ". Group may not exist.");
+
+					}
+				} else {
+					if (perm.playerInGroup(null, p, entry.getKey())) {
+						if (debug) 
+							getLogger().info("Removing " + p.getName() + " from " + entry.getKey());
+						boolean ret = perm.playerRemoveGroup(null, p, entry.getKey());
+						if(!ret)
+							getLogger().info("Failed removing " + p.getName() + " from " + entry.getKey()+ ". Group may not exist.");
 					}
 				}
 			}
+
 		} catch (Exception e) {
 			getLogger().severe("Could not set player permission group: " + e.getMessage());
 		}
@@ -482,4 +499,17 @@ public class VSE extends JavaPlugin implements Listener {
 		}
 	}
 	
+	public static boolean isSeated(Player player){
+		if(vivePlayers.containsKey(player.getUniqueId())){
+			return vivePlayers.get(player.getUniqueId()).isSeated();
+		}
+		return false;
+	}
+
+	public static boolean isStanding(Player player){
+		if(vivePlayers.containsKey(player.getUniqueId())){
+			if(!vivePlayers.get(player.getUniqueId()).isSeated() && vivePlayers.get(player.getUniqueId()).isVR()) return true;
+		}
+		return false;
+	}
 }

@@ -1,12 +1,16 @@
 package org.vivecraft.listeners;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArrow;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -17,7 +21,8 @@ import org.vivecraft.VSE;
 import org.vivecraft.VivePlayer;
 import org.vivecraft.utils.Headshot;
 
-import net.minecraft.server.v1_12_R1.Vec3D;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 
 
 public class VivecraftCombatListener implements Listener{
@@ -32,48 +37,49 @@ public class VivecraftCombatListener implements Listener{
 	public void onProjectileLaunch(ProjectileLaunchEvent event) {
 		//position all projectiles correctly.
 
-		final Projectile proj = event.getEntity();
+		Projectile proj = event.getEntity();
+		
 		if (!(proj.getShooter() instanceof Player) || !VSE.isVive((Player) proj.getShooter()))
 			return;
 
 		Player pl = (Player)proj.getShooter();
 		final VivePlayer vp = (VivePlayer)VSE.vivePlayers.get(pl.getUniqueId());
 
-		final boolean arrow = proj instanceof CraftArrow;
+		final boolean arrow = proj instanceof AbstractArrow && !(proj instanceof Trident);
 
 		if ((vp == null) && (this.vse.getConfig().getBoolean("general.debug"))) {
 			vse.getLogger().warning(" Error on projectile launch!");
 		}
+		
+		ServerPlayer nsme = ((CraftPlayer)pl).getHandle();
+	
+		Location pos = vp.getControllerPos(vp.activeHand);
+		Vec3 aim = vp.getControllerDir(vp.activeHand);
 
 		//this only works if the incoming speed is at max (based! on draw time)
 		//TODO: properly scale in all cases.
 
 		if(arrow && vp.getDraw() != 0) {
-			proj.setVelocity(proj.getVelocity().multiply(vp.getDraw()));  
-		}
-
-		int hand = arrow ? 1 : 0;
-
-		Vec3D aim = vp.getControllerDir(hand);
-
-		if(arrow){
-			aim = vp.getControllerDir(0);
-			if(!vp.isSeated() && vp.getDraw() !=0){ //standing
+			proj.setVelocity(proj.getVelocity().multiply(vp.getDraw()));  	
+			if(!vp.isSeated()){ //standing
+		    	pos = vp.getControllerPos(0);
 				Vector m = (vp.getControllerPos(1).subtract(vp.getControllerPos(0))).toVector();
 				m = m.normalize();
-				aim = new Vec3D(m.getX(),  m.getY(), m.getZ());
-			} else { //seated or roomscale off
-				hand = 0;
+				aim = new Vec3(m.getX(),  m.getY(), m.getZ());
 			}
-		}               
+		}
 
-		Location pos = vp.getControllerPos(hand);
-		proj.teleport(new Location(proj.getWorld(), pos.getX() + aim.x*0.6f, pos.getY()+aim.y*0.6f, pos.getZ()+aim.z*0.6f));
-
+		Location loc = new Location(proj.getWorld(), pos.getX() + aim.x*0.6f, pos.getY()+aim.y*0.6f, pos.getZ()+aim.z*0.6f);
+		double velo = proj.getVelocity().length();		
+		proj.teleport(loc); //paper sets velocity to 0 on teleport.
+		proj.setVelocity(new Vector(aim.x*velo, aim.y*velo, aim.z*velo));
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void onProjectileHit(EntityDamageByEntityEvent event) {
+		
+		if(event.getDamager() instanceof Trident) return;
+		
 		if (event.getDamager() instanceof Arrow && event.getEntity() instanceof LivingEntity) {
 			final Arrow arrow = (Arrow) event.getDamager();
 			LivingEntity target = (LivingEntity) event.getEntity();
@@ -101,30 +107,6 @@ public class VivecraftCombatListener implements Listener{
 		}
 	}
 
-	public boolean usingVR(Player player){
-		if(VSE.vivePlayers.containsKey(player.getUniqueId())){
-			if(!VSE.vivePlayers.get(player.getUniqueId()).isVR()){
-				return false;
-			}
-			return true;
-		}
-		return false;
-	}
-
-	public boolean isSeated(Player player){
-		if(VSE.vivePlayers.containsKey(player.getUniqueId())){
-			return VSE.vivePlayers.get(player.getUniqueId()).isSeated();
-		}
-		return false;
-	}
-
-	public boolean isStanding(Player player){
-		if(VSE.vivePlayers.containsKey(player.getUniqueId())){
-			if(!VSE.vivePlayers.get(player.getUniqueId()).isSeated() && VSE.vivePlayers.get(player.getUniqueId()).isVR()) return true;
-		}
-		return false;
-	}
-
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void onDamage(EntityDamageByEntityEvent e) {
 		final Entity damager = e.getDamager();
@@ -136,33 +118,46 @@ public class VivecraftCombatListener implements Listener{
 				Player victim = (Player) damager;
 
 				if (!vse.getConfig().getBoolean("pvp.VRvsVR",true)) {
-					if (usingVR(attacker) && usingVR(victim)) {
-						if (isStanding(attacker) && isStanding(victim)) {
+					if (VSE.isVive(attacker) && VSE.isVive(victim)) {
+						if (VSE.isStanding(attacker) && VSE.isStanding(victim)) {
 							e.setCancelled(true);
 						}
 					}
 				}
 
 				if (!vse.getConfig().getBoolean("pvp.VRvsNONVR", true)) {
-					if ((usingVR(attacker) && !usingVR(victim)) || (usingVR(victim) && !usingVR(attacker))) {
+					if ((VSE.isVive(attacker) && !VSE.isVive(victim)) || (VSE.isVive(victim) && !VSE.isVive(attacker))) {
 						e.setCancelled(true);
 					}
 				}
 
 				if (!vse.getConfig().getBoolean("pvp.SEATEDVRvsNONVR", true)) {
-					if(((usingVR(attacker) && isSeated(attacker)) && !usingVR(victim)) || ((usingVR(victim) && isSeated(victim)) && !usingVR(attacker))){
+					if(((VSE.isVive(attacker) && VSE.isSeated(attacker)) && !VSE.isVive(victim)) || ((VSE.isVive(victim) && VSE.isSeated(victim)) && !VSE.isVive(attacker))){
 						e.setCancelled(true);
 					}
 				}
 
 				if (!vse.getConfig().getBoolean("pvp.VRvsSEATEDVR", true)) {
-					if (usingVR(attacker) && usingVR(victim)) {
-						if ((isSeated(attacker) && isStanding(victim)) || (isSeated(victim) && isStanding(attacker))) {
+					if (VSE.isVive(attacker) && VSE.isVive(victim)) {
+						if ((VSE.isSeated(attacker) && VSE.isStanding(victim)) || (VSE.isSeated(victim) && VSE.isStanding(attacker))) {
 							e.setCancelled(true);
 						}
 					}
 				}
 
+			} 
+			else if(damaged instanceof Fireball) {
+				VivePlayer vp = (VivePlayer)VSE.vivePlayers.get(damager.getUniqueId());
+				if(vp!=null && vp.isVR()) {
+					Vec3 dir = vp.getHMDDir();
+					//Interesting experiment. 
+					//We know the player's look is read immediately after this event returns.
+					//Override it here. It should be set back to normal next tick.
+					//And ideally nothing weird happens because of it.
+
+					((CraftEntity) damager).getHandle().setXRot((float) Math.toDegrees(Math.asin(dir.y/dir.length()))); 
+					((CraftEntity) damager).getHandle().setYRot((float) Math.toDegrees(Math.atan2(-dir.x, dir.z))); 
+				}
 			}
 		}
 	}
