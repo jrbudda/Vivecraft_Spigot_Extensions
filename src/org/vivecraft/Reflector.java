@@ -11,14 +11,14 @@ import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.monster.EnderMan;
 
 public class Reflector {
-	//last checked 1.19.3
-	public static Field Entity_Data_Pose= getPrivateField("ad", Entity.class);
-	public static Field Entity_eyeHeight = getPrivateField("ba", Entity.class);
+	//last checked 1.19.4
+	public static Field Entity_Data_Pose= getPrivateField("ar", Entity.class);
+	public static Field Entity_eyeHeight = getPrivateField("bf", Entity.class);
 	public static Field SynchedEntityData_itemsById = getPrivateField("e", SynchedEntityData.class);
 	public static Field availableGoals = getPrivateField("d", GoalSelector.class);
 	public static Field aboveGroundTickCount = getPrivateField("H", ServerGamePacketListenerImpl.class);
-	
-	public static Method Entity_teleport= getPrivateMethod("t", EnderMan.class);
+	public static Field connection = getPrivateField("h", ServerGamePacketListenerImpl.class);
+	public static Method Entity_teleport= getPrivateMethod("r", EnderMan.class);
 	public static Method Entity_teleportTowards = getPrivateMethod("a", EnderMan.class, Entity.class);
 	
 	public static Object getFieldValue(Field field, Object object) {
