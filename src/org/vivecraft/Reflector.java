@@ -13,7 +13,7 @@ import net.minecraft.world.entity.monster.EnderMan;
 public class Reflector {
 	//last checked 1.20.1
 	public static Field Entity_Data_Pose= getPrivateField("ar", Entity.class);
-	public static Field Entity_eyeHeight = getPrivateField("bf", Entity.class);
+	public static Field Entity_eyeHeight = getPrivateField("bi", Entity.class);
 	public static Field SynchedEntityData_itemsById = getPrivateField("e", SynchedEntityData.class);
 	public static Field availableGoals = getPrivateField("d", GoalSelector.class);
 	public static Field aboveGroundTickCount = getPrivateField("H", ServerGamePacketListenerImpl.class);

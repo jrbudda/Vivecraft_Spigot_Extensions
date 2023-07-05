@@ -1,2 +1,3 @@
 #this file is used to check for updates
-1.20.1-1: VSE is up to date.
+1.20.1-1: VSE has an update!.
+1.20.1-2: VSE is up to date.
