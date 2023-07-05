@@ -72,18 +72,18 @@ public class VSE extends JavaPlugin implements Listener {
 
 	public static Map<UUID, VivePlayer> vivePlayers = new HashMap<UUID, VivePlayer>();
 	public static VSE me;
-	
+
 	private int sendPosDataTask = 0;
 	public List<String> blocklist = new ArrayList<>();
-	
+
 	public boolean debug = false;
-	
+
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onEnable() {
 		super.onEnable();		
 		me = this;
-		
+
 		if(getConfig().getBoolean("general.vive-crafting", true)){
 			{
 				ItemStack is = new ItemStack(Material.LEATHER_BOOTS);
@@ -113,33 +113,33 @@ public class VSE extends JavaPlugin implements Listener {
 			}
 		}
 		try {
-	        Metrics metrics = new Metrics(this, bStatsId);    
-	        metrics.addCustomChart(new Metrics.AdvancedPie("vrplayers", new Callable<Map<String, Integer>>() {
-	            @Override
-	            public Map<String, Integer> call() throws Exception {
-	            	int out = 0;
-	            	for (Player p : Bukkit.getOnlinePlayers()) {
-	            		//counts standing or seated players using VR
+			Metrics metrics = new Metrics(this, bStatsId);    
+			metrics.addCustomChart(new Metrics.AdvancedPie("vrplayers", new Callable<Map<String, Integer>>() {
+				@Override
+				public Map<String, Integer> call() throws Exception {
+					int out = 0;
+					for (Player p : Bukkit.getOnlinePlayers()) {
+						//counts standing or seated players using VR
 						if(isVive(p)) out++;
 					} 	            	            	
-	                Map<String, Integer> valueMap = new HashMap<>();
-	                valueMap.put("VR", out);
-	                valueMap.put("NonVR", vivePlayers.size() - out);
-	                valueMap.put("Vanilla", Bukkit.getOnlinePlayers().size() - vivePlayers.size());
-	                return valueMap;
-	            }
-	        }));
-	    } catch (Exception e) {
+					Map<String, Integer> valueMap = new HashMap<>();
+					valueMap.put("VR", out);
+					valueMap.put("NonVR", vivePlayers.size() - out);
+					valueMap.put("Vanilla", Bukkit.getOnlinePlayers().size() - vivePlayers.size());
+					return valueMap;
+				}
+			}));
+		} catch (Exception e) {
 			getLogger().warning("Could not start bStats metrics");
-	    }
-		
+		}
+
 		// Config Part
 		config.options().copyDefaults(true);
 		saveDefaultConfig();
 		saveConfig();
 		saveResource("config-instructions.yml", true);
 		ConfigurationSection sec = config.getConfigurationSection("climbey");
-		
+
 		if(sec!=null){
 			List<String> temp = sec.getStringList("blocklist");
 			//make an attempt to validate these on the server for debugging.
@@ -154,7 +154,7 @@ public class VSE extends JavaPlugin implements Listener {
 			}
 		}				
 		// end Config part
-		
+
 		getCommand("vive").setExecutor(new ViveCommand(this));
 		getCommand("vse").setExecutor(new ViveCommand(this));
 		getCommand("vive").setTabCompleter(new ConstructTabCompleter());
@@ -162,20 +162,20 @@ public class VSE extends JavaPlugin implements Listener {
 
 		getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, new VivecraftNetworkListener(this));
 		getServer().getMessenger().registerOutgoingPluginChannel(this, CHANNEL);
-		
+
 		getServer().getPluginManager().registerEvents(this, this);
 		getServer().getPluginManager().registerEvents(new VivecraftCombatListener(this), this);
 		getServer().getPluginManager().registerEvents(new VivecraftItemListener(this), this);
 
-        Headshot.init(this);
-        
-        if(getConfig().getBoolean("setSpigotConfig.enabled")){
-        	SpigotConfig.movedWronglyThreshold = getConfig().getDouble("setSpigotConfig.movedWronglyThreshold");
+		Headshot.init(this);
+
+		if(getConfig().getBoolean("setSpigotConfig.enabled")){
+			SpigotConfig.movedWronglyThreshold = getConfig().getDouble("setSpigotConfig.movedWronglyThreshold");
 			SpigotConfig.movedTooQuicklyMultiplier = getConfig().getDouble("setSpigotConfig.movedTooQuickly");
-        }
-        
+		}
+
 		debug = (getConfig().getBoolean("general.debug", false));
-        
+
 		sendPosDataTask = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
 				sendPosData();
@@ -184,7 +184,7 @@ public class VSE extends JavaPlugin implements Listener {
 
 		//check for any creepers and modify the fuse radius
 		CheckAllEntities();
-		
+
 		vault = true;
 		if(getServer().getPluginManager().getPlugin("Vault") == null || getServer().getPluginManager().getPlugin("Vault").isEnabled() == false) {
 			getLogger().severe("Vault not found, permissions groups will not be set");
@@ -205,21 +205,21 @@ public class VSE extends JavaPlugin implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-    public void onEvent(CreatureSpawnEvent event) {
+	public void onEvent(CreatureSpawnEvent event) {
 		if(!event.isCancelled()){
 			EditEntity(event.getEntity());
 		}
 	}
-	
+
 	public void CheckAllEntities(){
 		List<World> wrl = this.getServer().getWorlds();
 		for(World world: wrl){
 			for(Entity e: world.getLivingEntities()){
-					EditEntity(e);
+				EditEntity(e);
 			}
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked" )
 	public void EditEntity(Entity entity){
 		if(entity.getType() == EntityType.CREEPER){	
@@ -263,20 +263,36 @@ public class VSE extends JavaPlugin implements Listener {
 				continue; // dunno y but just in case.
 
 			for (VivePlayer v : vivePlayers.values()) {
-			
-					if (v == sendTo || v == null || v.player == null || !v.player.isOnline() || v.player.getWorld() != sendTo.player.getWorld() || v.hmdData == null || v.controller0data == null || v.controller1data == null){
-						continue;
-					}
-					
-					double d = sendTo.player.getLocation().distanceSquared(v.player.getLocation());
-	
-					if (d < 256 * 256) {
-						sendTo.player.sendPluginMessage(this, CHANNEL, v.getUberPacket());
+
+				if (v == sendTo || v == null || v.player == null || !v.player.isOnline() || v.player.getWorld() != sendTo.player.getWorld() || v.hmdData == null || v.controller0data == null || v.controller1data == null){
+					continue;
+				}
+
+				double d = sendTo.player.getLocation().distanceSquared(v.player.getLocation());
+
+				if (d < 256 * 256) {
+					sendTo.player.sendPluginMessage(this, CHANNEL, v.getUberPacket());
 				}
 			}
 		}
 	}
-	
+
+	public void sendVRActiveUpdate(VivePlayer v) {
+		if(v==null) return;
+        var payload = v.getVRPacket();
+		for (VivePlayer sendTo : vivePlayers.values()) {
+
+			if (sendTo == null || sendTo.player == null || !sendTo.player.isOnline())
+				continue; // dunno y but just in case.
+
+			if (v == sendTo ||v.player == null || !v.player.isOnline()){
+				continue;
+			}
+
+			sendTo.player.sendPluginMessage(this, CHANNEL, payload);
+		}
+	}
+
 	@Override
 	public void onDisable() {
 		getServer().getScheduler().cancelTask(sendPosDataTask);
@@ -287,7 +303,7 @@ public class VSE extends JavaPlugin implements Listener {
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		vivePlayers.remove(event.getPlayer().getUniqueId());
 		MetadataHelper.cleanupMetadata(event.getPlayer());
-		
+
 		if(getConfig().getBoolean("welcomemsg.enabled"))
 			broadcastConfigString("welcomemsg.leaveMessage", event.getPlayer().getDisplayName());
 	}
@@ -297,11 +313,11 @@ public class VSE extends JavaPlugin implements Listener {
 		final Player p = event.getPlayer();
 
 		if (debug) getLogger().info(p.getName() + " Has joined the server");
-			
+
 		int t = getConfig().getInt("general.vive-only-kickwaittime", 200);
 		if(t < 100) t = 100;
 		if(t > 1000) t = 1000;
-		
+
 		if (debug) 
 			getLogger().info("Checking " + event.getPlayer().getName() + " for Vivecraft");
 
@@ -310,7 +326,7 @@ public class VSE extends JavaPlugin implements Listener {
 			public void run() {		
 				if (p.isOnline()) {	
 					boolean kick = false;
-					
+
 					if(vivePlayers.containsKey(p.getUniqueId())) {
 						VivePlayer vp = VSE.vivePlayers.get(p.getUniqueId());
 						if(debug)
@@ -344,7 +360,7 @@ public class VSE extends JavaPlugin implements Listener {
 		Connection netManager = (Connection) Reflector.getFieldValue(Reflector.connection, ((CraftPlayer)p).getHandle().connection); 
 		netManager.channel.pipeline().addBefore("packet_handler", "vr_aim_fix", new AimFixHandler(netManager));
 	}
-		
+
 	public void startUpdateCheck() {
 		PluginDescriptionFile pdf = getDescription();
 		String version = pdf.getVersion();
@@ -374,27 +390,27 @@ public class VSE extends JavaPlugin implements Listener {
 			}
 		}
 	}
-	
+
 	public static boolean isVive(Player p){
 		if(p == null) return false;
-			if(vivePlayers.containsKey(p.getUniqueId())){
-				return vivePlayers.get(p.getUniqueId()).isVR();
-			}
+		if(vivePlayers.containsKey(p.getUniqueId())){
+			return vivePlayers.get(p.getUniqueId()).isVR();
+		}
 		return false;
 	}
-	
+
 	public static boolean isCompanion(Player p){
 		if(p == null) return false;
-			if(vivePlayers.containsKey(p.getUniqueId())){
-				return !vivePlayers.get(p.getUniqueId()).isVR();
-			}
+		if(vivePlayers.containsKey(p.getUniqueId())){
+			return !vivePlayers.get(p.getUniqueId()).isVR();
+		}
 		return false;
 	}
 
 	public void setPermissionsGroup(Player p) {
 		if(!vault) return;	
 		if(!getConfig().getBoolean("permissions.enabled")) return;
-		
+
 		Map<String, Boolean> groups = new HashMap<String, Boolean>();
 
 		boolean isvive = isVive(p);
@@ -412,13 +428,13 @@ public class VSE extends JavaPlugin implements Listener {
 			if (g_freemove != null && !g_freemove.trim().isEmpty())
 				groups.put(g_freemove, !vivePlayers.get(p.getUniqueId()).isTeleportMode);
 		}
-		
+
 		updatePlayerPermissionGroup(p, groups);
 
 	}
 
 	public boolean vault;
-	
+
 	public void updatePlayerPermissionGroup(Player p, Map<String, Boolean> groups) {
 		try {	
 
@@ -436,7 +452,7 @@ public class VSE extends JavaPlugin implements Listener {
 
 			for (Map.Entry<String, Boolean> entry : groups.entrySet()) {
 				if (entry.getValue()) {
-					
+
 					if (!perm.playerInGroup(null, p, entry.getKey())) {
 						if (debug) 
 							getLogger().info("Adding " + p.getName() + " to " + entry.getKey());
@@ -460,16 +476,16 @@ public class VSE extends JavaPlugin implements Listener {
 			getLogger().severe("Could not set player permission group: " + e.getMessage());
 		}
 	}
-	
+
 	boolean tryParseInt(String value) {  
-	     try {  
-	         Integer.parseInt(value);  
-	         return true;  
-	      } catch (NumberFormatException e) {  
-	         return false;  
-	      }  
+		try {  
+			Integer.parseInt(value);  
+			return true;  
+		} catch (NumberFormatException e) {  
+			return false;  
+		}  
 	}
-	
+
 	public void broadcastConfigString(String node, String playername){
 		String message = this.getConfig().getString(node);
 		if(message == null || message.isEmpty()) return;
@@ -481,12 +497,12 @@ public class VSE extends JavaPlugin implements Listener {
 		}
 	}
 
-	
+
 	public void sendWelcomeMessage(Player p){
 		if(!getConfig().getBoolean("welcomemsg.enabled"))return;
 
 		VivePlayer vp = VSE.vivePlayers.get(p.getUniqueId());
-		
+
 		if(vp==null){
 			broadcastConfigString("welcomemsg.welcomeVanilla", p.getDisplayName());
 		} else {
@@ -498,7 +514,7 @@ public class VSE extends JavaPlugin implements Listener {
 				broadcastConfigString("welcomemsg.welcomeVR", p.getDisplayName());
 		}
 	}
-	
+
 	public static boolean isSeated(Player player){
 		if(vivePlayers.containsKey(player.getUniqueId())){
 			return vivePlayers.get(player.getUniqueId()).isSeated();

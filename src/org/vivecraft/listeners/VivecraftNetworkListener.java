@@ -117,7 +117,9 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 
 				if(vse.getConfig().getBoolean("general.vive-only") == false)
 					sender.sendPluginMessage(vse, VSE.CHANNEL, new byte[]{(byte) PacketDiscriminators.VR_SWITCHING.ordinal(), 1});
-			
+				else
+					sender.sendPluginMessage(vse, VSE.CHANNEL, new byte[]{(byte) PacketDiscriminators.VR_SWITCHING.ordinal(), 0});
+
 				if(vse.getConfig().getBoolean("climbey.enabled") == true){
 
 					final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -250,6 +252,9 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 				vr = vrd.readBoolean();
 				if(vp.isVR()==vr) break;
 				vp.setVR(vr);
+                if (!vr) {
+                	vse.sendVRActiveUpdate(vp);
+                }
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
