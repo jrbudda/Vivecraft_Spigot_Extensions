@@ -1,7 +1,7 @@
 package org.vivecraft.utils;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_20_R2.entity.CraftEntity;
 import org.bukkit.entity.Player;
 import org.vivecraft.Reflector;
 import org.vivecraft.VSE;
