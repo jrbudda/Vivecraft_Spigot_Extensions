@@ -20,43 +20,90 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends NearestAttackableTargetGoal<Player> {
-	private final EnderMan enderman;
-	private Player pendingTarget;
-	private int aggroTime;
-	private int teleportTime;
-	private final TargetingConditions startAggroTargetConditions;
-	private final TargetingConditions continueAggroTargetConditions = TargetingConditions.forCombat().ignoreLineOfSight();
+	   private final EnderMan enderman;
+	   private Player pendingTarget;
+	   private int aggroTime;
+	   private int teleportTime;
+	   private final TargetingConditions startAggroTargetConditions;
+	   private final TargetingConditions continueAggroTargetConditions = TargetingConditions.forCombat().ignoreLineOfSight();
+	   private final Predicate<LivingEntity> isAngerInducing;
 
-	public CustomPathFinderGoalPlayerWhoLookedAtTarget(EnderMan entityenderman, Predicate<LivingEntity> p) {
-		super(entityenderman, Player.class, 10, false, false, p);
-		this.enderman = entityenderman;
-		this.startAggroTargetConditions = TargetingConditions.forCombat().range(this.getFollowDistance()).selector((player) ->
-		{
-			return isLookingAtMe((Player)player);
-		});
-	}
+	   public CustomPathFinderGoalPlayerWhoLookedAtTarget(EnderMan entityenderman, Predicate<LivingEntity> p) {
+	      super(entityenderman, Player.class, 10, false, false, p);
+	      this.enderman = entityenderman;
+	      this.isAngerInducing = (entityliving) -> {
+	         return (isLookingAtMe((Player)entityliving) || entityenderman.isAngryAt((LivingEntity) entityliving)) && !entityenderman.hasIndirectPassenger((Entity) entityliving);
+	      };
+	      this.startAggroTargetConditions = TargetingConditions.forCombat().range(this.getFollowDistance()).selector(this.isAngerInducing);
+	   }
 
-	@Override
-	public boolean canUse()
-	{
-		this.pendingTarget = this.enderman.level().getNearestPlayer(this.startAggroTargetConditions, this.enderman);
-		return this.pendingTarget != null;
-	}
+	   public boolean canUse() {
+	      this.pendingTarget = this.enderman.level().getNearestPlayer(this.startAggroTargetConditions, this.enderman);
+	      return this.pendingTarget != null;
+	   }
 
-	@Override
-	public void start()
-	{
-		this.aggroTime = 5;
-		this.teleportTime = 0;
-		this.enderman.setBeingStaredAt();
-	}
+	   public void start() {
+	      this.aggroTime = this.adjustedTickDelay(5);
+	      this.teleportTime = 0;
+	      this.enderman.setBeingStaredAt();
+	   }
 
-	@Override
-	public void stop()
-	{
-		this.pendingTarget = null;
-		super.stop();
-	}
+	   public void stop() {
+	      this.pendingTarget = null;
+	      super.stop();
+	   }
+
+	   public boolean canContinueToUse() {
+	      if (this.pendingTarget != null) {
+	         if (!this.isAngerInducing.test(this.pendingTarget)) {
+	            return false;
+	         } else {
+	            this.enderman.lookAt(this.pendingTarget, 10.0F, 10.0F);
+	            return true;
+	         }
+	      } else {
+	         if (this.target != null) {
+	            if (this.enderman.hasIndirectPassenger(this.target)) {
+	               return false;
+	            }
+
+	            if (this.continueAggroTargetConditions.test(this.enderman, this.target)) {
+	               return true;
+	            }
+	         }
+
+	         return super.canContinueToUse();
+	      }
+	   }
+
+	   public void tick() {
+	      if (this.enderman.getTarget() == null) {
+	         super.setTarget((LivingEntity)null);
+	      }
+
+	      if (this.pendingTarget != null) {
+	         if (--this.aggroTime <= 0) {
+	            this.target = this.pendingTarget;
+	            this.pendingTarget = null;
+	            super.start();
+	         }
+	      } else {
+	         if (this.target != null && !this.enderman.isPassenger()) {
+	            if (isLookingAtMe((Player)this.target)) {
+	               if (this.target.distanceToSqr(this.enderman) < 16.0) {
+	                  this.enderman.teleport();
+	               }
+
+	               this.teleportTime = 0;
+	            } else if (this.target.distanceToSqr(this.enderman) > 256.0 && this.teleportTime++ >= this.adjustedTickDelay(30) && this.enderman.teleportTowards(this.target)) {
+	               this.teleportTime = 0;
+	            }
+	         }
+
+	         super.tick();
+	      }
+
+	   }
 
 	//Vivecraft copy and modify from EnderMan
 	private boolean isLookingAtMe(Player pPlayer)
@@ -111,67 +158,6 @@ public class CustomPathFinderGoalPlayerWhoLookedAtTarget extends NearestAttackab
     	}
     }
 	
-	
-	@Override
-	public boolean canContinueToUse()
-	{
-		if (this.pendingTarget != null)
-		{
-			if (!isLookingAtMe(this.pendingTarget))
-			{
-				return false;
-			}
-			else
-			{
-				this.enderman.lookAt(this.pendingTarget, 10.0F, 10.0F);
-				return true;
-			}
-		}
-		else
-		{
-			return this.target != null && this.continueAggroTargetConditions.test((EnderMan)this.enderman, this.target) ? true : super.canContinueToUse();
-		}
-	}
-
-	@Override
-	public void tick()
-	{
-		if (this.enderman.getTarget() == null)
-		{
-			super.setTarget((LivingEntity)null);
-		}
-
-		if (this.pendingTarget != null)
-		{
-			if (--this.aggroTime <= 0)
-			{
-				this.target = (LivingEntity) this.pendingTarget;
-				this.pendingTarget = null;
-				super.start();
-			}
-		}
-		else
-		{
-			if (this.target != null && !this.enderman.isPassenger())
-			{
-				if (isLookingAtMe((Player)this.target))
-				{
-					if (this.target.distanceToSqr(this.enderman) < 16.0D)
-					{
-						Reflector.invoke(Reflector.Entity_teleport, enderman);
-					}
-
-					this.teleportTime = 0;
-				}
-				else if (this.target.distanceToSqr(this.enderman) > 256.0D && this.teleportTime++ >= 30 && (boolean)Reflector.invoke(Reflector.Entity_teleportTowards, enderman, pendingTarget));
-				{
-					this.teleportTime = 0;
-				}
-			}
-
-			super.tick();
-		}
-	}
 }
 
 
