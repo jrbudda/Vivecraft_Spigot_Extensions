@@ -12,10 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftCreeper;
@@ -35,6 +32,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -90,8 +88,9 @@ public class VSE extends JavaPlugin implements Listener {
 				ItemMeta meta = is.getItemMeta();
 				meta.setUnbreakable(true);
 				meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+				((LeatherArmorMeta) meta).setColor(Color.fromRGB(9233775));
 				is.setItemMeta(meta);
-				is = setLocalizedItemName(is, "vivecraft.item.jumpboots");
+				is = setLocalizedItemNameWithFallback(is, "vivecraft.item.jumpboots", "Jump Boots");
 				ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(this, "jump_boots"),is);
 				recipe.shape("B", "S");
 				recipe.setIngredient('B', Material.LEATHER_BOOTS);
@@ -104,7 +103,7 @@ public class VSE extends JavaPlugin implements Listener {
 				meta.setUnbreakable(true);
 				meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 				is.setItemMeta(meta);
-				is = setLocalizedItemName(is, "vivecraft.item.climbclaws");
+				is = setLocalizedItemNameWithFallback(is, "vivecraft.item.climbclaws", "Climb Claws");
 				ShapedRecipe recipe = new ShapedRecipe( new NamespacedKey(this, "climb_claws"), is);
 				recipe.shape("E E", "S S");
 				recipe.setIngredient('E', Material.SPIDER_EYE);
@@ -198,9 +197,9 @@ public class VSE extends JavaPlugin implements Listener {
 		}, 1);
 	}
 
-	public static ItemStack setLocalizedItemName(ItemStack stack, String key) {
+	public static ItemStack setLocalizedItemNameWithFallback(ItemStack stack, String key, String fallback) {
 		var nmsStack = CraftItemStack.asNMSCopy(stack);
-		nmsStack.setHoverName(Component.translatable(key));
+		nmsStack.setHoverName(Component.translatableWithFallback(key, fallback));
 		return CraftItemStack.asBukkitCopy(nmsStack);
 	}
 
