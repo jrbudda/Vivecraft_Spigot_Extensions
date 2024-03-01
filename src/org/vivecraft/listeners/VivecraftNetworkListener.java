@@ -174,6 +174,17 @@ public class VivecraftNetworkListener implements PluginMessageListener {
 					sender.sendPluginMessage(vse, VSE.CHANNEL, p);
 				}
 
+				if (vse.getConfig().getBoolean("settingOverrides.thirdPersonItems")) {
+					final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+					baos.write(PacketDiscriminators.SETTING_OVERRIDE.ordinal());
+
+					writeSetting(baos, "thirdPersonItems", true);
+
+					final byte[] p = baos.toByteArray();
+					sender.sendPluginMessage(vse, VSE.CHANNEL, p);
+				}
+
 				if (vse.getConfig().getBoolean("teleport.enabled"))
 					sender.sendPluginMessage(vse, VSE.CHANNEL, new byte[]{(byte) PacketDiscriminators.TELEPORT.ordinal()});
 

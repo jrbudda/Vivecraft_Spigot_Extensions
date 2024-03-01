@@ -95,3 +95,6 @@ worldscale:
   max: 2
   #Lower limit of range
   min: 0.5
+settingOverrides:
+  #Forces players to use the raw item position setting
+  thirdPersonItems: false
