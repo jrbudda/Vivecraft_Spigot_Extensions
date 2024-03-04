@@ -423,10 +423,13 @@ public class VSE extends JavaPlugin implements Listener {
 		if (g_classic != null && !g_classic.trim().isEmpty())
 			groups.put(g_classic, iscompanion);
 
-		if (isvive) {
-			String g_freemove = getConfig().getString("permissions.freemovegroup");
-			if (g_freemove != null && !g_freemove.trim().isEmpty())
+		String g_freemove = getConfig().getString("permissions.freemovegroup");
+		if (g_freemove != null && !g_freemove.trim().isEmpty()) {
+			if (isvive) {
 				groups.put(g_freemove, !vivePlayers.get(p.getUniqueId()).isTeleportMode);
+			} else {
+				groups.put(g_freemove, false);
+			}
 		}
 
 		updatePlayerPermissionGroup(p, groups);
