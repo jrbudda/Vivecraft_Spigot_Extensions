@@ -97,3 +97,5 @@ worldscale:
 settingOverrides:
   #Forces players to use the raw item position setting
   thirdPersonItems: false
+  #Forces players to use the raw item position setting, only for items with custom model data
+  thirdPersonItemsCustom: false
